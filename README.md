@@ -32,7 +32,7 @@ First, clone the .dotfiles repository into your $HOME directory using git
 
 ```
 $ git clone https://github.com/ize-302/.dotfiles
-$ cd dotfiles
+$ cd .dotfiles
 ```
 
 ### How to install / uninstall
@@ -41,16 +41,29 @@ $ cd dotfiles
 
 Then use GNU stow to create symlinks
 
-`$ stow --adopt -v -t $HOME .` to install
+```
+$ stow --adopt -v -t $HOME . # to install
+```
 
-`$ stow -v -t $HOME -D .` to uninstall
+```
+$ stow -v -t $HOME -D . # to uninstall
+```
 
 #### Method 2 (Using .sh script)
 
 i. Make the install.sh and uninstall.sh to be executables by running:
-`$ chmod +x install.sh uninstall.sh`
+
+```
+$ chmod +x install.sh uninstall.sh
+```
 
 ii. run:
-`$ ./install.sh` to install
-`$ ./uninstall.sh` to uninstall
+
+```
+$ ./install.sh # to install
+```
+
+```
+$ ./uninstall.sh # to uninstall
+```
 
