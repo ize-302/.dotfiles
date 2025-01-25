@@ -7,6 +7,9 @@ return {
   },
   config = function()
     require('nvim-tree').setup {
+      git = {
+        ignore = false,
+      },
       filters = { dotfiles = false },
       disable_netrw = true,
       hijack_cursor = false,
