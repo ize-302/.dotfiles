@@ -24,7 +24,9 @@ OR
 
 Debian / Ubuntu `$ apt install stow`
 
-## Installation
+## Setup
+
+### Clone and check into the repo 
 
 First, clone the .dotfiles repository into your $HOME directory using git
 
@@ -33,13 +35,22 @@ $ git clone https://github.com/ize-302/.dotfiles
 $ cd dotfiles
 ```
 
+### How to install / uninstall
+
+#### Method 1 (Manual setup)
+
 Then use GNU stow to create symlinks
 
-```
-$ stow --adopt -v -t $HOME .
-```
+`$ stow --adopt -v -t $HOME .` to install
 
-## Uninstallation
+`$ stow -v -t $HOME -D .` to uninstall
 
-`$ stow -v -t $HOME -D .`
+#### Method 2 (Using .sh script)
+
+i. Make the install.sh and uninstall.sh to be executables by running:
+`$ chmod +x install.sh uninstall.sh`
+
+ii. run:
+`$ ./install.sh` to install
+`$ ./uninstall.sh` to uninstall
 
