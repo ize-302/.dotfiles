@@ -1,0 +1,12 @@
+[user]
+	email = adavize302@gmail.com
+	name = Adavize Hassan
+[alias]
+	a = add
+	co = checkout
+	ps = push
+	pl = pull
+	br = branch
+	cm = commit
+	cm-a = commit --ammend
+	st = status
