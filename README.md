@@ -47,7 +47,7 @@ apt install stow
 First, clone the .dotfiles repository into your $HOME directory using git
 
 ```sh
-git clone https://github.com/ize-302/.dotfiles
+git clone git@github.com:ize-302/.dotfiles.git
 cd .dotfiles
 ```
 
