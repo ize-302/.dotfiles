@@ -10,19 +10,35 @@ Ensure you have the following installed on your computer
 
 ### Git
 
-Using homebrew `$ brew install git`
+Using homebrew
+
+```
+brew install git
+```
 
 OR
 
-Debian / Ubuntu `$ apt install git`
+Debian / Ubuntu
+
+```
+apt install git
+```
 
 ### GNU Stow
 
-Using homebrew `$ brew install stow`
+Using homebrew 
+
+```sh
+brew install stow
+```
 
 OR
 
-Debian / Ubuntu `$ apt install stow`
+Debian / Ubuntu 
+
+```sh
+apt install stow
+```
 
 ## Setup
 
@@ -30,9 +46,9 @@ Debian / Ubuntu `$ apt install stow`
 
 First, clone the .dotfiles repository into your $HOME directory using git
 
-```
-$ git clone https://github.com/ize-302/.dotfiles
-$ cd .dotfiles
+```sh
+git clone https://github.com/ize-302/.dotfiles
+cd .dotfiles
 ```
 
 ### How to install / uninstall
@@ -41,29 +57,29 @@ $ cd .dotfiles
 
 Then use GNU stow to create symlinks
 
-```
-$ stow --adopt -v -t $HOME . # to install
+```sh
+stow --adopt -v -t $HOME . # to install
 ```
 
-```
-$ stow -v -t $HOME -D . # to uninstall
+```sh
+stow -v -t $HOME -D . # to uninstall
 ```
 
 #### Method 2 (Using .sh script)
 
-i. Make the install.sh and uninstall.sh to be executables by running:
+Step i. Make the install.sh and uninstall.sh to be executables by running:
 
-```
-$ chmod +x install.sh uninstall.sh
-```
-
-ii. run:
-
-```
-$ ./install.sh # to install
+```sh
+chmod +x install.sh uninstall.sh
 ```
 
+Step ii. Run:
+
+```sh
+./install.sh # to install
 ```
-$ ./uninstall.sh # to uninstall
+
+```sh
+./uninstall.sh # to uninstall
 ```
 
