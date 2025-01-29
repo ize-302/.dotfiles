@@ -35,6 +35,7 @@ require('lazy').setup({
   require '302.plugins.nvim-treesitter',
   require '302.plugins.markview',
   require '302.plugins.alpha-nvim',
+  require '302.plugins.blame_line',
 
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
