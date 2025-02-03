@@ -116,6 +116,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
+
 PATH=~/.console-ninja/.bin:$PATH
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -127,3 +128,4 @@ eval "$(thefuck --alias)"
 
 # set neovim to open using alias 'vim'
 alias nv="nvim"
+. "$HOME/.cargo/env"
