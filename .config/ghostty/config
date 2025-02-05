@@ -1,0 +1,16 @@
+# Appearance
+# font-family = "JetBrainsMono Nerd Font"
+font-family = "JetBrainsMono NF Medium"
+theme = "tokyonight_night"
+window-padding-x = 6
+background-blur = true 
+background-opacity = 0.9
+font-size = 10
+# foreground = 84cc16
+
+# keybinds
+keybind = ctrl+h=new_split:left
+keybind = ctrl+l=new_split:right
+keybind = ctrl+j=new_split:down
+keybind = ctrl+k=new_split:up
+keybind = ctrl+r=reload_config
