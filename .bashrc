@@ -129,3 +129,6 @@ eval "$(thefuck --alias)"
 # set neovim to open using alias 'vim'
 alias nv="nvim"
 . "$HOME/.cargo/env"
+
+# Run fastfetch on start terminal
+fastfetch
