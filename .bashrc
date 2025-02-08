@@ -132,3 +132,9 @@ alias nv="nvim"
 
 # Run fastfetch on start terminal
 fastfetch
+
+# Opens vault-33 directory by default
+echo "cd ~/vault-33" >> ~/.bashrc
+cd ~/vault-33
+
+cd ~/vault-33
