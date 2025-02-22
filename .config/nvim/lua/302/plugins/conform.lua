@@ -45,6 +45,7 @@ return {
         scss = { 'prettier', 'stylelint' }, -- Use Prettier for SCSS files
         json = { 'prettier' }, -- You can add other filetypes as well
         go = { 'goimports', 'gofmt' },
+        c = { 'clang-format' },
       },
     },
   },
