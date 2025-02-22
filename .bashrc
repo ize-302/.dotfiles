@@ -133,3 +133,9 @@ alias nv="nvim"
 # Run fastfetch on start terminal
 fastfetch
 
+# Wezterm shortcuts
+alias wezterm-split-2="wezterm cli split-pane --right --percent 30"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
