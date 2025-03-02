@@ -42,6 +42,7 @@ symbol = " "
 
 [directory]
 read_only = " 󰌾"
+style = "bold blue"
 
 [time]
 disabled = false
