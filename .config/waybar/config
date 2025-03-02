@@ -1,0 +1,112 @@
+{
+  "layer": "bottom",
+  "position": "top",
+  "height": 30,
+  "spacing": 1,
+  "modules-left": ["sway/mode", "sway/workspaces", "sway/window"],
+  "modules-center": [],
+  "modules-right": ["tray","cpu","memory","network","backlight","battery","pulseaudio","jack","clock","custom/power"],
+  "reload_style_on_change": true,
+
+  // Modules configuration
+  "sway/mode": {
+      "format": "R"
+  },
+  "clock": {
+      "format": "{:%a %d %b  %I:%M %p}",
+      "interval":1,
+      "tooltip": false
+  },
+  "battery": {
+      "interval": 1,
+      "states": {
+          "good": 95,
+          "warning": 30,
+          "critical": 15
+      },
+      "format": "{icon}{capacity}%",
+      "format-charging": "󰂄{capacity}%",
+      "format-plugged": "󰂄{capacity}%",
+      "format-alt": "{time} {icon}",
+      "format-icons": [
+          "󰁻",
+          "󰁼",
+          "󰁾",
+          "󰂀",
+          "󰂂",
+          "󰁹"
+      ],
+  },
+  "tray": {
+      "icon-size": 14,
+      "spacing": 10
+  },
+  "network": {
+      "format-wifi": " {essid}",
+      "format-ethernet":" ",
+      "format-disconnected": "",
+      "tooltip-format": "{ipaddr}",
+      "tooltip-format-wifi": "{essid} ({signalStrength}%)  | {ipaddr}",
+      "tooltip-format-ethernet": "{ifname} 🖧 | {ipaddr}",
+      "on-click": "bash ~/.config/wofi/scripts/wifimenu.sh"
+  },
+  "cpu": {
+      "interval": 1,
+      "format": " {usage}%",
+      "min-length": 6,
+      "max-length": 6,
+      "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"],
+  },
+  "memory": {
+      "format": " {percentage}%"
+  },
+  "pulseaudio": {
+      "format": "{icon} {volume}%",
+      "format-bluetooth":"",
+      "format-muted": "",
+      "format-icons": {
+         "headphones": "",
+         "bluetooth": "󰥰",
+         "handsfree": " ",
+         "headset": "󱡬",
+         "phone": "",
+         "portable": "",
+         "car": "",
+         "default": ["","",""]
+      },
+      "justify": "center",
+      "on-click": "amixer sset Master toggle",
+      "on-click-right": "pavucontrol",
+      "tooltip-format": "{icon} {volume}%"
+  },
+  "jack": {
+      "format": "{} 󱎔",
+      "format-xrun": "{xruns} xruns",
+      "format-disconnected": "DSP off",
+      "realtime": true
+  },
+  "backlight": {
+      "device": "intel_backlight",
+      "format": "<span font='12'>{icon}</span>",
+      "format-icons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+      ],
+      //"on-scroll-up": "light -A 10",
+      //"on-scroll-down": "light -U 10",
+      //"smooth-scrolling-threshold": 1
+  },
+  "custom/power": {
+      "format": "  ",
+      "on-click": "bash ~/.config/wofi/scripts/powermenu/powermenu.sh",
+      "tooltip": false
+  },
+}
