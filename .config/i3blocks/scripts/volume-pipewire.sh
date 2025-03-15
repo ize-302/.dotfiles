@@ -86,14 +86,6 @@ fi
 CAPABILITY=$(amixer -D $MIXER get $SCONTROL | sed -n "s/  Capabilities:.*cvolume.*/Capture/p")
 
 
-function move_sinks_to_new_default {
-    DEFAULT_SINK=$1
-    pactl list sink-inputs | grep 'Sink Input #' | grep -o '[0-9]\+' | while read SINK
-    do
-        pactl move-sink-input $SINK $DEFAULT_SINK
-    done
-}
-
 function set_default_playback_device_next {
     inc=${1:-1}
     num_devices=$(pactl list sinks | grep -c Name:)
@@ -103,7 +95,6 @@ function set_default_playback_device_next {
     default_sink_index=$(( ($default_sink_index + $num_devices + $inc) % $num_devices ))
     default_sink=${sink_arr[$default_sink_index]}
     pactl set-default-sink $default_sink
-    move_sinks_to_new_default $default_sink
 }
 
 case "$BLOCK_BUTTON" in
