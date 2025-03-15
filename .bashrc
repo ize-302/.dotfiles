@@ -128,7 +128,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # set neovim to open using alias 'vim'
 alias nv="nvim"
-. "$HOME/.cargo/env"
+# . "$HOME/.cargo/env"
 
 # Run fastfetch on start terminal
 fastfetch
