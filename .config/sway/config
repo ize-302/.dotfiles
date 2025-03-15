@@ -19,10 +19,11 @@ set $term wezterm
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
 # set $menu dmenu_path | dmenu | xargs swaymsg exec --
-set $menu wofi --show
+set $menu tofi-drun --drun-launch=true
 
 # font
-font pango:JetBrainsMono 10.5
+font pango:JetBrainsMono 13
+# set $font_dpi 144
 
 # Window borders
 default_border pixel 1
@@ -47,24 +48,27 @@ include /etc/sway/config.d/*
 exec "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
 
 # Use pactl to adjust volume in PulseAudio.
-bindsym --locked XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume $(pacmd list-sinks |awk '/* index:/{print $3}') +5%
-bindsym --locked XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume $(pacmd list-sinks |awk '/* index:/{print $3}') -5%
-bindsym --locked XF86AudioMute exec --no-startup-id pactl set-sink-mute $(pacmd list-sinks |awk '/* index:/{print $3}') toggle
+# First find out which sink corresponds to the audio output you would like to control. To list available sinks
+# run: pactl list sinks short
+bindsym --locked XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 61 $(pacmd list-sinks |awk '/* index:/{print $3}') +5%
+bindsym --locked XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 61 $(pacmd list-sinks |awk '/* index:/{print $3}') -5%
+bindsym --locked XF86AudioMute exec --no-startup-id pactl set-sink-mute 61 $(pacmd list-sinks |awk '/* index:/{print $3}') toggle
+bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 bindsym --locked XF86AudioPlay exec playerctl play-pause
 bindsym --locked XF86AudioNext exec playerctl next
 bindsym --locked XF86AudioPrev exec playerctl previous
 
 # use brightnessctl to adjust brightness in
-bindsym XF86MonBrightnessDown exec brightnessctl --min-val=2 -q set 3%-
-bindsym XF86MonBrightnessUp exec brightnessctl -q set 3%+
+bindsym XF86MonBrightnessDown exec brightnessctl --min-val=2 -q set 5%-
+bindsym XF86MonBrightnessUp exec brightnessctl -q set 5%+
 # Use Mouse+$mod to drag floating windows to their wanted position
 
 
 ### Output configuration
 # set wallpapaer
-output * bg ~/Pictures/wallpaper1.png fill
+output * bg ~/Pictures/wallpaper.jpg fill
 # scale applies to both/all screens
-output eDP-1 scale 1.7
+output eDP-1 scale 1.4 mode 2560x1440
 # monitor on the left, laptop on the right. Thanks to position
 # Dont understand how it works but it does work
 output DP-2 position 0,0
@@ -121,6 +125,10 @@ input "type:pointer" {
 #
 # Basics:
 #
+    # show power menu
+    set $powermenu exec bash ~/.config/tofi/scripts/powermenu/powermenu.sh
+    bindsym $mod+Escape exec $powermenu
+
     # Start a terminal
     bindsym $mod+Return exec $term
 
@@ -143,6 +151,7 @@ input "type:pointer" {
     # Exit sway (logs you out of your Wayland session)
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 #
+
 
 #
     # Move your focus around
@@ -284,5 +293,6 @@ set $base04 #b16286
 ## Window Colours
 ## class border background text indicator child_border
 client.focused   $base04  $base00  $base01  $base02  $base03
+
 
 include /etc/sway/config.d/*

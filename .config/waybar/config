@@ -1,11 +1,11 @@
 {
   "layer": "bottom",
   "position": "top",
-  "height": 30,
+  "height": 34,
   "spacing": 1,
   "modules-left": ["sway/mode", "sway/workspaces", "sway/window"],
   "modules-center": [],
-  "modules-right": ["tray","cpu","memory","network","backlight","battery","pulseaudio","jack","clock","custom/power"],
+  "modules-right": ["tray","custom/yazi","cpu","memory","network","backlight","pulseaudio","jack","battery","clock","custom/power"],
   "reload_style_on_change": true,
 
   // Modules configuration
@@ -24,7 +24,7 @@
           "warning": 30,
           "critical": 15
       },
-      "format": "{icon}{capacity}%",
+      "format": " {icon}{capacity}%",
       "format-charging": "󰂄{capacity}%",
       "format-plugged": "󰂄{capacity}%",
       "format-alt": "{time} {icon}",
@@ -38,7 +38,7 @@
       ],
   },
   "tray": {
-      "icon-size": 14,
+      "icon-size": 13,
       "spacing": 10
   },
   "network": {
@@ -48,7 +48,8 @@
       "tooltip-format": "{ipaddr}",
       "tooltip-format-wifi": "{essid} ({signalStrength}%)  | {ipaddr}",
       "tooltip-format-ethernet": "{ifname} 🖧 | {ipaddr}",
-      "on-click": "bash ~/.config/wofi/scripts/wifimenu.sh"
+      // "on-click": "bash ~/.config/wofi/scripts/wifimenu.sh",
+      "on-click": "wezterm -e nmtui"
   },
   "cpu": {
       "interval": 1,
@@ -56,6 +57,10 @@
       "min-length": 6,
       "max-length": 6,
       "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"],
+  },
+  "custom/yazi": {
+        "format": " files",
+        "on-click": "wezterm -e yazi"
   },
   "memory": {
       "format": " {percentage}%"
@@ -80,33 +85,22 @@
       "tooltip-format": "{icon} {volume}%"
   },
   "jack": {
-      "format": "{} 󱎔",
+      "format": " {}󱎔",
       "format-xrun": "{xruns} xruns",
       "format-disconnected": "DSP off",
-      "realtime": true
+      "realtime": true,
   },
   "backlight": {
       "device": "intel_backlight",
-      "format": "<span font='12'>{icon}</span>",
-      "format-icons": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-      ],
-      //"on-scroll-up": "light -A 10",
-      //"on-scroll-down": "light -U 10",
-      //"smooth-scrolling-threshold": 1
+      "format": " {percent}%",
+      "tooltip": false,
+      // "on-scroll-up": "light -A 10",
+      // "on-scroll-down": "light -U 10",
+      "smooth-scrolling-threshold": 1,
   },
   "custom/power": {
-      "format": "  ",
-      "on-click": "bash ~/.config/wofi/scripts/powermenu/powermenu.sh",
+      "format": "",
+      "on-click": "bash ~/.config/tofi/scripts/powermenu/powermenu.sh",
       "tooltip": false
   },
 }

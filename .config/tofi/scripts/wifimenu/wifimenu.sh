@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# Scripts looks at the config and style files at $HOME/.config/wofi
-CONFIG="${WOFI_CONFIG:-$HOME/.config/wofi/config}"
-STYLE="${WOFI_STYLE:-$HOME/.config/wofi/style.css}"
-LOCK_FILE="/tmp/wofi_wifi.lock"
+# Scripts looks at the config and style files at $HOME/.config/tofi
+CONFIG="${TOFI_CONFIG:-$HOME/.config/tofi/config}"
 
 # Function to map signal strength to bars
 wifi_signal_bar() {
@@ -73,7 +71,7 @@ WIFI_LIST=$(cat "$SAVED_CONNECTED_LIST" "$SAVED_LIST" "$NEW_LIST")
 rm -f "$SAVED_CONNECTED_LIST" "$SAVED_LIST" "$NEW_LIST"
 
 # Display menu
-CHENTRY=$(echo -e "$WIFI_LIST" | uniq -u | wofi -d --conf "${CONFIG}" --style "${STYLE}" --prompt "Select Wi-Fi Network")
+CHENTRY=$(echo -e "$WIFI_LIST" | uniq -u | tofi "${CONFIG}")
 
 # Extract SSID
 CHSSID=$(echo "$CHENTRY" | awk '{print $3}')
@@ -82,7 +80,7 @@ CHSSID=$(echo "$CHENTRY" | awk '{print $3}')
 if [[ -z "$CHENTRY" ]]; then
     exit
 elif [[ "$CHSSID" == "(hidden)" ]]; then
-    CHSSID=$(wofi -d --conf "${CONFIG}" --style "${STYLE}" -p "Enter Hidden SSID")
+    CHSSID=$(tofi --conf "${CONFIG}" --style "${STYLE}" -p "Enter Hidden SSID")
     [[ -z "$CHSSID" ]] && notify-send 'Wi-Fi' 'No SSID entered, cancelling.' && exit
 fi
 
@@ -91,7 +89,7 @@ if echo "$SAVED_NETWORKS" | grep -Fxq "$CHSSID"; then
     notify-send "Wi-Fi" "Connecting to $CHSSID..."
     nmcli con up "$CHSSID"
 else
-    WIFIPASS=$(wofi -d --conf "${CONFIG}" --style "${STYLE}" -p "Enter Wi-Fi Password" --no-clear )
+    WIFIPASS=$(tofi --conf "${CONFIG}" --style "${STYLE}" -p "Enter Wi-Fi Password" --no-clear )
     [[ -z "$WIFIPASS" ]] && notify-send 'Wi-Fi' 'No password entered, cancelling.' && exit
     echo "$WIFIPASS" | nmcli device wifi connect "$CHSSID" password-file -
 fi

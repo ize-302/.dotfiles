@@ -1,0 +1,22 @@
+[volume-pipewire]
+command=$SCRIPT_DIR/volume-pipewire.sh
+interval=1
+signal=1
+#USE_ALSA_NAME=1
+#label=vol
+
+[battery]
+command=./scripts/battery.sh
+interval=1
+color=#71717a
+
+[date]
+command=date +" %a, %d %b "
+interval=1
+color=#71717a
+
+[time]
+command=date +" %H:%M"
+interval=1
+color=#71717a
+
