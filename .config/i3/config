@@ -29,6 +29,8 @@ hide_edge_borders smart
 smart_gaps on
 gaps inner 0
 
+
+
 # set wallpapaer
 exec --no-startup-id feh --bg-scale ~/Pictures/wallpaper.jpg
 
@@ -55,7 +57,7 @@ exec --no-startup-id nm-applet
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5% && $refresh_i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 100% && $refresh_i3status
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5% && $refresh_i3status
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
 bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
@@ -231,6 +233,16 @@ bindsym $mod+r mode "resize"
 bar {
         status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
         position top
+        
+        colors {
+            separator #444444
+            background #222222
+            statusline #B1B1B1
+            focused_workspace #c3e88d #c3e88d #000000
+            active_workspace #333333 #333333 #888888
+            inactive_workspace #c3e88d #333333 #c3e88d
+            urgent_workspace #eb709b #eb709b #ffffff
+        }
 }
 
 ## Colours

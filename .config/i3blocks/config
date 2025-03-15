@@ -1,22 +1,32 @@
+[cpu_usage]
+command=./scripts/cpu_usage.sh
+interval=10
+label= 
+# min_width=CPU: 100.00%
+T_WARN=50
+T_CRIT=80
+#DECIMALS=2
+COLOR_NORMAL=#EBDBB2
+COLOR_WARN=#FFFC00
+COLOR_CRIT=#FF0000
+
+[memory]
+command=./scripts/memory.sh
+label=  
+interval=30
+
 [volume-pipewire]
-command=$SCRIPT_DIR/volume-pipewire.sh
+command=./scripts/volume-pipewire.sh
 interval=1
-signal=1
-#USE_ALSA_NAME=1
+#signal=1
+USE_ALSA_NAME=1
 #label=vol
 
 [battery]
 command=./scripts/battery.sh
 interval=1
-color=#71717a
-
-[date]
-command=date +" %a, %d %b "
-interval=1
-color=#71717a
 
 [time]
-command=date +" %H:%M"
+command=date +" 🚀 %a, %d %b - %H:%M"
 interval=1
-color=#71717a
 

@@ -54,7 +54,7 @@ if ($status eq 'Discharging') {
                 $full_text = "󰂀${full_text}";
 	} elsif ($percent < 85) {
                 $full_text = "󰂂${full_text}";
-	} elsif ($percent < 90) {
+	} elsif ($percent < 100) {
                 $full_text = "󰁹${full_text}";
         }
 } elsif ($status eq 'Charging') {
@@ -76,9 +76,10 @@ if ($status eq 'Discharging') {
 }
 
 $short_text = $full_text;
-
-if ($acpi =~ /(\d\d:\d\d):/) {
-	$full_text .= " [$1]";
+if ($status eq 'Discharging') {
+	if ($acpi =~ /(\d\d:\d\d):/) {
+		$full_text .= " [$1]";
+	}
 }
 
 # print text
@@ -89,18 +90,20 @@ print " $short_text \n";
 if ($status eq 'Discharging') {
 
 	if ($percent < 10) {
-		print "#ef4444\n";
+		print "#f87171\n";
 	} elsif ($percent < 40) {
 		print "#fdba74\n";
 	} elsif ($percent < 60) {
 		print "#fde047\n";
-	} elsif ($percent < 85) {
+	} elsif ($percent < 100) {
 		print "#bef264\n";
 	}
 
 	if ($percent < 5) {
 		exit(33);
 	}
+} elsif ($status eq 'Charging') {
+	print "#7dd3fc\n";
 }
 
 exit(0);
