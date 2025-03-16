@@ -124,7 +124,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-# eval "$(thefuck --alias)"
+eval "$(thefuck --alias)"
 
 # set neovim to open using alias 'vim'
 alias nv="nvim"
