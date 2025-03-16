@@ -63,11 +63,9 @@ bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ to
 bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
 # use brightnessctl to adjust brightness in
-bindsym XF86MonBrightnessDown exec brightnessctl --min-val=2 -q set 5%-
-bindsym XF86MonBrightnessUp exec brightnessctl -q set 5%+
+bindsym XF86MonBrightnessDown exec brightnessctl --min-val=3 -q set 3%-
+bindsym XF86MonBrightnessUp exec brightnessctl -q set 3%+
 # Use Mouse+$mod to drag floating windows to their wanted position
-
-
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
