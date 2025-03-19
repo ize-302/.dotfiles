@@ -29,11 +29,15 @@ hide_edge_borders smart
 smart_gaps on
 gaps inner 10
 
+# external monitor DP-2 left of main screen eDP-1
+exec --no-startup-id xrandr --output DP-2 --auto --left-of eDP-1
+
 # set wallpapaer
 exec --no-startup-id feh --bg-fill ~/Pictures/SamSpratt_VIII_InfiniteCeremony_4k.jpg
 
 # backgroud blur, opacity, transparency - whatever you call it
-exec --no-startup-id picom --config ~/.config/picom/picom.conf
+# you need picom-git for this to work
+# exec --no-startup-id picom --config ~/.config/picom/picom.conf
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -238,7 +242,7 @@ bar {
             statusline #B1B1B1
             focused_workspace #c3e88d #c3e88d #000000
             active_workspace #333333 #333333 #888888
-            inactive_workspace #00000000 #333333 #c3e88d
+            inactive_workspace #00000000 #00000000 #c3e88d
             urgent_workspace #eb709b #eb709b #ffffff
         }
 }

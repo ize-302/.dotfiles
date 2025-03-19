@@ -1,14 +1,22 @@
+[temperature]
+command=./scripts/temperature.sh
+label=  
+interval=10
+T_WARN=70
+T_CRIT=90
+#SENSOR_CHIP=""
+
 [cpu_usage]
 command=./scripts/cpu_usage.sh
 interval=10
-label= 
+#label=  
 # min_width=CPU: 100.00%
-T_WARN=50
-T_CRIT=80
-#DECIMALS=2
-COLOR_NORMAL=#EBDBB2
-COLOR_WARN=#FFFC00
-COLOR_CRIT=#FF0000
+#T_WARN=50
+#T_CRIT=80
+#DECIMALS=0
+#COLOR_NORMAL=#EBDBB2
+#COLOR_WARN=#FFFC00
+#COLOR_CRIT=#FF0000
 
 [memory]
 command=./scripts/memory.sh
@@ -26,7 +34,13 @@ USE_ALSA_NAME=1
 command=./scripts/battery.sh
 interval=1
 
+[bluetooth]
+command=./scripts/bluetooth.sh
+color=#ffffff
+label=
+interval=0
+
 [time]
-command=date +" 🚀 %a, %d %b - %H:%M"
+command=date +" 🔥 %a, %d %b - %H:%M"
 interval=1
 color=#ffffff

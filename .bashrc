@@ -141,3 +141,7 @@ alias wezterm-split-2="wezterm cli split-pane --right --percent 30"
 # export PATH="$BUN_INSTALL/bin:$PATH"
 
 eval "$(starship init bash)"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

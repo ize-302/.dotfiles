@@ -45,20 +45,20 @@ $full_text = "$label$percent%";
 
 if ($status eq 'Discharging') {
         if ($percent < 10) {
-                $full_text = "󰁻${full_text}";
+                $full_text = "󰁻 ${full_text}";
 	} elsif ($percent < 25) {
-                $full_text = "󰁼${full_text}";
+                $full_text = "󰁼 ${full_text}";
 	} elsif ($percent < 40) {
-                $full_text = "󰁾${full_text}";
+                $full_text = "󰁾 ${full_text}";
 	} elsif ($percent < 60) {
-                $full_text = "󰂀${full_text}";
+                $full_text = "󰂀 ${full_text}";
 	} elsif ($percent < 85) {
-                $full_text = "󰂂${full_text}";
+                $full_text = "󰂂 ${full_text}";
 	} elsif ($percent < 100) {
-                $full_text = "󰁹${full_text}";
+                $full_text = "󰁹 ${full_text}";
         }
 } elsif ($status eq 'Charging') {
-	$full_text = "󰂄${full_text}";
+	$full_text = "󰂄 ${full_text}";
 } elsif ($status eq 'Unknown') {
 	open (AC_ADAPTER, "acpi -a |") or die;
 	$ac_adapt = <AC_ADAPTER>;
@@ -71,8 +71,10 @@ if ($status eq 'Discharging') {
 			$full_text .= ' CHR';
 		} elsif ($ac_adapt eq 'off-line') {
 			$full_text .= ' DIS';
-		}
+		} 
 	}
+} elsif ($status eq 'Not charging') {
+	$full_text = " ${full_text}"
 }
 
 $short_text = $full_text;
