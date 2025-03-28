@@ -1,46 +1,40 @@
+[arch]
+command=./scripts/arch.py
+interval=3600
+markup=pango
+
+[brightness]
+command=./scripts/brightness.py
+interval=1
+color=#ffffff
+markup=pango
+
 [temperature]
-command=./scripts/temperature.sh
-label=  
-interval=10
-T_WARN=70
-T_CRIT=90
-#SENSOR_CHIP=""
-
-[cpu_usage]
-command=./scripts/cpu_usage.sh
-interval=10
-#label=  
-# min_width=CPU: 100.00%
-#T_WARN=50
-#T_CRIT=80
-#DECIMALS=0
-#COLOR_NORMAL=#EBDBB2
-#COLOR_WARN=#FFFC00
-#COLOR_CRIT=#FF0000
-
-[memory]
-command=./scripts/memory.sh
-label=  
+command=./scripts/temperature.py
+markup=pango
 interval=30
 
-[volume-pipewire]
-command=./scripts/volume-pipewire.sh
+[cpu_usage]
+command=./scripts/cpu_usage.py
+interval=30
+markup=pango
+
+[memory]
+command=./scripts/memory.py
+markup=pango
+interval=30
+
+[volume]
+command=./scripts/volume.py
+markup=pango
 interval=1
-#signal=1
-USE_ALSA_NAME=1
-#label=vol
 
 [battery]
-command=./scripts/battery.sh
+command=./scripts/battery.py
 interval=1
+markup=pango
 
-[bluetooth]
-command=./scripts/bluetooth.sh
-color=#ffffff
-label=
-interval=0
-
-[time]
-command=date +" 🔥 %a, %d %b - %H:%M"
-interval=1
+[datetime]
+command=date +"    %a, %d %b - %H:%M"
+interval=10
 color=#ffffff
