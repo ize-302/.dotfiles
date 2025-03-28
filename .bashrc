@@ -1,3 +1,5 @@
+eval "$(starship init bash)"
+
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -28,12 +30,12 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+# [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
+# if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+#     debian_chroot=$(cat /etc/debian_chroot)
+# fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
@@ -117,9 +119,9 @@ if ! shopt -oq posix; then
 fi
 
 
-PATH=~/.console-ninja/.bin:$PATH
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# PATH=~/.console-ninja/.bin:$PATH
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -128,19 +130,13 @@ eval "$(thefuck --alias)"
 
 # set neovim to open using alias 'vim'
 alias nv="nvim"
-# . "$HOME/.cargo/env"
+. "$HOME/.cargo/env"
 
 # Run fastfetch on start terminal
 fastfetch
 
 # Wezterm shortcuts
 alias wezterm-split-2="wezterm cli split-pane --right --percent 30"
-
-# bun
-# export BUN_INSTALL="$HOME/.bun"
-# export PATH="$BUN_INSTALL/bin:$PATH"
-
-eval "$(starship init bash)"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"

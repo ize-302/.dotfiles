@@ -8,6 +8,8 @@ $directory\
 $git_branch\
 $git_status\
 []()\
+$c\
+$docker\
 $lua\
 $go\
 $zig\

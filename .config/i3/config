@@ -26,15 +26,14 @@ default_border pixel 1
 default_floating_border normal
 hide_edge_borders smart
 
-smart_gaps on
+smart_gaps inverse_outer
 gaps inner 10
 
 # external monitor DP-2 left of main screen eDP-1
 exec --no-startup-id xrandr --output DP-2 --auto --left-of eDP-1
 
 # set wallpapaer
-exec --no-startup-id feh --bg-fill ~/Pictures/SamSpratt_VIII_InfiniteCeremony_4k.jpg
-
+exec --no-startup-id feh --bg-fill --randomize ~/Pictures/wallpapers/*
 # backgroud blur, opacity, transparency - whatever you call it
 # you need picom-git for this to work
 # exec --no-startup-id picom --config ~/.config/picom/picom.conf
@@ -67,7 +66,7 @@ bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ to
 bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
 # use brightnessctl to adjust brightness in
-bindsym XF86MonBrightnessDown exec brightnessctl --min-val=3 -q set 3%-
+bindsym XF86MonBrightnessDown exec brightnessctl --min-val=1 -q set 3%-
 bindsym XF86MonBrightnessUp exec brightnessctl -q set 3%+
 # Use Mouse+$mod to drag floating windows to their wanted position
 
@@ -84,7 +83,10 @@ bindsym $mod+Return exec wezterm
 bindsym $mod+x kill
 
 # start dmenu (a program launcher)
-bindsym $mod+space exec --no-startup-id dmenu_run
+# bindsym $mod+space exec --no-startup-id dmenu_run
+# bindsym $mod+space exec rofi -show run -lines 3 -eh 2 -bw 0 -width 100 -padding 400 -fullscreen
+bindsym $mod+space exec rofi -show drun
+
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -153,6 +155,8 @@ set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
 
+exec --no-startup-id i3-msg 'workspace 1; exec wezterm'
+
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
 bindsym $mod+2 workspace number $ws2
@@ -187,7 +191,7 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 
 # power options
 set $Locker betterlockscreen -l && sleep 1
-set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
+set $mode_system  lock(l) |  logout(e) |   sleep(s) |  hibernate(h) |  reboot(r) |  shutdown(Shift+s)
 mode "$mode_system" {
     bindsym l exec --no-startup-id $Locker, mode "default"
     bindsym e exec --no-startup-id i3-msg exit, mode "default"
@@ -201,7 +205,6 @@ mode "$mode_system" {
     bindsym Escape mode "default"
 }
 bindsym $mod+Escape mode "$mode_system"
-
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -234,7 +237,8 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
-        position top
+        # status_command py3status
+        position bottom 
         
         colors {
             separator #444444
@@ -242,8 +246,8 @@ bar {
             statusline #B1B1B1
             focused_workspace #c3e88d #c3e88d #000000
             active_workspace #333333 #333333 #888888
-            inactive_workspace #00000000 #00000000 #c3e88d
-            urgent_workspace #eb709b #eb709b #ffffff
+            inactive_workspace #222222 #222222 #c3e88d
+            urgent_workspace #7dd3fc #7dd3fc #000000
         }
 }
 
