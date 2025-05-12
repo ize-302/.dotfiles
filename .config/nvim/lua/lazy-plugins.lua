@@ -11,32 +11,27 @@
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   require '302.plugins.vim-sleuth',
-
-  require '302.plugins.debug',
-  require '302.plugins.indent_line',
   require '302.plugins.lint',
   require '302.plugins.autopairs',
   require '302.plugins.nvim-tree',
   require '302.plugins.gitsigns',
+
   require '302.plugins.which-key',
   require '302.plugins.telescope',
-
-  -- LSP Plugins
   require '302.plugins.lazydev',
   require '302.plugins.nvim-lspconfig',
   require '302.plugins.conform',
+
   require '302.plugins.nvim-cmp',
   require '302.plugins.colorscheme',
-
-  -- Highlight todo, notes, etc in comments
   require '302.plugins.todo-comments',
-
   require '302.plugins.mini',
   require '302.plugins.nvim-treesitter',
+
   require '302.plugins.markview',
   require '302.plugins.alpha-nvim',
-  require '302.plugins.blame_line',
   require '302.plugins.lazygit',
+  require '302.plugins.live-server',
 
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!

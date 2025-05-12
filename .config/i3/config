@@ -22,18 +22,27 @@ set $term wezterm
 font pango:JetBrainsMono NF Medium 11
 
 #indow borders
-default_border pixel 1
+default_border pixel 2
 default_floating_border normal
 hide_edge_borders smart
 
 smart_gaps inverse_outer
 gaps inner 10
 
+# Hide app top title bar 
+for_window [class="^.*"] border pixel 2
+for_window [class="^.*"] move position center 
+
 # external monitor DP-2 left of main screen eDP-1
-exec --no-startup-id xrandr --output DP-2 --auto --left-of eDP-1
+# exec --no-startup-id xrandr --output eDP-1 
+# exec --no-startup-id xrandr --dpi 100 --output HDMI-1 --scale 1x1
+
+# exec --no-startup-id xrandr --output DP-2 --auto --left-of eDP-1
+# exec xrandr --output eDP-1 --auto
+exec xrandr --dpi 100 --output eDP-1 --mode 1920x1080
 
 # set wallpapaer
-exec --no-startup-id feh --bg-fill --randomize ~/Pictures/wallpapers/*
+exec --no-startup-id feh --bg-fill --randomize ~/.config/wallpapers/*
 # backgroud blur, opacity, transparency - whatever you call it
 # you need picom-git for this to work
 # exec --no-startup-id picom --config ~/.config/picom/picom.conf
