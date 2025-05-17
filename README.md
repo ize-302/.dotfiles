@@ -10,6 +10,14 @@ Ensure you have the following installed on your computer
 
 ### Git
 
+Using Arch 
+
+```
+pacman -S git
+```
+
+OR
+
 Using homebrew
 
 ```
@@ -20,11 +28,20 @@ OR
 
 Debian / Ubuntu
 
+
 ```
 apt install git
 ```
 
 ### GNU Stow
+
+Using Arch 
+
+```sh
+pacman -S stow
+```
+
+OR
 
 Using homebrew 
 
