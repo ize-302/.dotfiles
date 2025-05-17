@@ -43,9 +43,6 @@ exec xrandr --dpi 100 --output eDP-1 --mode 1920x1080
 
 # set wallpapaer
 exec --no-startup-id feh --bg-fill --randomize ~/Pictures/wallpapers/*
-# backgroud blur, opacity, transparency - whatever you call it
-# you need picom-git for this to work
-# exec --no-startup-id picom --config ~/.config/picom/picom.conf
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).

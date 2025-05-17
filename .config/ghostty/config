@@ -1,8 +1,0 @@
-# Appearance
-# font-family = "JetBrainsMono Nerd Font"
-font-family = "JetBrainsMono NF Medium"
-theme = "tokyonight_night"
-window-padding-x = 6
-background-blur = true 
-background-opacity = 0.9
-font-size = 10.5
