@@ -32,6 +32,7 @@ require('lazy').setup({
   require '302.plugins.alpha-nvim',
   require '302.plugins.lazygit',
   require '302.plugins.live-server',
+  require '302.plugins.comment',
 
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
