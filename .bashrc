@@ -89,11 +89,6 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -125,19 +120,44 @@ fi
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
 eval "$(thefuck --alias)"
 
-# set neovim to open using alias 'vim'
-alias nv="nvim"
 . "$HOME/.cargo/env"
 
 # Run fastfetch on start terminal
 fastfetch
 
-# Wezterm shortcuts
-alias wezterm-split-2="wezterm cli split-pane --right --percent 30"
-
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Play sound if last command failed
+# PROMPT_COMMAND='if [ $? -ne 0 ]; then ~/bin/error-sound.sh; fi'
+
+# Aliases
+
+## zellij
+alias za="zellij attach"
+alias zl="zellij list-sessions"
+
+# neovim 
+alias nv="nvim"
+
+## Git
+alias ga="git add"
+alias gc="git commit" 
+
+alias gco="git checkout" 
+alias gdf="git diff" 
+
+alias gca="gc --amend" # ammend previous commit message
+alias gnb="gco -b" # create new branch
+alias gst="git status --short" # git status
+alias gps="git push" # push
+alias gpl="git pull" # pull
+alias gcp="git cherry-pick" # git cherry-pick
+
+# ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
