@@ -25,7 +25,9 @@ if output:
 
 # Regexp that returns if headphones are plugged
 aux = check_output(['amixer', '-c', '0', 'contents'], universal_newlines=True)
-headphones = re.search(r'numid=15.*\n.*\n\s*:\svalues=(.*)', aux).group(1)
+# incase there is an issue next time. Just print(aux) and see what numid is
+# Then replace the value of numid below
+headphones = re.search(r'numid=2.*\n.*\n\s*:\svalues=(.*)', aux).group(1)
 # Calculate average volume of right and left speakers
 vol = int((leftVol + rightVol) / 2)
 
