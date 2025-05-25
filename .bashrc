@@ -1,60 +1,34 @@
-eval "$(starship init bash)"
+# ~/.bashrc: executed by bash for non-login interactive shells.
 
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
-# If not running interactively, don't do anything
+# Exit if not running interactively
 case $- in
     *i*) ;;
-      *) return;;
+    *) return;;
 esac
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+##======================
+## History Configuration
+##======================
+HISTCONTROL=ignoreboth       # Ignore duplicate lines and lines starting with space
+shopt -s histappend          # Append to the history file
 HISTSIZE=1000
 HISTFILESIZE=2000
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+##==========================
+## Terminal Behavior & Prompt
+##==========================
+shopt -s checkwinsize        # Auto-adjust terminal size
 
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
-
-# make less more friendly for non-text input files, see lesspipe(1)
-# [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# set variable identifying the chroot you work in (used in the prompt below)
-# if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-#     debian_chroot=$(cat /etc/debian_chroot)
-# fi
-
-# set a fancy prompt (non-color, unless we know we "want" color)
+# Enable color prompt if supported
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-#force_color_prompt=yes
-
 if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+    if [ -x /usr/bin/tput ] && tput setaf 1 &>/dev/null; then
+        color_prompt=yes
     else
-	color_prompt=
+        color_prompt=
     fi
 fi
 
@@ -65,99 +39,65 @@ else
 fi
 unset color_prompt force_color_prompt
 
-# If this is an xterm set the title to user@host:dir
+# Set terminal window title for xterm/rxvt
 case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        ;;
 esac
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+##=============
+## Aliases
+##=============
+[ -f ~/.bash_aliases ] && . ~/.bash_aliases
 
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
-
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+##======================
+## Autocompletion Support
+##======================
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
 fi
 
+##==================
+## Custom Toolchains
+##==================
 
-# PATH=~/.console-ninja/.bin:$PATH
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# NVM (Node Version Manager)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
-# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# The Fuck (command corrector)
 eval "$(thefuck --alias)"
 
+# Rust (Cargo)
 . "$HOME/.cargo/env"
 
-# Run fastfetch on start terminal
-fastfetch
-
-# bun
+# Bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# Play sound if last command failed
-# PROMPT_COMMAND='if [ $? -ne 0 ]; then ~/bin/error-sound.sh; fi'
+# fastfetch: Show system info on terminal launch
+fastfetch
 
-# Aliases
+# Play sound on command failure (disabled by default)
+error_sound() {
+    local exit_status=$?
+    if [ $exit_status -ne 0 ]; then
+        ~/bin/error-sound.sh
+    fi
+}
+PROMPT_COMMAND="error_sound${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 
-## zellij
-alias za="zellij attach"
-alias zl="zellij list-sessions"
+##===================
+## Optional Features
+##===================
 
-# neovim 
-alias nv="nvim"
-
-## Git
-alias ga="git add"
-alias gc="git commit" 
-
-alias gco="git checkout" 
-alias gdf="git diff" 
-
-alias gca="gc --amend" # ammend previous commit message
-alias gnb="gco -b" # create new branch
-alias gst="git status --short" # git status
-alias gps="git push" # push
-alias gpl="git pull" # pull
-alias gcp="git cherry-pick" # git cherry-pick
-
-# ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+# Starship
+eval "$(starship init bash)"
+# Execute the precmd to set initial PS1
+starship_precmd
