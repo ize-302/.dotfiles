@@ -39,3 +39,4 @@ alias gps="git push" # push
 alias gpl="git pull" # pull
 alias gcp="git cherry-pick" # git cherry-pick
 
+alias monitor-switch="xrandr --output eDP-1 --off --output HDMI-1 --auto" # switch to use only external display
