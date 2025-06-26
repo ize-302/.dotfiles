@@ -3,6 +3,11 @@ command=./scripts/arch.py
 interval=3600
 markup=pango
 
+[capslock-status]
+command=./scripts/capslock-status.py
+interval=1
+markup=pango
+
 [brightness]
 command=./scripts/brightness.py
 interval=1

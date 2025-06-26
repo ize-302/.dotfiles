@@ -12,5 +12,13 @@ config.window_background_opacity = 1
 config.tab_bar_at_bottom = true
 config.max_fps = 120
 
+config.keys = {
+	{
+		key = "x",
+		mods = "CTRL",
+		action = wezterm.action.CloseCurrentTab({ confirm = true }),
+	},
+}
+
 -- and finally, return the configuration to wezterm
 return config
