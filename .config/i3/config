@@ -45,7 +45,7 @@ exec xrandr --dpi 100 --output eDP-1 --mode 1920x1080
 exec --no-startup-id feh --bg-fill --randomize ~/Pictures/wallpapers/*
 
 # picom
-exec picom --config ~/.config/picom/picom.conf
+# exec picom --config ~/.config/picom/picom.conf
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
