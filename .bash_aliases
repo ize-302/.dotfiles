@@ -25,18 +25,5 @@ alias zl="zellij list-sessions"
 # neovim 
 alias nv="nvim"
 
-## Git
-alias ga="git add"
-alias gc="git commit" 
-
-alias gco="git checkout" 
-alias gdf="git diff" 
-
-alias gca="gc --amend" # ammend previous commit message
-alias gnb="gco -b" # create new branch
-alias gst="git status --short" # git status
-alias gps="git push" # push
-alias gpl="git pull" # pull
-alias gcp="git cherry-pick" # git cherry-pick
-
-alias monitor-switch="xrandr --output eDP-1 --off --output HDMI-1 --auto" # switch to use only external display
+# switch to use only external display
+alias monitor-switch="xrandr --output eDP-1 --off --output HDMI-1 --auto"
