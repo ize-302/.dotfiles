@@ -84,15 +84,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # fastfetch: Show system info on terminal launch
 fastfetch
 
-# Play sound on command failure (disabled by default)
-error_sound() {
-    local exit_status=$?
-    if [ $exit_status -ne 0 ]; then
-        ~/bin/error-sound.sh
-    fi
-}
-PROMPT_COMMAND="error_sound${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
-
 ##===================
 ## Optional Features
 ##===================

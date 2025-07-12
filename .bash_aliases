@@ -26,4 +26,4 @@ alias zl="zellij list-sessions"
 alias nv="nvim"
 
 # switch to use only external display
-alias monitor-switch="xrandr --output eDP-1 --off --output HDMI-1 --auto"
+alias solo-hdmi="xrandr --output eDP-1 --off --output HDMI-1 --auto"
