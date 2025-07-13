@@ -28,12 +28,12 @@ require('lazy').setup({
   require '302.plugins.mini',
   require '302.plugins.nvim-treesitter',
 
-  require '302.plugins.markview',
   require '302.plugins.alpha-nvim',
   require '302.plugins.lazygit',
   require '302.plugins.live-server',
   require '302.plugins.comment',
 
+  require '302.plugins.mason',
   -- require '302.plugins.hardtime-nvim'
 
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`

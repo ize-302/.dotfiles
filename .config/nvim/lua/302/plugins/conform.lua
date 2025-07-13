@@ -37,15 +37,18 @@ return {
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
-        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
-        typescript = { 'prettierd', 'prettier', stop_after_first = true },
-        css = { 'prettier', 'stylelint' }, -- Use Prettier for CSS files
-        scss = { 'prettier', 'stylelint' }, -- Use Prettier for SCSS files
-        json = { 'prettier' }, -- You can add other filetypes as well
-        go = { 'goimports', 'gofmt' },
+        javascript = { 'biome', 'prettierd', 'prettier' },
+        javascriptreact = { 'biome', 'prettierd' },
+        typescript = { 'biome', 'prettierd', 'prettier' },
+        typescriptreact = { 'biome', 'prettierd' },
+        css = { 'prettier', 'stylelint' },
+        scss = { 'prettierd', 'stylelint' },
+        json = { 'biome', 'prettierd', 'prettier' },
+        go = { 'goimports', 'gofmt', 'prettier' },
         c = { 'clang-format' },
+        vue = { 'biome', 'prettierd', 'prettier' },
+        svelte = { 'prettierd', 'prettier' },
+        html = { 'biome', 'prettierd', 'prettier' },
       },
     },
   },
