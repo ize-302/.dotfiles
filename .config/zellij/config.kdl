@@ -249,7 +249,7 @@ plugins {
     strider location="zellij:strider"
     tab-bar location="zellij:tab-bar"
     welcome-screen location="zellij:session-manager" {
-        welcome_screen true
+        welcome_screen false 
     }
 }
 
@@ -314,7 +314,7 @@ simplified_ui true
 //   - true (default, enabled)
 //   - false
 // 
-// pane_frames false
+pane_frames false
  
 // When attaching to an existing session with other users,
 // should the session be mirrored (true)
