@@ -45,17 +45,17 @@ return {
         capabilities = capabilities,
         on_attach = on_attach,
         settings = {
-          typescript = {
-            preferences = {
-              importModuleSpecifier = 'non-relative',
-              suggest = {
-                completeFunctionCalls = true,
-              },
-              updateImportsOnFileMove = {
-                enabled = 'always',
-              },
-            },
-          },
+          -- typescript = {
+          --   preferences = {
+          --     importModuleSpecifier = 'non-relative',
+          --     suggest = {
+          --       completeFunctionCalls = true,
+          --     },
+          --     updateImportsOnFileMove = {
+          --       enabled = 'always',
+          --     },
+          --   },
+          -- },
           vtsls = {
             autoUseWorkspaceTsdk = true,
             tsserver = {

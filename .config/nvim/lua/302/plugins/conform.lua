@@ -40,7 +40,7 @@ return {
         javascript = { 'biome', 'prettierd', 'prettier' },
         javascriptreact = { 'biome', 'prettierd' },
         typescript = { 'biome', 'prettierd', 'prettier' },
-        typescriptreact = { 'biome', 'prettierd' },
+        typescriptreact = { 'prettierd', 'prettier' },
         css = { 'prettier', 'stylelint' },
         scss = { 'prettierd', 'stylelint' },
         json = { 'biome', 'prettierd', 'prettier' },

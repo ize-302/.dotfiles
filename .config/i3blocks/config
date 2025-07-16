@@ -1,5 +1,5 @@
 [arch]
-command=./scripts/arch.py
+command=./scripts/kernel/kernel
 interval=3600
 markup=pango
 
@@ -15,19 +15,19 @@ color=#ffffff
 markup=pango
 
 [temperature]
-command=./scripts/temperature.py
+command=./scripts/temperature/temperature
 markup=pango
-interval=30
+interval=1
 
 [cpu_usage]
-command=./scripts/cpu_usage.py
-interval=30
+command=./scripts/cpu_usage/cpu_usage
+interval=1
 markup=pango
 
 [memory]
-command=./scripts/memory.py
+command=./scripts/memory/memory
 markup=pango
-interval=30
+interval=1
 
 [volume]
 command=./scripts/volume.py
@@ -35,7 +35,7 @@ markup=pango
 interval=1
 
 [battery]
-command=./scripts/battery.py
+command=./scripts/battery/battery
 interval=1
 markup=pango
 
