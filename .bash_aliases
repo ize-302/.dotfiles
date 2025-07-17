@@ -18,10 +18,6 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 ## Sudo
 alias abeg="sudo"
 
-## zellij
-alias za="zellij attach"
-alias zl="zellij list-sessions"
-
 # neovim 
 alias nv="nvim"
 
