@@ -251,12 +251,32 @@ plugins {
     welcome-screen location="zellij:session-manager" {
         welcome_screen false 
     }
+    zjstatus-hints location="https://github.com/b0o/zjstatus-hints/releases/latest/download/zjstatus-hints.wasm" {
+        // Maximum number of characters to display
+        max_length 0 // 0 = unlimited
+        // String to append when truncated
+        overflow_str "..." // default
+        // Name of the pipe for zjstatus integration
+        pipe_name "zjstatus_hints" // default
+        // Hide hints in base mode (a.k.a. default mode)
+        // E.g. if you have set default_mode to "locked", then
+        // you can hide hints in the locked mode by setting this to true
+        hide_in_base_mode false // default
+    }
 }
 
 // Plugins to load in the background when a new session starts
 // eg. "file:/path/to/my-plugin.wasm"
 // eg. "https://example.com/my-plugin.wasm"
 load_plugins {
+    "$HOME/.config/zellij/plugins/zjstatus.wasm"
+    zjstatus-hints
+    "$HOME/.config/zellij/plugins/zjframes.wasm" {
+        hide_frame_for_single_pane       "true"
+        hide_frame_except_for_search     "true"
+        hide_frame_except_for_scroll     "true"
+        hide_frame_except_for_fullscreen "true"
+    }
 }
  
 // Use a simplified UI without special fonts (arrow glyphs)
@@ -264,7 +284,7 @@ load_plugins {
 //   - true
 //   - false (Default)
 // 
-simplified_ui true
+// simplified_ui true
  
 // Choose the theme that is specified in the themes section.
 // Default: default
@@ -377,13 +397,13 @@ pane_frames false
 // otherwise this will error if such a session exists.
 // Default: <RANDOM>
 // 
-// session_name "My singleton session"
+session_name "My default session"
  
 // When `session_name` is provided, attaches to that session
 // if it is already running or creates it otherwise.
 // Default: false
 // 
-// attach_to_session true
+attach_to_session true
  
 // Toggle between having Zellij lay out panes according to a predefined set of layouts whenever possible
 // Options:
@@ -444,7 +464,7 @@ pane_frames false
 // Whether to show tips on startup
 // Default: true
 // 
-// show_startup_tips false
+show_startup_tips false
  
 // Whether to show release notes on first version run
 // Default: true
