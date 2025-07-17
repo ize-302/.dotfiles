@@ -82,7 +82,13 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # fastfetch: Show system info on terminal launch
-fastfetch
+if [ "$ZELLIJ" = "1" ] && [ -z "$FASTFETCH_SHOWN" ]; then
+  export FASTFETCH_SHOWN=1
+  fastfetch
+else
+  fastfetch
+fi
+
 
 ##===================
 ## Optional Features
