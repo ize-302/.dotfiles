@@ -21,10 +21,10 @@ config.window_background_opacity = 1
 config.tab_bar_at_bottom = true
 config.max_fps = 120
 config.window_padding = {
-	top = 5,
-	right = 5,
-	bottom = 5,
-	left = 5,
+	top = 4,
+	right = 4,
+	bottom = 2,
+	left = 4,
 }
 
 config.keys = {
@@ -33,7 +33,7 @@ config.keys = {
 	-- { key = "t", mods = "ALT", action = act.SpawnTab("CurrentPaneDomain") },
 	-- { key = "w", mods = "ALT", action = act.CloseCurrentTab({ confirm = false }) },
 	-- { key = "Tab", mods = "ALT", action = act.ActivateTabRelative(1) },
-	-- { key = "Tab", mods = "ALT|SHIFT", action = act.ActivateTabRelative(-1) },
+	-- { key = "Tab", mods = "ALT|SHIFT", action =act.ActivateTabRelative(-1) },
 	--
 	-- -- pane management
 	-- { key = "v", mods = "ALT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
