@@ -167,7 +167,6 @@ set $ws10 "10"
 
 # define default app to open in certain workspace
 exec --no-startup-id i3-msg 'workspace 1; exec wezterm'
-exec --no-startup-id i3-msg 'workspace 2; exec zen-browser'
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
