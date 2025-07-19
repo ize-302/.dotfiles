@@ -7,8 +7,8 @@ local act = wezterm.action
 -- This will hold the configuration.
 local config = wezterm.config_builder()
 
--- automatically start a zellij session when wezterm is opened
-config.default_prog = { "zellij" }
+-- automatically start a tmux session when wezterm is opened
+config.default_prog = { "tmux" }
 
 --leader
 config.leader = { key = "Space", mods = "CTRL|SHIFT" }
