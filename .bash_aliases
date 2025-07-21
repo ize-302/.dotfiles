@@ -23,3 +23,9 @@ alias nv="nvim"
 
 # switch to use only external display
 alias solo-hdmi="xrandr --output eDP-1 --off --output HDMI-1 --auto"
+
+# gparted
+alias gparted="sudo gparted"
+
+# timeshift
+alias timeshift="sudo timeshift-gtk"
