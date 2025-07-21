@@ -13,4 +13,4 @@ def is_caps_lock_on():
 
 # Example usage
 if is_caps_lock_on():
-    print(' <span color="#00FF00">🅰️</span> ')
+    print(' <span color="#FF0000">⇪ locked</span> ')
