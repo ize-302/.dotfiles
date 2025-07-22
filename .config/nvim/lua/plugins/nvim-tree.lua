@@ -2,17 +2,17 @@ local HEIGHT_RATIO = 0.8
 local WIDTH_RATIO = 0.5
 
 local keymap = vim.keymap
-keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>')
+keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>")
 
 return {
-  'nvim-tree/nvim-tree.lua',
-  version = '*',
+  "nvim-tree/nvim-tree.lua",
+  version = "*",
   lazy = false,
   dependencies = {
-    'nvim-tree/nvim-web-devicons',
+    "nvim-tree/nvim-web-devicons",
   },
   config = function()
-    require('nvim-tree').setup {
+    require("nvim-tree").setup({
       git = {
         ignore = false,
       },
@@ -40,8 +40,8 @@ return {
             local center_x = (screen_w - window_w) / 2
             local center_y = ((vim.opt.lines:get() - window_h) / 2) - vim.opt.cmdheight:get()
             return {
-              border = 'rounded',
-              relative = 'editor',
+              border = "rounded",
+              relative = "editor",
               row = center_y,
               col = center_x,
               width = window_w_int,
@@ -59,18 +59,18 @@ return {
         indent_markers = { enable = true },
         icons = {
           glyphs = {
-            default = '󰈚',
+            default = "󰈚",
             folder = {
-              default = '',
-              empty = '',
-              empty_open = '',
-              open = '',
-              symlink = '',
+              default = "",
+              empty = "",
+              empty_open = "",
+              open = "",
+              symlink = "",
             },
-            git = { unmerged = '' },
+            git = { unmerged = "" },
           },
         },
       },
-    }
+    })
   end,
 }
