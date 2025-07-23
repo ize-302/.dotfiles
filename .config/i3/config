@@ -15,8 +15,10 @@ set $left h
 set $down j
 set $up k
 set $right l
+
 # Preferred terminal emulator
 set $term wezterm
+
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 font pango:JetBrainsMono NF Medium 11
@@ -33,12 +35,6 @@ gaps inner 10
 for_window [class="^.*"] border pixel 2
 for_window [class="^.*"] move position center 
 
-# external monitor DP-2 left of main screen eDP-1
-# exec --no-startup-id xrandr --output eDP-1 
-# exec --no-startup-id xrandr --dpi 100 --output HDMI-1 --scale 1x1
-
-# exec --no-startup-id xrandr --output DP-2 --auto --left-of eDP-1
-# exec xrandr --output eDP-1 --auto
 exec xrandr --dpi 100 --output eDP-1 --mode 1920x1080
 
 # set wallpapaer
@@ -58,7 +54,6 @@ exec --no-startup-id mpv --no-video ~/Music/sounds/Windows_XP.mp3
 
 # xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
 # screen before suspend. Use loginctl lock-session to lock your screen.
-# exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 exec --no-startup-id xss-lock --transfer-sleep-lock betterlockscreen -l
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
@@ -86,19 +81,12 @@ tiling_drag modifier titlebar
 
 # start a terminal
 bindsym $mod+Return exec wezterm
+
 # kill focused window
 bindsym $mod+x kill
 
-# start dmenu (a program launcher)
-# bindsym $mod+space exec --no-startup-id dmenu_run
-# bindsym $mod+space exec rofi -show run -lines 3 -eh 2 -bw 0 -width 100 -padding 400 -fullscreen
+# start rofi (a program launcher)
 bindsym $mod+space exec rofi -show drun
-
-# A more modern dmenu replacement is rofi:
-# bindcode $mod+40 exec "rofi -modi drun,run -show drun"
-# There also is i3-dmenu-desktop which only displays applications shipping a
-# .desktop file. It is a wrapper around dmenu, so you need that installed.
-# bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
 
 # change focus
 bindsym $mod+$left focus left
@@ -132,25 +120,8 @@ bindsym $mod+v splitv
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
-# change container layout (stacked, tabbed, toggle split)
-# bindsym $mod+s layout stacking
-# bindsym $mod+w layout tabbed
-# bindsym $mod+e layout toggle split
-
 # Take screen short with flameshot
 bindsym $mod+s exec flameshot gui
-
-# toggle tiling / floating
-# bindsym $mod+Shift+space floating toggle
-
-# change focus between tiling / floating windows
-# bindsym $mod+space focus mode_toggle
-
-# focus the parent container
-# bindsym $mod+a focus parent
-
-# focus the child container
-#bindsym $mod+d focus child
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
@@ -250,14 +221,14 @@ bar {
         status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
         # status_command py3status
         position bottom 
-        
+
         colors {
             separator #444444
-            background #222222
+            background #1a1b26
             statusline #B1B1B1
             focused_workspace #c3e88d #c3e88d #000000
             active_workspace #333333 #333333 #888888
-            inactive_workspace #222222 #222222 #c3e88d
+            inactive_workspace #1a1b26 #1a1b26 #c3e88d
             urgent_workspace #7dd3fc #7dd3fc #000000
         }
 }

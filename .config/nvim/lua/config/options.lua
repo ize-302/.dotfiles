@@ -68,3 +68,5 @@ vim.opt.scrolloff = 10
 
 -- Set to false to disable auto format
 vim.g.lazyvim_eslint_auto_format = true
+
+vim.opt.termguicolors = true

@@ -2,26 +2,26 @@
 
 # Exit if not running interactively
 case $- in
-    *i*) ;;
-    *) return;;
+*i*) ;;
+*) return ;;
 esac
 
 ##======================
 ## History Configuration
 ##======================
-HISTCONTROL=ignoreboth       # Ignore duplicate lines and lines starting with space
-shopt -s histappend          # Append to the history file
+HISTCONTROL=ignoreboth # Ignore duplicate lines and lines starting with space
+shopt -s histappend    # Append to the history file
 HISTSIZE=1000
 HISTFILESIZE=2000
 
 ##==========================
 ## Terminal Behavior & Prompt
 ##==========================
-shopt -s checkwinsize        # Auto-adjust terminal size
+shopt -s checkwinsize # Auto-adjust terminal size
 
 # Enable color prompt if supported
 case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
+xterm-color | *-256color) color_prompt=yes ;;
 esac
 
 if [ -n "$force_color_prompt" ]; then
@@ -41,9 +41,9 @@ unset color_prompt force_color_prompt
 
 # Set terminal window title for xterm/rxvt
 case "$TERM" in
-    xterm*|rxvt*)
-        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-        ;;
+xterm* | rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
 esac
 
 ##=============
@@ -83,12 +83,11 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # fastfetch: Show system info on terminal launch
 if [ "$ZELLIJ" = "1" ] && [ -z "$FASTFETCH_SHOWN" ]; then
-  export FASTFETCH_SHOWN=1
-  fastfetch
+    export FASTFETCH_SHOWN=1
+    fastfetch
 else
-  fastfetch
+    fastfetch
 fi
-
 
 ##===================
 ## Optional Features
