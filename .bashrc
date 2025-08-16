@@ -90,6 +90,14 @@ else
 fi
 
 ##===================
+## Sounds
+##===================
+readonly ERR_SOUND="/usr/share/sounds/freedesktop/stereo/dialog-error.oga"
+
+# Play sound on command error (interactive shells)
+trap '[[ $? != 0 ]] && (paplay "$ERR_SOUND" & disown)' ERR
+
+##===================
 ## Optional Features
 ##===================
 

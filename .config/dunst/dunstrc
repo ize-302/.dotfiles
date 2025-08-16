@@ -363,7 +363,6 @@
     override_pause_level = 60
     # Icon for notifications with critical urgency
     default_icon = dialog-warning
-    exec = paplay /usr/share/sounds/freedesktop/stereo/message.oga
 
 [error]
     appname = *
