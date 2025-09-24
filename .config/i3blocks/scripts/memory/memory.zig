@@ -1,6 +1,8 @@
 const std = @import("std");
 
-const stdout = std.io.getStdOut().writer();
+var stdout_buffer: [1024]u8 = undefined;
+var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+const stdout = &stdout_writer.interface;
 
 pub fn main() !void {
     const path = "/proc/meminfo";
@@ -19,6 +21,7 @@ pub fn main() !void {
     const usage_percent = @as(u8, @intFromFloat(usage_percent_f64));
 
     try stdout.print(" <span color='{s}'> {:>1}% </span>\n ", .{ getColor(usage_percent), usage_percent });
+    try stdout.flush();
 }
 
 fn readMemInfoValue(content: []const u8, key: []const u8) ?u64 {

@@ -1,6 +1,8 @@
 const std = @import("std");
 
-const stdout = std.io.getStdOut().writer();
+var stdout_buffer: [1024]u8 = undefined;
+var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+const stdout = &stdout_writer.interface;
 
 pub fn main() !void {
     const brighPath = "/sys/class/backlight/intel_backlight/actual_brightness";
@@ -12,6 +14,7 @@ pub fn main() !void {
     const brightness_perc = brightness / maxBrightness;
 
     try stdout.print(" <span color='orange'>☀️{:>1}%</span> \n ", .{brightness_perc});
+    try stdout.flush();
 }
 
 fn readFile(path: []const u8) !u64 {
