@@ -6,18 +6,24 @@ return {
       section_separators = { left = "", right = "" },
     },
     sections = {
-      lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
+      lualine_a = {
+        {
+          "mode",
+          fmt = function(res)
+            return res:sub(1, 1)
+          end,
+          separator = { left = "" },
+          right_padding = 2,
+        },
+      },
+      lualine_b = { "branch", "diff", "diagnostics" },
+      lualine_c = { "filename" },
+      lualine_x = { "encoding", "fileformat", "filetype" },
       lualine_y = {
-        { "progress", separator = "", padding = { left = 1, right = 0 } },
-        { "location", padding = { left = 0, right = 1 } },
+        { "progress", separator = "", padding = { left = 1, right = 1 } },
       },
       lualine_z = {
-        {
-          function()
-            return " " .. os.date("%R")
-          end,
-          separator = { right = "" },
-        },
+        { "location", padding = { left = 0, right = 1 } },
       },
     },
   },
