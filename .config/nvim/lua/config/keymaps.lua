@@ -30,3 +30,8 @@ vim.diagnostic.config({
   virtual_text = false,
 })
 vim.keymap.set("n", "<Leader>d", ":lua vim.diagnostic.open_float(0, {scope='line'})<CR>")
+
+-- lazygit
+vim.keymap.set("n", "<leader>lg", function()
+  require("snacks").lazygit.open({ cwd = require("lazyvim.util").root.get() })
+end, { desc = "Open Lazygit (root dir)" })

@@ -225,7 +225,7 @@ bar {
 
         colors {
             separator #444444
-            background #1a1b26
+            background #181818
             statusline #B1B1B1
             focused_workspace #c3e88d #c3e88d #000000
             active_workspace #333333 #333333 #888888
