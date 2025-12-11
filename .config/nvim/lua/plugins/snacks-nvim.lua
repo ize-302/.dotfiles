@@ -2,20 +2,20 @@ return {
   "snacks.nvim",
   opts = {
     dashboard = {
-      preset = {
-        pick = function(cmd, opts)
-          return LazyVim.pick(cmd, opts)()
-        end,
-
-        header = [[
+      sections = {
+        {
+          header = [[
 ██╗   ██╗ █████╗ ██╗   ██╗██╗  ████████╗
 ██║   ██║██╔══██╗██║   ██║██║  ╚══██╔══╝
 ██║   ██║███████║██║   ██║██║     ██║   
 ╚██╗ ██╔╝██╔══██║██║   ██║██║     ██║   
  ╚████╔╝ ██║  ██║╚██████╔╝███████╗██║   
   ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝   
-                                             ]],
-        keys = {},
+]],
+          footer = [[]], -- Set the footer to an empty string
+          padding = 0, -- Optional: Adjust padding if needed
+          align = "center", -- Optional: Alignment setting
+        },
       },
     },
 

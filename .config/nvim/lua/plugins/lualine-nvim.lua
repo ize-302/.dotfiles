@@ -21,8 +21,12 @@ return {
       lualine_x = { "diagnostics" },
       lualine_y = { "filetype" },
       lualine_z = {
-        { "filetype", padding = { left = 0, right = 1 } },
-        enabled = false,
+        {
+          function()
+            return "🌊"
+          end,
+          padding = { left = 1, right = 1 },
+        },
       },
     },
   },
