@@ -90,6 +90,14 @@ else
 fi
 
 ##===================
+## Sounds
+##===================
+readonly ERR_SOUND="/usr/share/sounds/freedesktop/stereo/dialog-error.oga"
+
+# Play sound on command error (interactive shells)
+trap '[[ $? != 0 ]] && (paplay "$ERR_SOUND" & disown)' ERR
+
+##===================
 ## Optional Features
 ##===================
 
@@ -97,3 +105,6 @@ fi
 eval "$(starship init bash)"
 # Execute the precmd to set initial PS1
 starship_precmd
+
+# opencode
+export PATH=/home/ize/.opencode/bin:$PATH

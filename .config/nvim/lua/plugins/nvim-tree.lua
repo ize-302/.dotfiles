@@ -1,8 +1,5 @@
 local HEIGHT_RATIO = 0.8
-local WIDTH_RATIO = 0.5
-
-local keymap = vim.keymap
-keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>")
+local WIDTH_RATIO = 0.3
 
 return {
   "nvim-tree/nvim-tree.lua",

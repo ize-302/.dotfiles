@@ -1,6 +1,8 @@
 const std = @import("std");
 
-const stdout = std.io.getStdOut().writer();
+var stdout_buffer: [1024]u8 = undefined;
+var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+const stdout = &stdout_writer.interface;
 
 pub fn main() !void {
     const path = "/sys/class/thermal/thermal_zone0/temp";
@@ -17,6 +19,7 @@ pub fn main() !void {
     const temp_percentage: u8 = @intCast(result);
 
     try stdout.print(" <span color='{s}'>{s} {:>1}ºC </span>\n ", .{ getColor(temp_percentage), getIcon(temp_percentage), temp_percentage });
+    try stdout.flush();
 }
 
 fn getColor(temp: u8) []const u8 {

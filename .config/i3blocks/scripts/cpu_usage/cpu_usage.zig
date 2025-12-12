@@ -1,6 +1,8 @@
 const std = @import("std");
 
-const stdout = std.io.getStdOut().writer();
+var stdout_buffer: [1024]u8 = undefined;
+var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+const stdout = &stdout_writer.interface;
 
 const CpuTimes = struct {
     user: u64,
@@ -61,7 +63,7 @@ fn readCpuTimes() !CpuTimes {
 
 pub fn main() !void {
     const cpu1 = try readCpuTimes();
-    std.time.sleep(500 * std.time.ns_per_ms); // 500ms
+    std.Thread.sleep(500 * std.time.ns_per_ms); // 500ms
 
     const cpu2 = try readCpuTimes();
 
@@ -72,6 +74,7 @@ pub fn main() !void {
     const usage_percent = @as(u8, @intFromFloat(usage_percent_f64));
 
     try stdout.print(" <span color='{s}'> {:.2}%</span> \n", .{ getColor(usage_percent), usage_percent });
+    try stdout.flush();
 }
 
 fn getColor(percent: u8) []const u8 {

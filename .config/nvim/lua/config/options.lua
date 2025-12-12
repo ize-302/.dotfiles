@@ -1,15 +1,10 @@
--- Options are automatically loaded before lazy.nvim startup
--- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
--- Add any additional options here
 -- [[ Setting options ]]
 -- See `:help vim.opt`
--- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
 -- Make line numbers default
 vim.opt.number = true
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
+-- Relative line numbers, to help with jumping.
 vim.opt.relativenumber = true
 
 vim.opt.expandtab = true -- use space in place of tab
@@ -20,10 +15,7 @@ vim.opt.mouse = "a"
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
--- Sync clipboard between OS and Neovim.
---  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
+-- Sync clipboard between OS and Neovim. See `:help 'clipboard'`
 vim.schedule(function()
   vim.opt.clipboard = "unnamedplus"
 end)
@@ -70,3 +62,9 @@ vim.opt.scrolloff = 10
 vim.g.lazyvim_eslint_auto_format = true
 
 vim.opt.termguicolors = true
+
+-- hide the ~ symbols
+vim.opt.fillchars = { eob = " " }
+
+-- hide extra empty line at bottom of lualine
+vim.opt.cmdheight = 0

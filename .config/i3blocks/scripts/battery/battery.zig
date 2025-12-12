@@ -1,6 +1,8 @@
 const std = @import("std");
 
-const stdout = std.io.getStdOut().writer();
+var stdout_buffer: [1024]u8 = undefined;
+var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+const stdout = &stdout_writer.interface;
 
 pub fn main() !void {
     const batt_capacity_path = "/sys/class/power_supply/BAT0/capacity";
@@ -19,9 +21,11 @@ pub fn main() !void {
     if (plugged) {
         if (batt_capacity > 0) {
             try stdout.print(" <span color='{s}'>{s} {}% ⚡</span>\n", .{ color, icon, batt_capacity });
+            try stdout.flush();
         }
     } else if (power_now == 0) {
         try stdout.print(" <span color='{s}'>{s} {}% 🤔</span>\n", .{ color, icon, batt_capacity });
+        try stdout.flush();
     } else if (power_now > 0) {
         const time_hours = @as(f64, @floatFromInt(energy_now)) / @as(f64, @floatFromInt(power_now));
         const time_minutes_f64 = time_hours * 60.0;
@@ -30,6 +34,7 @@ pub fn main() !void {
         const mins = time_minutes % 60;
 
         try stdout.print(" <span color='{s}'>{s} {}% {}h{}m</span>\n", .{ color, icon, batt_capacity, hrs, mins });
+        try stdout.flush();
     }
 }
 

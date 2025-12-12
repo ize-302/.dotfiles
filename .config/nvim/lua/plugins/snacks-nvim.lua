@@ -1,35 +1,47 @@
 return {
-  {
-    "snacks.nvim",
-    opts = {
-      dashboard = {
-        preset = {
-          pick = function(cmd, opts)
-            return LazyVim.pick(cmd, opts)()
-          end,
-
+  "snacks.nvim",
+  opts = {
+    dashboard = {
+      sections = {
+        {
           header = [[
-                                                             
-          ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ 
-          ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ 
-          ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ 
-          ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ 
-          ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ 
-          ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ 
-     ]],
-        -- stylua: ignore
-        ---@type snacks.dashboard.Item[]
-        keys = {
-          { icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
-          { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-          { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.dashboard.pick('live_grep')" },
-          { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
-          { icon = " ", key = "c", desc = "Config", action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" },
-          { icon = " ", key = "s", desc = "Restore Session", section = "session" },
-          { icon = " ", key = "x", desc = "Lazy Extras", action = ":LazyExtras" },
-          { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
-          { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+██╗   ██╗ █████╗ ██╗   ██╗██╗  ████████╗
+██║   ██║██╔══██╗██║   ██║██║  ╚══██╔══╝
+██║   ██║███████║██║   ██║██║     ██║   
+╚██╗ ██╔╝██╔══██║██║   ██║██║     ██║   
+ ╚████╔╝ ██║  ██║╚██████╔╝███████╗██║   
+  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝   
+]],
+          footer = [[]], -- Set the footer to an empty string
+          padding = 0, -- Optional: Adjust padding if needed
+          align = "center", -- Optional: Alignment setting
         },
+      },
+    },
+
+    scroll = {
+      configure = true,
+    },
+
+    lazygit = {
+      configure = true,
+      config = {
+        os = {
+          editPreset = "nvim-remote",
+        },
+        gui = {
+          nerdFontsVersion = "3", -- Set to "" to disable icons
+        },
+      },
+    },
+    -- Optional: Customize the appearance of the floating window
+    styles = {
+      lazygit = {
+        -- Example for a floating window
+        position = "float",
+        size = {
+          width = 0.8, -- 90% of screen width
+          height = 0.8, -- 90% of screen height
         },
       },
     },
