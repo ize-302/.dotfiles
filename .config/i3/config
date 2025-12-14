@@ -38,7 +38,8 @@ for_window [class="^.*"] move position center
 exec xrandr --dpi 100 --output eDP-1 --mode 1920x1080
 
 # set wallpapaer
-exec --no-startup-id feh --bg-fill --randomize ~/Pictures/wallpapers/*
+# exec --no-startup-id feh --bg-fill --randomize ~/Pictures/wallpapers/*
+exec nitrogen --restore
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
