@@ -23,3 +23,8 @@ startup_command = "nvim"
 name = "👽 Personal"
 path = "~/codebase/personal/"
 startup_command = "nvim"
+
+[[session]]
+name = "📝 Notes"
+path = "~/Notes/"
+startup_command = "nvim"
