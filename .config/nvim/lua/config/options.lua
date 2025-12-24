@@ -49,3 +49,8 @@ vim.o.autoindent = true
 -- Enable persistent undo
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.expand("~/.local/share/nvim/undo//")
+
+-- Enable Treesitter-based code folding
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldlevel = 99 -- Start with all folds open
