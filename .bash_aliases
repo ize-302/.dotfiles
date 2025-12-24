@@ -29,3 +29,6 @@ alias gparted="sudo gparted"
 
 # timeshift
 alias timeshift="sudo timeshift-gtk"
+
+# rm - requires trash-cli
+alias rm='trash-put'
