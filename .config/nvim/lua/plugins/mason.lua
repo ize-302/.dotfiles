@@ -34,6 +34,7 @@ return {
         "lua-language-server",
         "zls",
         "typescript-language-server",
+        "gopls",
       },
       auto_update = false,
       run_on_start = true,
@@ -45,6 +46,7 @@ return {
         "lua_ls",
         "zls",
         "ts_ls",
+        "gopls",
       },
       automatic_installation = true,
     })
