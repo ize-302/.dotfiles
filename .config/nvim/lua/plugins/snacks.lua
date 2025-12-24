@@ -98,6 +98,62 @@ return {
       nowait = true,
       desc = "References",
     },
+    {
+      "gD",
+      vim.lsp.buf.declaration,
+      desc = "Goto Declaration",
+    },
+    {
+      "gi",
+      function()
+        Snacks.picker.lsp_implementations()
+      end,
+      desc = "Goto Implementation",
+    },
+    {
+      "gy",
+      function()
+        Snacks.picker.lsp_type_definitions()
+      end,
+      desc = "Goto Type Definition",
+    },
+    {
+      "K",
+      vim.lsp.buf.hover,
+      desc = "Hover Documentation",
+    },
+    {
+      "<leader>ds",
+      function()
+        Snacks.picker.lsp_symbols()
+      end,
+      desc = "Document Symbols",
+    },
+    {
+      "<leader>rn",
+      vim.lsp.buf.rename,
+      desc = "Rename Symbol",
+    },
+    {
+      "<leader>ca",
+      vim.lsp.buf.code_action,
+      mode = { "n", "v" },
+      desc = "Code Action",
+    },
+    {
+      "]d",
+      function()
+        vim.diagnostic.jump({ count = 1, float = true })
+      end,
+      desc = "Next Diagnostic",
+    },
+    {
+      "[d",
+      function()
+        vim.diagnostic.jump({ count = -1, float = true })
+      end,
+      desc = "Prev Diagnostic",
+    },
   },
   init = function()
     vim.api.nvim_create_autocmd("User", {
