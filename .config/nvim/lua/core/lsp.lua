@@ -1,13 +1,18 @@
-vim.lsp.enable("lua_ls")
-vim.lsp.enable("zls")
-vim.lsp.enable("ts_ls")
-vim.lsp.enable("gopls")
-
+-- Set up LSP capabilities and enable servers after plugins load
+vim.api.nvim_create_autocmd("User", {
+  pattern = "VeryLazy",
+  callback = function()
+    vim.lsp.config("*", {
+      capabilities = require("cmp_nvim_lsp").default_capabilities(),
+    })
+    vim.lsp.enable("lua_ls")
+    vim.lsp.enable("zls")
+    vim.lsp.enable("ts_ls")
+  end,
+})
 vim.diagnostic.config({
-  -- virtual_lines = true,
   virtual_text = {
     prefix = "●",
-    -- prefix = "💀",
     spacing = 2,
   },
   underline = true,
