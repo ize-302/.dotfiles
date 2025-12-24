@@ -1,36 +1,52 @@
 return {
   "mason-org/mason.nvim",
   cmd = "Mason",
+  event = "VeryLazy",
   keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-  build = ":MasonUpdate",
-  opts_extend = { "ensure_installed" },
-  opts = {
-    ensure_installed = {
-      "stylua",
-      "shfmt",
-    },
+  dependencies = {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    "mason-org/mason-lspconfig.nvim",
   },
+  build = ":MasonUpdate",
   ---@param opts MasonSettings | {ensure_installed: string[]}
   config = function(_, opts)
-    require("mason").setup(opts)
-    local mr = require("mason-registry")
-    mr:on("package:install:success", function()
-      vim.defer_fn(function()
-        -- trigger FileType event to possibly load this newly installed LSP server
-        require("lazy.core.handler.event").trigger({
-          event = "FileType",
-          buf = vim.api.nvim_get_current_buf(),
-        })
-      end, 100)
-    end)
+    local mason = require("mason")
+    local mason_tool_installer = require("mason-tool-installer")
+    local mason_lspconfig = require("mason-lspconfig")
 
-    mr.refresh(function()
-      for _, tool in ipairs(opts.ensure_installed) do
-        local p = mr.get_package(tool)
-        if not p:is_installed() then
-          p:install()
-        end
-      end
-    end)
+    mason.setup({
+      ui = {
+        icons = {
+          package_installed = "✓",
+          package_pending = "➜",
+          package_uninstalled = "✗",
+        },
+      },
+    })
+
+    -- 1️⃣ Install tools & LSP binaries
+    mason_tool_installer.setup({
+      ensure_installed = {
+        -- formatters
+        "stylua",
+        "eslint",
+        -- lsp (mason package names)
+        "lua-language-server",
+        "zls",
+        "typescript-language-server",
+      },
+      auto_update = false,
+      run_on_start = true,
+    })
+
+    -- 2️⃣ Register LSPs with lspconfig
+    mason_lspconfig.setup({
+      ensure_installed = {
+        "lua_ls",
+        "zls",
+        "ts_ls",
+      },
+      automatic_installation = true,
+    })
   end,
 }
