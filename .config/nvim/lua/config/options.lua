@@ -1,70 +1,51 @@
--- [[ Setting options ]]
--- See `:help vim.opt`
---  For more options, you can see `:help option-list`
+-- set leader key
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
 
--- Make line numbers default
-vim.opt.number = true
--- Relative line numbers, to help with jumping.
-vim.opt.relativenumber = true
+-- Enable auto format
+vim.g.lazyvim_eslint_auto_format = true
 
-vim.opt.expandtab = true -- use space in place of tab
+-- show number
+vim.o.number = true
 
--- Enable mouse mode, can be useful for resizing splits for example!
+-- enable relative number
+-- vim.o.relativenumber = true
+
+-- remove extra space at the bottom
+vim.opt.cmdheight = 0
+
+-- hide the ~ symbol
+vim.opt.fillchars = { eob = " " }
+
+-- enable mouse mode, can be used for resizing split for example
 vim.opt.mouse = "a"
 
--- Don't show the mode, since it's already in the status line
-vim.opt.showmode = false
-
--- Sync clipboard between OS and Neovim. See `:help 'clipboard'`
+-- sync clipboard between os and neovim
 vim.schedule(function()
   vim.opt.clipboard = "unnamedplus"
 end)
 
--- Enable break indent
-vim.opt.breakindent = true
-
--- Save undo history
-vim.opt.undofile = true
-
--- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-
--- Keep signcolumn on by default
-vim.opt.signcolumn = "yes"
-
--- Decrease update time
-vim.opt.updatetime = 250
-
--- Decrease mapped sequence wait time
-vim.opt.timeoutlen = 300
-
--- Configure how new splits should be opened
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = "split"
-
--- Show which line your cursor is on
-vim.opt.cursorline = true
-
--- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
-
--- Set to false to disable auto format
-vim.g.lazyvim_eslint_auto_format = true
-
+-- use termguicolors
 vim.opt.termguicolors = true
 
--- hide the ~ symbols
-vim.opt.fillchars = { eob = " " }
+-- keep signcolumn on by default
+vim.opt.signcolumn = "yes"
 
--- hide extra empty line at bottom of lualine
-vim.opt.cmdheight = 0
+-- how many spaces per tab
+vim.o.tabstop = 2
+
+-- how many spaces per shift
+vim.o.shiftwidth = 2
+
+-- highlight line where cursor is
+vim.o.cursorline = true
+
+-- copy indentation from current line when creating new line
+vim.o.autoindent = true
+
+-- Enable persistent undo
+vim.opt.undofile = true
+vim.opt.undodir = vim.fn.expand("~/.local/share/nvim/undo//")

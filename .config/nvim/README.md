@@ -1,4 +1,15 @@
-# 💤 LazyVim
+# Todo
+- [x] LSP - lua, typescript, zig
+- [ ] Setup autocompletion
+- [ ] Diagnostics
+- [x] mini.icons integration for nvim-tree
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+## Hello
+
+```
+helo
+```
+
+
+
+helldsfa
