@@ -35,6 +35,7 @@ return {
         "zls",
         "typescript-language-server",
         "gopls",
+        "bash-language-server",
       },
       auto_update = false,
       run_on_start = true,
@@ -47,6 +48,7 @@ return {
         "zls",
         "ts_ls",
         "gopls",
+        "bashls",
       },
       automatic_installation = true,
     })
