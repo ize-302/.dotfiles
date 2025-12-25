@@ -6,7 +6,7 @@ startup_command = "yazi"
 [[session]]
 name = "Dotfiles"
 path = "~/.dotfiles"
-startup_command = "nvim"
+startup_command = ""
 
 [[session]]
 name = "Drizzle gateway"
@@ -16,12 +16,12 @@ startup_command = "./start"
 [[session]]
 name = "Personal"
 path = "~/codebase/personal/"
-startup_command = "nvim"
+startup_command = ""
 
 [[session]]
 name = "Notes"
 path = "~/Notes/"
-startup_command = "nvim"
+startup_command = ""
 
 [[session]]
 name = "Rechaj"
