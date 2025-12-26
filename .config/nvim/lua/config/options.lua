@@ -54,3 +54,6 @@ vim.opt.undodir = vim.fn.expand("~/.local/share/nvim/undo//")
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99 -- Start with all folds open
+
+-- set max length of text width
+vim.opt.textwidth = 80
