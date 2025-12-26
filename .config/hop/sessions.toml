@@ -26,6 +26,4 @@ startup_command = ""
 [[session]]
 name = "Rechaj"
 path = "~/codebase/work/rechaj"
-startup_command = ""
-
-
+ startup_command = ""
