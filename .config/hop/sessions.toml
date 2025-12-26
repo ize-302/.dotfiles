@@ -1,0 +1,29 @@
+[[session]]
+name = "File manager"
+path = "/home/ize"
+startup_command = "yazi"
+
+[[session]]
+name = "Dotfiles"
+path = "~/.dotfiles"
+startup_command = ""
+
+[[session]]
+name = "Drizzle gateway"
+path = "~/codebase/personal/drizzle-gateway"
+startup_command = "./start"
+
+[[session]]
+name = "Personal"
+path = "~/codebase/personal/"
+startup_command = ""
+
+[[session]]
+name = "Notes"
+path = "~/Notes/"
+startup_command = ""
+
+[[session]]
+name = "Rechaj"
+path = "~/codebase/work/rechaj"
+ startup_command = ""
