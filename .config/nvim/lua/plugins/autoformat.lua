@@ -27,6 +27,7 @@ return {
         html = { "biome", "prettierd", "prettier" },
         cpp = { "clang-format" },
         lua = { "stylua" },
+        zig = { "zigfmt" },
       },
       format_on_save = { timeout_ms = 500 },
     },
