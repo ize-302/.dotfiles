@@ -1,10 +1,10 @@
 const std = @import("std");
 
-var stdout_buffer: [1024]u8 = undefined;
-var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
-const stdout = &stdout_writer.interface;
-
 pub fn main() !void {
+    var stdout_buffer: [1024]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout = &stdout_writer.interface;
+
     const batt_capacity_path = "/sys/class/power_supply/BAT0/capacity";
     const energy_now_path = "/sys/class/power_supply/BAT0/energy_now";
     const power_now_path = "/sys/class/power_supply/BAT0/power_now";

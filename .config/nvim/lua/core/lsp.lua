@@ -5,13 +5,20 @@ vim.api.nvim_create_autocmd("User", {
     vim.lsp.config("*", {
       capabilities = require("cmp_nvim_lsp").default_capabilities(),
     })
+
+    -- Toggle inlay hints in Neovim
+    vim.lsp.inlay_hint.enable(true)
+
     vim.lsp.enable("lua_ls")
     vim.lsp.enable("zls")
     vim.lsp.enable("ts_ls")
     vim.lsp.enable("gopls")
     vim.lsp.enable("bashls")
+    vim.lsp.enable("clangd")
+    vim.lsp.enable("html")
   end,
 })
+
 vim.diagnostic.config({
   virtual_text = {
     prefix = "●",

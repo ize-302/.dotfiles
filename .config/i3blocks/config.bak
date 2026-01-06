@@ -4,7 +4,7 @@ interval=3600
 markup=pango
 
 [capslock-status]
-command=./scripts/capslock/capslock
+command=./scripts/capslock-status.py
 interval=1
 markup=pango
 
@@ -26,6 +26,11 @@ markup=pango
 
 [memory]
 command=./scripts/memory/memory
+markup=pango
+interval=1
+
+[volume]
+command=./scripts/volume.py
 markup=pango
 interval=1
 

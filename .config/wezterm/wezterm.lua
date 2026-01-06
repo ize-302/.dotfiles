@@ -4,7 +4,7 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
 -- automatically start a tmux session with name "genesis" when wezterm is opened
-config.default_prog = { "tmux", "new-session", "-A", "-s", "genesis" }
+config.default_prog = { "tmux", "new-session", "-A", "-s", "home" }
 
 --leader
 config.leader = { key = "Space", mods = "CTRL|SHIFT" }

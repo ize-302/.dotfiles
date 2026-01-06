@@ -36,6 +36,8 @@ return {
         "typescript-language-server",
         "gopls",
         "bash-language-server",
+        "clangd",
+        "html",
       },
       auto_update = false,
       run_on_start = true,
@@ -49,6 +51,8 @@ return {
         "ts_ls",
         "gopls",
         "bashls",
+        "clangd",
+        "html",
       },
       automatic_installation = true,
     })
