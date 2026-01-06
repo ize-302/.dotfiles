@@ -1,11 +1,11 @@
+[capslock]
+command=./scripts/capslock/capslock
+interval=1
+markup=pango
+
 [arch]
 command=./scripts/kernel/kernel
 interval=3600
-markup=pango
-
-[capslock-status]
-command=./scripts/capslock/capslock
-interval=1
 markup=pango
 
 [brightness]
@@ -34,7 +34,17 @@ command=./scripts/battery/battery
 interval=1
 markup=pango
 
-[datetime]
-command=date +"    %a, %d %b - %H:%M"
+[volume]
+command=./scripts/volume/volume
+markup=pango
+interval=1
+
+[date]
+command=date +"    %a, %d %b "
+interval=10
+color=#ffffff
+
+[time]
+command=date +"   %H:%M"
 interval=10
 color=#ffffff
