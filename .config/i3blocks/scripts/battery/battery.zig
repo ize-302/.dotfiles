@@ -20,11 +20,11 @@ pub fn main() !void {
 
     if (plugged) {
         if (batt_capacity > 0) {
-            try stdout.print(" <span color='{s}'>{s} {}% ⚡</span>\n", .{ color, icon, batt_capacity });
+            try stdout.print(" <span color='{s}'>{s} {}%</span> \n", .{ color, icon, batt_capacity });
             try stdout.flush();
         }
     } else if (power_now == 0) {
-        try stdout.print(" <span color='{s}'>{s} {}% 🤔</span>\n", .{ color, icon, batt_capacity });
+        try stdout.print(" <span color='{s}'>{s} {}%  </span>\n", .{ color, icon, batt_capacity });
         try stdout.flush();
     } else if (power_now > 0) {
         const time_hours = @as(f64, @floatFromInt(energy_now)) / @as(f64, @floatFromInt(power_now));
@@ -33,7 +33,7 @@ pub fn main() !void {
         const hrs = time_minutes / 60;
         const mins = time_minutes % 60;
 
-        try stdout.print(" <span color='{s}'>{s} {}% {}h{}m</span>\n", .{ color, icon, batt_capacity, hrs, mins });
+        try stdout.print(" <span color='{s}'>{s} {}% {}h{}m</span> \n", .{ color, icon, batt_capacity, hrs, mins });
         try stdout.flush();
     }
 }

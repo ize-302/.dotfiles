@@ -15,7 +15,8 @@ pub fn main() !void {
     const content = buffer[0..bytes_read];
 
     if (content[0] == 49) {
-        try stdout.print(" <span color='#FF0000'>⇪ locked</span> \n", .{});
-        try stdout.flush();
+        try stdout.print(" <span color='#ff5555'> ON</span> \n", .{});
     }
+
+    try stdout.flush();
 }
