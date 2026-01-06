@@ -1,9 +1,5 @@
 const std = @import("std");
 
-var stdout_buffer: [1024]u8 = undefined;
-var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
-const stdout = &stdout_writer.interface;
-
 const CpuTimes = struct {
     user: u64,
     nice: u64,
@@ -62,6 +58,10 @@ fn readCpuTimes() !CpuTimes {
 }
 
 pub fn main() !void {
+    var stdout_buffer: [1024]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout = &stdout_writer.interface;
+
     const cpu1 = try readCpuTimes();
     std.Thread.sleep(500 * std.time.ns_per_ms); // 500ms
 
