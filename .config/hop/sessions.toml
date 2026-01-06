@@ -26,4 +26,9 @@ startup_command = ""
 [[session]]
 name = "Rechaj"
 path = "~/codebase/work/rechaj"
- startup_command = ""
+startup_command = ""
+
+[[session]]
+name = "Fastwash"
+path = "~/codebase/work/fastwash-new"
+startup_command = ""
