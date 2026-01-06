@@ -37,6 +37,7 @@ return {
         "gopls",
         "bash-language-server",
         "clangd",
+        "html",
       },
       auto_update = false,
       run_on_start = true,
@@ -51,6 +52,7 @@ return {
         "gopls",
         "bashls",
         "clangd",
+        "html",
       },
       automatic_installation = true,
     })

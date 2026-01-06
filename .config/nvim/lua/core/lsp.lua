@@ -15,6 +15,7 @@ vim.api.nvim_create_autocmd("User", {
     vim.lsp.enable("gopls")
     vim.lsp.enable("bashls")
     vim.lsp.enable("clangd")
+    vim.lsp.enable("html")
   end,
 })
 
