@@ -1,41 +1,41 @@
 [capslock]
-command=./scripts/capslock/capslock
+command=./capslock/capslock
 interval=1
 markup=pango
 
 [arch]
-command=./scripts/kernel/kernel
+command=./kernel/kernel
 interval=3600
 markup=pango
 
 [brightness]
-command=./scripts/brightness/brightness
+command=./brightness/brightness
 interval=1
 color=#ffffff
 markup=pango
 
 [temperature]
-command=./scripts/temperature/temperature
+command=./temperature/temperature
 markup=pango
 interval=1
 
 [cpu_usage]
-command=./scripts/cpu_usage/cpu_usage
+command=./cpu_usage/cpu_usage
 interval=1
 markup=pango
 
 [memory]
-command=./scripts/memory/memory
+command=./memory/memory
 markup=pango
 interval=1
 
 [battery]
-command=./scripts/battery/battery
+command=./battery/battery
 interval=1
 markup=pango
 
 [volume]
-command=./scripts/volume/volume
+command=./volume/volume
 markup=pango
 interval=1
 
