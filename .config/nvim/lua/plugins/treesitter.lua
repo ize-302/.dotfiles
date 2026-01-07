@@ -20,12 +20,16 @@ return {
       "vim",
       "vimdoc",
       "tsx",
+      "c",
     },
     auto_install = true,
     highlight = {
       enable = true,
     },
     indent = {
+      enable = true,
+    },
+    autopairs = {
       enable = true,
     },
   },
