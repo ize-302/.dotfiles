@@ -1,7 +1,7 @@
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufWritePre" },
+    event = { "LspAttach", "BufReadPost", "BufNewFile" },
     cmd = { "ConformInfo" },
     keys = {
       {
@@ -28,8 +28,9 @@ return {
         cpp = { "clang-format" },
         lua = { "stylua" },
         zig = { "zigfmt" },
+        markdown = { "prettier" },
       },
-      format_on_save = { timeout_ms = 500 },
+      format_on_save = { timeout_ms = 2500 },
     },
   },
 }

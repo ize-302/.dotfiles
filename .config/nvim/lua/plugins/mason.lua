@@ -38,6 +38,7 @@ return {
         "bash-language-server",
         "clangd",
         "html",
+        "markdown-oxide",
       },
       auto_update = false,
       run_on_start = true,
@@ -53,6 +54,7 @@ return {
         "bashls",
         "clangd",
         "html",
+        "markdown_oxide",
       },
       automatic_installation = true,
     })

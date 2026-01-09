@@ -56,4 +56,8 @@ vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99 -- Start with all folds open
 
 -- set max length of text width
+vim.opt.wrap = true
 vim.opt.textwidth = 80
+vim.opt.linebreak = true
+vim.opt.list = false
+vim.opt.formatoptions:append("t")
