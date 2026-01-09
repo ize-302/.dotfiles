@@ -68,6 +68,10 @@ bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
 bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
+# set default volume level to 50%, second line ensures its not muted
+exec_always --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ 50% 
+exec_always --no-startup-id pactl set-sink-mute   @DEFAULT_SINK@ 0
+
 # use brightnessctl to adjust brightness in
 bindsym XF86MonBrightnessDown exec brightnessctl --min-val=1 -q set 3%-
 bindsym XF86MonBrightnessUp exec brightnessctl -q set 3%+
