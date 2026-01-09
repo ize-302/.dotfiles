@@ -8,12 +8,6 @@ command=./kernel/kernel
 interval=3600
 markup=pango
 
-[brightness]
-command=./brightness/brightness
-interval=1
-color=#ffffff
-markup=pango
-
 [temperature]
 command=./temperature/temperature
 markup=pango
