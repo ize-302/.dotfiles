@@ -52,5 +52,5 @@ foreground = "#c0caf5"
 
 [terminal]
 shell.program = "/bin/bash"
-shell.args = ["-l", "-c", "exec tmux attach || exec tmux"]
+shell.args = ["-l", "-c", "tmux attach || tmux"]
 
