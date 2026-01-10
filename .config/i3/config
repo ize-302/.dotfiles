@@ -17,7 +17,7 @@ set $up k
 set $right l
 
 # Preferred terminal emulator
-set $term wezterm
+set $term alacritty 
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -68,6 +68,10 @@ bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
 bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
+# set default volume level to 50%, second line ensures its not muted
+exec_always --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ 50% 
+exec_always --no-startup-id pactl set-sink-mute   @DEFAULT_SINK@ 0
+
 # use brightnessctl to adjust brightness in
 bindsym XF86MonBrightnessDown exec brightnessctl --min-val=1 -q set 3%-
 bindsym XF86MonBrightnessUp exec brightnessctl -q set 3%+
@@ -81,7 +85,7 @@ floating_modifier $mod
 tiling_drag modifier titlebar
 
 # start a terminal
-bindsym $mod+Return exec wezterm
+bindsym $mod+Return exec alacritty
 
 # kill focused window
 bindsym $mod+x kill
@@ -138,7 +142,7 @@ set $ws9 "9"
 set $ws10 "10"
 
 # define default app to open in certain workspace
-exec --no-startup-id i3-msg 'workspace 1; exec wezterm'
+exec --no-startup-id i3-msg 'workspace 1; exec alacritty'
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
