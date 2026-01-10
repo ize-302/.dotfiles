@@ -1,60 +1,56 @@
-# $HOME/.config/alacritty/alacritty.toml
-# by Rito Ghosh 2023-10-06
-#
-# Alacritty now uses TOML formatting for its config files.
-# This is a simple example.
-#
-# Specifications: https://github.com/alacritty/alacritty/blob/master/extra/man/alacritty.5.scd
-# It is straightforward to translate to TOML:
-# - Tables: WINDOW, COLORS, etc. → [window], [colors]
-# - Variables go under their respective tables
-# - Boolean example: dynamic_padding = true under [window]
-# - Multiple values: use dotted keys (e.g., padding.x = 5)
-#
-# TOML spec: https://toml.io/en/v1.0.0
-# Config location: $HOME/.config/alacritty/alacritty.toml (or other supported paths)
-
 [window]
-opacity = 0.8
-blur = true
+opacity = 1.0
 padding.x = 4
-padding.y = 4
-decorations = "Full"
+padding.y = 0
+decorations = "None"
 decorations_theme_variant = "Dark"
+dynamic_padding = false 
 
 [font]
-normal.family = "JetBrainsMono Nerd Font"
-bold.family = "JetBrainsMono Nerd Font"
-italic.family = "JetBrainsMono Nerd Font"
-bold_italic.family = "JetBrainsMono Nerd Font"
 size = 11.0
 
-# Tokyo-night theme
-# Source: https://github.com/zatchheems/tokyo-night-alacritty-theme/blob/main/tokyo-night.toml
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
 
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+[font.bold_italic]
+family = "JetBrainsMono Nerd Font"
+style = "Bold Italic"
+
+# Modified Tokyo-night theme
 [colors.bright]
-black   = "#444b6a"
-blue    = "#7da6ff"
-cyan    = "#0db9d7"
-green   = "#b9f27c"
+black   = "#414868"
+red     = "#f7768e"
+green   = "#9ece6a"
+yellow  = "#e0af68"
+blue    = "#7aa2f7"
 magenta = "#bb9af7"
-red     = "#ff7a93"
-white   = "#acb0d0"
-yellow  = "#ff9e64"
+cyan    = "#7dcfff"
+white   = "#c0caf5"
 
 [colors.normal]
-black   = "#32344a"
-blue    = "#7aa2f7"
-cyan    = "#449dab"
-green   = "#9ece6a"
-magenta = "#ad8ee6"
+black   = "#15161e"
 red     = "#f7768e"
-white   = "#787c99"
+green   = "#9ece6a"
 yellow  = "#e0af68"
+blue    = "#7aa2f7"
+magenta = "#bb9af7"
+cyan    = "#7dcfff"
+white   = "#a9b1d6"
 
 [colors.primary]
 background = "#1a1b26"
-foreground = "#a9b1d6"
+foreground = "#c0caf5"
 
-# Tip: For inspiration, check VS Code theme source files.
-# Use a color picker or an editor with HEX previews to test colors.
+[terminal]
+shell.program = "/bin/bash"
+shell.args = ["-l", "-c", "exec tmux attach || exec tmux"]
+
