@@ -224,18 +224,17 @@ bindsym $mod+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
-        # status_command py3status
+        status_command i3blocks
         position bottom 
 
         colors {
-            separator #444444
-            background #181818
+            separator #414868
+            background #15161e
             statusline #B1B1B1
-            focused_workspace #c3e88d #c3e88d #000000
+            focused_workspace #1a1b26 #9ece6a #1a1b26
             active_workspace #333333 #333333 #888888
-            inactive_workspace #1a1b26 #1a1b26 #c3e88d
-            urgent_workspace #7dd3fc #7dd3fc #000000
+            inactive_workspace #1a1b26 #1a1b26 #9ece6a
+            urgent_workspace #7dd3fc #7dd3fc #15161e
         }
 }
 
@@ -243,7 +242,7 @@ bar {
 set $base00 #282828
 set $base01 #fbf1c7
 set $base02 #cc241d
-set $base03 #c3e88d
+set $base03 #9ece6a
 set $base04 #ffffff
 
 ## Window Colours
