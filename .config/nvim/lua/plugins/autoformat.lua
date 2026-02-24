@@ -29,6 +29,7 @@ return {
         lua = { "stylua" },
         zig = { "zigfmt" },
         markdown = { "prettier" },
+        go = { "goimports", "gofumpt" },
       },
       format_on_save = { timeout_ms = 2500 },
     },
