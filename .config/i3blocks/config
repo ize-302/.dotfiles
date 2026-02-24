@@ -3,11 +3,6 @@ command=./capslock/capslock
 interval=1
 markup=pango
 
-[arch]
-command=./kernel/kernel
-interval=3600
-markup=pango
-
 [temperature]
 command=./temperature/temperature
 markup=pango
@@ -33,12 +28,17 @@ command=./volume/volume
 markup=pango
 interval=1
 
+[kernel]
+command=./kernel/kernel
+interval=3600
+markup=pango
+
 [date]
-command=date +"    %a, %d %b "
+command=date +"  %a, %d %b "
 interval=10
 color=#ffffff
 
 [time]
-command=date +"   %H:%M"
+command=date +" %H:%M"
 interval=10
 color=#ffffff

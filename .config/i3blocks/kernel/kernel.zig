@@ -15,6 +15,6 @@ pub fn main() !void {
     const content = buffer[0..bytes_read];
     const trimmed = std.mem.trim(u8, content, "\n");
 
-    try stdout.print(" <span color='#1793d1'> {s}</span> \n", .{trimmed});
+    try stdout.print(" <span color='#ffcc33'> {s}</span> \n", .{trimmed});
     try stdout.flush();
 }
