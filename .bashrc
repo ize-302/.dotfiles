@@ -112,3 +112,7 @@ export PATH=$PATH:$(go env GOPATH)/bin
 # opencode
 export PATH=/home/ize/.opencode/bin:$PATH
 export PATH=$PATH:/usr/local/go/bin
+
+# Add JBang to environment
+alias j!=jbang
+export PATH="$HOME/.jbang/bin:$PATH"
