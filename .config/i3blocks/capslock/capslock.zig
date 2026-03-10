@@ -6,7 +6,9 @@ pub fn main() !void {
     var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
     const stdout = &stdout_writer.interface;
 
-    const path = "/sys/class/leds/input7::capslock/brightness";
+    //list out files with "::capslock"
+
+    const path = "/sys/class/leds/input28::capslock/brightness";
     var file = try std.fs.openFileAbsolute(path, .{});
     defer file.close();
 
