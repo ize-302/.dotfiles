@@ -39,6 +39,7 @@ return {
         "clangd",
         "html",
         "markdown-oxide",
+        "jdtls",
       },
       auto_update = false,
       run_on_start = true,

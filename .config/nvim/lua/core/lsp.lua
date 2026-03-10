@@ -17,6 +17,7 @@ vim.api.nvim_create_autocmd("User", {
     vim.lsp.enable("clangd")
     vim.lsp.enable("html")
     vim.lsp.enable("markdown_oxide")
+    -- vim.lsp.enable("jdtls")
   end,
 })
 
