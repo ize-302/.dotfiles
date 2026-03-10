@@ -7,22 +7,23 @@ decorations_theme_variant = "Dark"
 dynamic_padding = false 
 
 [font]
-size = 11.0
+size = 12.0
+
 
 [font.normal]
-family = "JetBrainsMono Nerd Font"
+family = "GeistMono Nerd Font"
 style = "Regular"
 
 [font.bold]
-family = "JetBrainsMono Nerd Font"
+family = "GeistMono Nerd Font"
 style = "Bold"
 
 [font.italic]
-family = "JetBrainsMono Nerd Font"
+family = "GeistMono Nerd Font"
 style = "Italic"
 
 [font.bold_italic]
-family = "JetBrainsMono Nerd Font"
+family = "GeistMono Nerd Font"
 style = "Bold Italic"
 
 # Modified Tokyo-night theme
