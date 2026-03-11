@@ -30,6 +30,7 @@ return {
         zig = { "zigfmt" },
         markdown = { "prettier" },
         go = { "goimports", "gofumpt" },
+        java = { "google-java-format", "spotless" },
       },
       format_on_save = { timeout_ms = 2500 },
     },

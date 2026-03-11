@@ -24,6 +24,13 @@ path = "~/Notes/"
 startup_command = ""
 
 [[session]]
+name = "LedgeAtlas"
+path = "~/codebase/work/ledgeAtlas/"
+startup_command = ""
+
+
+
+[[session]]
 name = "Rechaj"
 path = "~/codebase/work/rechaj"
 startup_command = ""
@@ -32,3 +39,5 @@ startup_command = ""
 name = "Fastwash"
 path = "~/codebase/work/fastwash-new"
 startup_command = ""
+
+
