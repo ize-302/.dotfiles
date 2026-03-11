@@ -21,6 +21,7 @@ return {
       "vimdoc",
       "tsx",
       "c",
+      "java",
     },
     auto_install = true,
     highlight = {

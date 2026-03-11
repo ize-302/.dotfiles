@@ -6,6 +6,7 @@ return {
   dependencies = {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     "mason-org/mason-lspconfig.nvim",
+    "jay-babu/mason-nvim-dap.nvim",
   },
   build = ":MasonUpdate",
   ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -13,6 +14,7 @@ return {
     local mason = require("mason")
     local mason_tool_installer = require("mason-tool-installer")
     local mason_lspconfig = require("mason-lspconfig")
+    local mason_nvim_dap = require("mason-nvim-dap")
 
     mason.setup({
       ui = {
@@ -40,6 +42,8 @@ return {
         "html",
         "markdown-oxide",
         "jdtls",
+        -- debuggers
+        "js-debug-adapter",
       },
       auto_update = false,
       run_on_start = true,
@@ -57,6 +61,11 @@ return {
         "html",
         "markdown_oxide",
       },
+      automatic_installation = true,
+    })
+
+    mason_nvim_dap.setup({
+      ensure_installed = { "python", "delve" },
       automatic_installation = true,
     })
   end,
