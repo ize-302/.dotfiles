@@ -8,9 +8,6 @@ vim.g.lazyvim_eslint_auto_format = true
 -- show number
 vim.o.number = true
 
--- enable relative number
--- vim.o.relativenumber = true
-
 -- remove extra space at the bottom
 vim.opt.cmdheight = 0
 
@@ -61,3 +58,4 @@ vim.opt.textwidth = 80
 vim.opt.linebreak = true
 vim.opt.list = false
 vim.opt.formatoptions:append("t")
+

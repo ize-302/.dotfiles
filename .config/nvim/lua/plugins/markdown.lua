@@ -1,8 +1,5 @@
-return {
-  "MeanderingProgrammer/render-markdown.nvim",
-  dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.icons" }, -- if you use standalone mini plugins
-  ---@module 'render-markdown'
-  opts = {
-    render_modes = { "n", "c", "t" },
-  },
-}
+vim.pack.add({ "https://github.com/MeanderingProgrammer/render-markdown.nvim" })
+
+require("render-markdown").setup({
+	render_modes = { "n", "c", "t" },
+})

@@ -1,15 +1,10 @@
-return {
-  "windwp/nvim-autopairs",
-  event = "InsertEnter",
-  dependencies = { "hrsh7th/nvim-cmp" },
-  config = function()
-    local autopairs = require("nvim-autopairs")
-    autopairs.setup({
-      check_ts = true, -- Enable Treesitter integration
-    })
-    -- Integrate with nvim-cmp (auto-add parentheses after function completion)
-    local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-    local cmp = require("cmp")
-    cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-  end,
-}
+vim.pack.add({ "https://github.com/windwp/nvim-autopairs" })
+
+require("nvim-autopairs").setup({
+	check_ts = true,
+})
+
+-- Auto-add closing brackets after LSP completion
+local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+local cmp = require("cmp")
+cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
