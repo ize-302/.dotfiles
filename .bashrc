@@ -116,3 +116,5 @@ export PATH=$PATH:/usr/local/go/bin
 # Add JBang to environment
 alias j!=jbang
 export PATH="$HOME/.jbang/bin:$PATH"
+
+export PATH="$HOME/.local/bin:$PATH"
