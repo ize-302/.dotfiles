@@ -8,7 +8,7 @@ pub fn main() !void {
 
     //list out files with "::capslock"
 
-    const path = "/sys/class/leds/input28::capslock/brightness";
+    const path = "/sys/class/leds/input3::capslock/brightness";
     var file = try std.fs.openFileAbsolute(path, .{});
     defer file.close();
 
