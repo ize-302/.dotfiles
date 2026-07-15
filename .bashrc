@@ -118,3 +118,5 @@ alias j!=jbang
 export PATH="$HOME/.jbang/bin:$PATH"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+export PATH="/opt/postgresql17/bin:$PATH"

@@ -1,15 +1,15 @@
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    # ls
-    alias ls='ls --color=auto'
-    alias ll='ls -alF'
-    alias la='ls -A'
-    alias l='ls -CF'
+	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+	# ls
+	alias ls='ls --color=auto'
+	alias ll='ls -alF'
+	alias la='ls -A'
+	alias l='ls -CF'
 
-    #grep
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+	#grep
+	alias grep='grep --color=auto'
+	alias fgrep='fgrep --color=auto'
+	alias egrep='egrep --color=auto'
 fi
 
 # Desktop notification after long command
@@ -18,7 +18,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 ## Sudo
 alias abeg="sudo"
 
-# neovim 
+# neovim
 alias nv="nvim"
 
 # switch to use only external display
@@ -32,3 +32,22 @@ alias timeshift="sudo timeshift-gtk"
 
 # rm - requires trash-cli
 alias rm='trash-put'
+
+# using glow to render .md files beautifully
+# cat - required glow: https://github.com/charmbracelet/glow
+cat() {
+	local all_md=true
+
+	for arg in "$@"; do
+		[[ "$arg" == *.md ]] || {
+			all_md=false
+			break
+		}
+	done
+
+	if $all_md && [[ $# -gt 0 ]]; then
+		glow "$@"
+	else
+		command cat "$@"
+	fi
+}
