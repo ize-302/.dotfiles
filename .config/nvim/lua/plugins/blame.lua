@@ -1,9 +1,3 @@
-return {
-  {
-    "FabijanZulj/blame.nvim",
-    lazy = false,
-    config = function()
-      require("blame").setup({})
-    end,
-  },
-}
+vim.pack.add({ "https://github.com/FabijanZulj/blame.nvim" })
+
+require("blame").setup({})

@@ -1,22 +1,22 @@
 const std = @import("std");
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     var stdout_buffer: [1024]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buffer);
     const stdout = &stdout_writer.interface;
 
     const batt_capacity_path = "/sys/class/power_supply/BAT0/capacity";
     const energy_now_path = "/sys/class/power_supply/BAT0/energy_now";
     const power_now_path = "/sys/class/power_supply/BAT0/power_now";
 
-    const batt_capacity_u64 = try readIntFromFile(batt_capacity_path);
+    const batt_capacity_u64 = try readIntFromFile(batt_capacity_path, init);
     const batt_capacity: u8 = @as(u8, @intCast(batt_capacity_u64)); // cast to u8
 
-    const plugged = try isPluggedIn();
+    const plugged = try isPluggedIn(init);
     const icon = try getIcon(batt_capacity, plugged);
     const color = try getColor(batt_capacity, plugged);
-    const energy_now = try readIntFromFile(energy_now_path);
-    const power_now = try readIntFromFile(power_now_path);
+    const energy_now = try readIntFromFile(energy_now_path, init);
+    const power_now = try readIntFromFile(power_now_path, init);
 
     if (plugged) {
         if (batt_capacity > 0) {
@@ -74,25 +74,33 @@ fn getIcon(percent: u8, plugged: bool) ![]const u8 {
     }
 }
 
-fn isPluggedIn() !bool {
+fn isPluggedIn(init: std.process.Init) !bool {
     const file_path = "/sys/class/power_supply/AC/online";
-    var file = try std.fs.openFileAbsolute(file_path, .{});
-    defer file.close();
+    var file = try std.Io.Dir.openFileAbsolute(init.io, file_path, .{});
+    defer file.close(init.io);
 
     var buffer: [16]u8 = undefined;
-    const bytes_read = try file.readAll(&buffer);
-    const trimmed = std.mem.trim(u8, buffer[0..bytes_read], "\n");
+    var bytes_read = std.Io.File.reader(file, init.io, &buffer);
+
+    var content_buffer: [2048]u8 = undefined;
+    const bytes_read_size = try bytes_read.interface.readSliceShort(&content_buffer);
+    const content = content_buffer[0..bytes_read_size];
+    const trimmed = std.mem.trim(u8, content, "\n");
 
     return std.mem.eql(u8, trimmed, "1");
 }
 
-fn readIntFromFile(path: []const u8) !u64 {
-    var file = try std.fs.openFileAbsolute(path, .{});
-    defer file.close();
+fn readIntFromFile(path: []const u8, init: std.process.Init) !u64 {
+    var file = try std.Io.Dir.openFileAbsolute(init.io, path, .{});
+    defer file.close(init.io);
 
     var buffer: [32]u8 = undefined;
-    const bytes_read = try file.readAll(&buffer);
-    const trimmed = std.mem.trim(u8, buffer[0..bytes_read], "\n");
+    var bytes_read = std.Io.File.reader(file, init.io, &buffer);
+
+    var content_buffer: [2048]u8 = undefined;
+    const bytes_read_size = try bytes_read.interface.readSliceShort(&content_buffer);
+    const content = content_buffer[0..bytes_read_size];
+    const trimmed = std.mem.trim(u8, content, "\n");
 
     return try std.fmt.parseInt(u64, trimmed, 10);
 }

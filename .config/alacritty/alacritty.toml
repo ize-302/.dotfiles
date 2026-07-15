@@ -11,19 +11,19 @@ size = 12.0
 
 
 [font.normal]
-family = "GeistMono Nerd Font"
+family = "JetBrains Mono Nerd Font"
 style = "Regular"
 
 [font.bold]
-family = "GeistMono Nerd Font"
+family = "JetBrains Mono Nerd Font"
 style = "Bold"
 
 [font.italic]
-family = "GeistMono Nerd Font"
+family = "JetBrains Mono Nerd Font"
 style = "Italic"
 
 [font.bold_italic]
-family = "GeistMono Nerd Font"
+family = "JetBrains Mono Nerd Font"
 style = "Bold Italic"
 
 # Modified Tokyo-night theme

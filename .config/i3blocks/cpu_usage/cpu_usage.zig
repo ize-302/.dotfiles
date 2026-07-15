@@ -23,14 +23,17 @@ const CpuTimes = struct {
     }
 };
 
-fn readCpuTimes() !CpuTimes {
+fn readCpuTimes(init: std.process.Init) !CpuTimes {
     const path = "/proc/stat";
-    var file = try std.fs.openFileAbsolute(path, .{});
-    defer file.close();
+    var file = try std.Io.Dir.openFileAbsolute(init.io, path, .{});
+    defer file.close(init.io);
 
     var buffer: [256]u8 = undefined;
-    const bytes_read = try file.readAll(&buffer);
-    const content = buffer[0..bytes_read];
+    var bytes_read = std.Io.File.reader(file, init.io, &buffer);
+
+    var content_buffer: [2048]u8 = undefined;
+    const bytes_read_size = try bytes_read.interface.readSliceShort(&content_buffer);
+    const content = content_buffer[0..bytes_read_size];
 
     var lines = std.mem.splitAny(u8, content, "\n");
 
@@ -57,15 +60,15 @@ fn readCpuTimes() !CpuTimes {
     };
 }
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     var stdout_buffer: [1024]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buffer);
     const stdout = &stdout_writer.interface;
 
-    const cpu1 = try readCpuTimes();
-    std.Thread.sleep(500 * std.time.ns_per_ms); // 500ms
+    const cpu1 = try readCpuTimes(init);
+    try std.Io.sleep(init.io, std.Io.Duration{ .nanoseconds = 500 * std.time.ns_per_ms }, .awake); // 500ms
 
-    const cpu2 = try readCpuTimes();
+    const cpu2 = try readCpuTimes(init);
 
     const delta_total = cpu2.total() - cpu1.total();
     const delta_active = cpu2.active() - cpu1.active();

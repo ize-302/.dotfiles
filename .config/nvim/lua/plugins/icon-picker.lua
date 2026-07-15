@@ -1,10 +1,5 @@
-return {
-  "ziontee113/icon-picker.nvim",
-  config = function()
-    require("icon-picker").setup({ disable_legacy_commands = true })
+vim.pack.add({ "https://github.com/ziontee113/icon-picker.nvim" })
 
-    local opts = { noremap = true, silent = true }
+require("icon-picker").setup({ disable_legacy_commands = true })
 
-    vim.keymap.set("n", "<Leader>ic", "<cmd>IconPickerNormal<cr>", opts)
-  end,
-}
+vim.keymap.set("n", "<Leader>ic", "<cmd>IconPickerNormal<cr>", { noremap = true, silent = true })
