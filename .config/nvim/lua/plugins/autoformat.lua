@@ -13,6 +13,7 @@ require("conform").setup({
 		vue = { "biome", "prettierd", "prettier" },
 		html = { "biome", "prettierd", "prettier" },
 		cpp = { "clang-format" },
+		c = { "clang_format" },
 		lua = { "stylua" },
 		zig = { "zigfmt" },
 		markdown = { "prettier" },
@@ -20,7 +21,7 @@ require("conform").setup({
 		java = { "google-java-format", "spotless" },
 		php = { "php-cs-fixer" },
 	},
-	format_on_save = { timeout_ms = 2500 },
+	format_on_save = { timeout_ms = 500, lsp_format = "fallback" },
 })
 
 vim.keymap.set("", "<leader>f", function()

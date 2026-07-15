@@ -28,6 +28,10 @@ name = "LedgeAtlas"
 path = "~/codebase/work/ledgeAtlas/"
 startup_command = ""
 
+[[session]]
+name = "Comandel"
+path = "~/codebase/work/comandel"
+startup_command = ""
 
 
 [[session]]

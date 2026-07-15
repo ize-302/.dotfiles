@@ -1,15 +1,15 @@
 const std = @import("std");
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     var stdout_buffer: [1024]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buffer);
     const stdout = &stdout_writer.interface;
 
-    var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
+    var fba_buffer: [1024]u8 = undefined;
+    var fba = std.heap.FixedBufferAllocator.init(&fba_buffer);
+    const allocator = fba.allocator();
 
-    const volumeLevel = try getVolumeLevel(allocator);
+    const volumeLevel = try getVolumeLevel(allocator, init);
     const isMute = volumeLevel.is_muted;
     const color = try getColor(isMute);
     const icon = try getIcon(isMute, volumeLevel.percent);
@@ -18,9 +18,8 @@ pub fn main() !void {
     try stdout.flush();
 }
 
-fn getVolumeLevel(allocator: std.mem.Allocator) !struct { percent: u8, is_muted: bool } {
-    const result = try std.process.Child.run(.{
-        .allocator = allocator,
+fn getVolumeLevel(allocator: std.mem.Allocator, init: std.process.Init) !struct { percent: u8, is_muted: bool } {
+    const result = try std.process.run(allocator, init.io, .{
         .argv = &[_][]const u8{
             "wpctl",
             "get-volume",
