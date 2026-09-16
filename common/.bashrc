@@ -120,3 +120,6 @@ export PATH="$HOME/.jbang/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 export PATH="/opt/postgresql17/bin:$PATH"
+
+# claude-mocx: Claude Code tied to work account (separate config/auth dir)
+alias claude-mocx='CLAUDE_CONFIG_DIR="$HOME/.claude-work" claude'
