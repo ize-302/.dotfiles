@@ -46,6 +46,11 @@ shadows_on_csd enable
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
 # output * bg /home/ize/Downloads/sung-jinwoo.jpg fill
 exec ~/.azotebg
+exec $term
+
+# System tray applets
+exec_always --no-startup-id "pgrep -x nm-applet || nm-applet --indicator"
+exec_always --no-startup-id "pgrep -x blueman-applet || blueman-applet"
 
 # Layout: external on the left, laptop on the right
 output DP-2 pos 0 0
@@ -118,6 +123,10 @@ bindsym $mod+x kill
 
 # Start your launcher
 bindsym $mod+space exec $menu
+
+# Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet/blueman-applet)
+bindsym $mod+n exec nm-connection-editor
+bindsym $mod+Shift+b exec blueman-manager
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod normal
@@ -261,7 +270,9 @@ bindsym $mod+r mode "resize"
 # Read `man 5 sway-bar` for more information about this section.
 bar {
         status_command i3blocks
-        position bottom 
+        position bottom
+        tray_output *
+        icon_theme Papirus-Dark
 
         colors {
             separator #414868
