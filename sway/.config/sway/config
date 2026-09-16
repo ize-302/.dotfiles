@@ -44,12 +44,12 @@ shadows_on_csd enable
 
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /home/ize/Downloads/sung-jinwoo.jpg fill
-# exec nitrogen --restore
+# output * bg /home/ize/Downloads/sung-jinwoo.jpg fill
+exec ~/.azotebg
 
 # Layout: external on the left, laptop on the right
 output DP-2 pos 0 0
-output eDP-1 pos 1920 0
+output eDP-1 pos 1920 0 scale 1.4
 
 # Turn the laptop screen off/on with the lid
 bindswitch --reload --locked lid:on output eDP-1 disable
