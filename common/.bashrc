@@ -74,8 +74,8 @@ export NVM_DIR="$HOME/.nvm"
 # The Fuck (command corrector)
 eval "$(thefuck --alias)"
 
-# Rust (Cargo)
-. "$HOME/.cargo/env"
+# Rust (Cargo) - only present if installed via rustup-init.sh, not the distro rustup package
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # Bun
 export BUN_INSTALL="$HOME/.bun"

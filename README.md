@@ -1,8 +1,16 @@
 # My .dotfiles configuration
 
-This directory contains the .dotfiles for my computer
+This directory contains the .dotfiles for my computer, covering both **i3** and **Sway** setups.
 
-> NOTE: For easy 'stowing', I am making the file structure similar to that of my $HOME directory
+> NOTE: For easy 'stowing', each top-level directory is a separate GNU Stow package whose contents mirror my $HOME directory.
+
+## Layout
+
+- `common/` — configs shared by both window managers (shell, nvim, tmux, terminal, rofi, dunst, i3blocks, etc.)
+- `i3/` — i3-only configs (`i3`)
+- `sway/` — Sway-only configs (`sway`)
+
+Always stow `common` together with exactly one of `i3` or `sway`.
 
 ## Requirements
 
@@ -72,14 +80,16 @@ cd .dotfiles
 
 #### Method 1 (Manual setup)
 
-Then use GNU stow to create symlinks
+Then use GNU stow to create symlinks, picking exactly one of `i3` or `sway` alongside `common`:
 
 ```sh
-stow --adopt -v -t $HOME . # to install
+stow --adopt -v -t $HOME common i3   # to install i3
+stow --adopt -v -t $HOME common sway # to install Sway
 ```
 
 ```sh
-stow -v -t $HOME -D . # to uninstall
+stow -v -t $HOME -D common i3   # to uninstall i3
+stow -v -t $HOME -D common sway # to uninstall Sway
 ```
 
 #### Method 2 (Using .sh script)
@@ -93,10 +103,12 @@ chmod +x install.sh uninstall.sh
 Step ii. Run:
 
 ```sh
-./install.sh # to install
+./install.sh i3    # or: ./install.sh sway
 ```
 
 ```sh
-./uninstall.sh # to uninstall
+./uninstall.sh i3   # or: ./uninstall.sh sway
 ```
+
+Running either script with no argument will prompt you to choose interactively.
 
