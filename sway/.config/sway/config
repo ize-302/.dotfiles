@@ -118,6 +118,8 @@ bindsym $mod+Escape mode "$mode_system"
 
 bindsym $mod+Return exec $term
 
+bindsym $mod+s exec sh -c 'pkill -x flameshot || flameshot gui'
+
 # Kill focused window
 bindsym $mod+x kill
 
