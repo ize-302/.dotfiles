@@ -120,6 +120,8 @@ bindsym $mod+Return exec $term
 
 bindsym $mod+s exec sh -c 'pkill -x flameshot || flameshot gui'
 
+bindsym $mod+Shift+w exec ~/.local/bin/record-toggle
+
 # Kill focused window
 bindsym $mod+x kill
 
