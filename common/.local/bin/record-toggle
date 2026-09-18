@@ -9,6 +9,10 @@ else
 	-s | --sound)
 		audio_args=(--audio)
 		;;
+	-d | --desktop)
+		default_sink="$(pactl get-default-sink)"
+		audio_args=(--audio="${default_sink}.monitor")
+		;;
 	esac
 
 	notify-send "Select area to record"
