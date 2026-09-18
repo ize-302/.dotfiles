@@ -4,6 +4,13 @@ if pgrep -x wf-recorder >/dev/null; then
 	pkill -INT wf-recorder
 	notify-send "Recording saved"
 else
+	audio_args=()
+	case "$1" in
+	-s | --sound)
+		audio_args=(--audio)
+		;;
+	esac
+
 	notify-send "Select area to record"
-	wf-recorder -g "$(slurp)" -c libx264rgb -f ~/Videos/rec-$(date +%Y%m%d-%H%M%S).mp4
+	wf-recorder -g "$(slurp)" -c libx264rgb "${audio_args[@]}" -f ~/Videos/rec-$(date +%Y%m%d-%H%M%S).mp4
 fi
