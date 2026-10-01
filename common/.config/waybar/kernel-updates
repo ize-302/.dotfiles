@@ -83,7 +83,8 @@ while true; do
 		elif [ $((repo + aur)) -eq 0 ]; then
 			tooltip="System is up to date"
 		else
-			tooltip="$((repo + aur)) updates pending\\n$repo official · $aur AUR"
+			total=$((repo + aur))
+			tooltip="$total update$([ "$total" -ne 1 ] && echo s) pending\\n$repo official · $aur AUR"
 		fi
 
 		# A kernel upgrade removes the running kernel's modules until the next boot

@@ -169,11 +169,16 @@ window#waybar {
   opacity: 0.77;
 }
 
+/* Hover popups: flat panel, no border. The GTK theme would otherwise add its
+   own outline and shadow. */
 tooltip {
   background-color: #15161e;
-  border: 1px solid #414868;
+  border: none;
+  box-shadow: none;
 }
 tooltip label {
   color: #b1b1b1;
+  font-size: 11pt;
+  font-weight: 400;
   padding: 4px;
 }
