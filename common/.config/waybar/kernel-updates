@@ -1,0 +1,61 @@
+#!/bin/bash
+# Waybar custom/kernel: the tooltip reports the running kernel, pending
+# package updates (official repos via checkupdates, AUR via paru) and whether a
+# reboot is needed.
+# Runs continuously: prints the kernel at once, then re-checks every 30 minutes.
+kernel="$(uname -r)"
+cache="${XDG_RUNTIME_DIR:-/tmp}/waybar-kernel-updates"
+
+# The bar shows only an icon (see the module's format), so the version goes in
+# the tooltip. Text must stay non-empty or waybar hides the module.
+emit() { # tooltip
+	printf '{"text": "%s", "tooltip": "Kernel %s\\n%s"}\n' "$kernel" "$kernel" "$1"
+}
+
+# Prints "<repo> <aur>" or "error". One waybar instance runs per monitor, so the
+# check is locked and its result shared for a minute rather than run twice.
+check() {
+	(
+		flock 9
+		if [ -f "$cache" ] && [ $(($(date +%s) - $(stat -c %Y "$cache"))) -lt 60 ]; then
+			cat "$cache"
+			exit
+		fi
+		# checkupdates: 0 = updates listed, 2 = none, anything else = failed (e.g. offline)
+		repo_list="$(checkupdates 2>/dev/null)"
+		status=$?
+		if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
+			result=error
+		else
+			result="$(printf '%s' "$repo_list" | grep -c .) $(paru -Qua 2>/dev/null | grep -c .)"
+		fi
+		printf '%s\n' "$result" | tee "$cache"
+	) 9>"$cache.lock"
+}
+
+trap 'kill "$sleep_pid" 2>/dev/null; exit' TERM INT HUP
+
+emit "Checking for updates…"
+
+while true; do
+	read -r repo aur <<<"$(check)"
+
+	if [ "$repo" = error ]; then
+		tooltip="Could not check for updates"
+	elif [ $((repo + aur)) -eq 0 ]; then
+		tooltip="System is up to date"
+	else
+		tooltip="$((repo + aur)) updates pending\\n$repo official · $aur AUR"
+	fi
+
+	# A kernel upgrade removes the running kernel's modules until the next boot
+	if [ ! -d "/usr/lib/modules/$kernel" ]; then
+		tooltip="Reboot needed: kernel $kernel is no longer installed\\n$tooltip"
+	fi
+
+	emit "$tooltip"
+
+	sleep 1800 &
+	sleep_pid=$!
+	wait "$sleep_pid"
+done

@@ -6,6 +6,7 @@
 	"spacing": 0,
 	"modules-left": ["sway/workspaces", "sway/mode"],
 	"modules-right": [
+		"custom/kernel",
 		"custom/capslock",
 		"temperature",
 		"cpu",
@@ -13,7 +14,6 @@
 		"battery",
 		"backlight",
 		"wireplumber",
-		"custom/kernel",
 		"clock",
 		"tray",
 		"bluetooth"
@@ -118,11 +118,12 @@
 		"tooltip": false
 	},
 
+	// Icon only. Hover shows the kernel version and pending package updates;
+	// the script keeps running and re-checks every 30 minutes.
 	"custom/kernel": {
-		"exec": "uname -r",
-		"interval": "once",
-		"format": " <span color='#ffcc33'> {}</span> ",
-		"tooltip": false
+		"exec": "~/.config/waybar/kernel-updates",
+		"return-type": "json",
+		"format": " <span font_family='Noto Color Emoji'>🐧</span> "
 	},
 
 	"clock": {

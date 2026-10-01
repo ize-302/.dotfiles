@@ -53,6 +53,7 @@ window#waybar {
 }
 
 /* Status blocks, separated by a thin line like i3blocks */
+#custom-kernel,
 #custom-capslock,
 #temperature,
 #cpu,
@@ -60,11 +61,16 @@ window#waybar {
 #battery,
 #backlight,
 #wireplumber,
-#custom-kernel,
 #clock {
   padding: 0 4px;
   margin: 4px 0;
   border-right: 1px solid #414868;
+}
+
+/* Kernel icon is a colour emoji, so no text colour applies. The emoji has
+   its own side spacing, so the block padding is dropped to keep gaps even. */
+#custom-kernel {
+  padding: 0;
 }
 
 /* CPU / memory usage colours (states: value >= threshold) */
