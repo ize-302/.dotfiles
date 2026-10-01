@@ -75,11 +75,11 @@
 	},
 
 	// Battery states match when capacity <= value.
+	// Time remaining is shown on hover only.
 	"battery": {
 		"interval": 1,
 		"states": { "lt10": 9, "lt30": 29, "lt50": 49, "lt80": 79, "lt100": 99 },
 		"format": " {icon} {capacity}% ",
-		"format-discharging": " {icon} {capacity}% {time} ",
 		"format-time": "{H}h{M}m",
 		"format-icons": {
 			"charging": "󰂄",
@@ -92,7 +92,9 @@
 			"lt80": "󰂀",
 			"default": "󰁹"
 		},
-		"tooltip": false
+		"tooltip-format": "{timeTo}",
+		"tooltip-format-discharging": "{time} left",
+		"tooltip-format-charging": "{time} until full"
 	},
 
 	"backlight": {
