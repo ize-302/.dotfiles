@@ -60,10 +60,12 @@
 	},
 
 	// Colours come from the state classes in style.css.
+	// Click opens btop on its own workspace; click again there to close it.
 	"cpu": {
 		"interval": 1,
 		"format": "  {usage}% ",
 		"states": { "c0": 0, "c10": 10, "c25": 25, "c50": 50, "c60": 60, "c70": 70 },
+		"on-click": "~/.local/bin/btop-toggle",
 		"tooltip": false
 	},
 
@@ -71,6 +73,7 @@
 		"interval": 1,
 		"format": "  {percentage}% ",
 		"states": { "c0": 0, "c10": 10, "c25": 25, "c50": 50, "c60": 60, "c70": 70 },
+		"on-click": "~/.local/bin/btop-toggle",
 		"tooltip": false
 	},
 
