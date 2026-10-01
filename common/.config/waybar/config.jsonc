@@ -11,6 +11,7 @@
 		"cpu",
 		"memory",
 		"battery",
+		"backlight",
 		"wireplumber",
 		"custom/kernel",
 		"clock#date",
@@ -25,9 +26,11 @@
 
 	// keyboard-state needs read access to /dev/input (input group),
 	// so caps lock still uses the i3blocks binary.
+	// Sway signals RTMIN+8 on Caps_Lock release; the interval is a fallback.
 	"custom/capslock": {
 		"exec": "$HOME/.config/i3blocks/capslock/capslock",
-		"interval": 1,
+		"interval": 5,
+		"signal": 8,
 		"tooltip": false
 	},
 
@@ -89,6 +92,12 @@
 			"lt80": "󰂀",
 			"default": "󰁹"
 		},
+		"tooltip": false
+	},
+
+	"backlight": {
+		"device": "intel_backlight",
+		"format": " ☀️{percent}% ",
 		"tooltip": false
 	},
 
