@@ -110,23 +110,8 @@ input type:touchpad {
 # Login sound
 exec paplay /usr/share/sounds/freedesktop/stereo/service-login.oga
 
-# power options
-set $logoutSound /usr/share/sounds/freedesktop/stereo/service-logout.oga
-set $Locker swaylock -f -c 000000 && sleep 1
-set $mode_system  lock(l) |  logout(e) |   sleep(s) |  hibernate(h) |  reboot(r) |  shutdown(Shift+s)
-mode "$mode_system" {
-    bindsym l exec --no-startup-id $Locker, mode "default"
-    bindsym e exec --no-startup-id paplay $logoutSound && swaymsg exit, mode "default"
-    bindsym s exec --no-startup-id systemctl suspend, mode "default"
-    bindsym h exec --no-startup-id paplay $logoutSound && $Locker && systemctl hibernate, mode "default"
-    bindsym r exec --no-startup-id paplay $logoutSound && systemctl reboot, mode "default"
-    bindsym Shift+s exec --no-startup-id paplay $logoutSound && systemctl poweroff -i, mode "default"
-
-    # back to normal: Enter or Escape
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
-}
-bindsym $mod+Escape mode "$mode_system"
+# power options: centred rofi menu (lock, logout, sleep, hibernate, reboot, shutdown)
+bindsym $mod+Escape exec ~/.local/bin/power-menu
 
 bindsym $mod+Return exec $term
 

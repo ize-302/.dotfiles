@@ -1,0 +1,16 @@
+/**
+ * Power menu: same look as the application launcher, driven by
+ * ~/.local/bin/power-menu
+ **/
+
+@import                          "./launcher.rasi"
+
+/* No title or search box: just the six entries, vertically centred */
+mainbox {
+    children:                    [ "listview" ];
+    padding:                     34% 35%;
+}
+
+listview {
+    lines:                       6;
+}
