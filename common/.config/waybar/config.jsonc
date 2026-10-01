@@ -130,7 +130,7 @@
 	// the manager for pairing.
 	"bluetooth": {
 		"format": "󰂯",
-		"format-connected": "󰂱 {num_connections}",
+		"format-connected": "󰂱",
 		"format-off": "󰂲",
 		"format-disabled": "󰂲",
 		"format-no-controller": "",
@@ -146,6 +146,6 @@
 
 	"tray": {
 		"icon-size": 21,
-		"spacing": 6
+		"spacing": 4
 	}
 }

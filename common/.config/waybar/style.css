@@ -19,26 +19,23 @@ window#waybar {
   padding: 0 4px;
   margin: 0;
   background-color: #1a1b26;
-  color: #9ece6a;
-  border: 1px solid #1a1b26;
+  color: #565f89;
 }
 
+/* Shown on another output */
 #workspaces button.visible {
-  background-color: #333333;
-  color: #888888;
-  border-color: #333333;
+  background-color: #1a1b26;
+  color: #a9b1d6;
 }
 
 #workspaces button.focused {
-  background-color: #9ece6a;
-  color: #1a1b26;
-  border-color: #1a1b26;
+  background-color: #292e42;
+  color: #c0caf5;
 }
 
 #workspaces button.urgent {
-  background-color: #7dd3fc;
+  background-color: #f7768e;
   color: #15161e;
-  border-color: #7dd3fc;
 }
 
 #workspaces button:hover {
@@ -137,11 +134,8 @@ window#waybar {
 
 /* Bluetooth sits beside the tray icons, so no separator */
 #bluetooth {
-  padding: 0 6px;
+  padding: 0 10px 0 0px;
   color: #ffffff;
-}
-#bluetooth.connected {
-  color: #7dd3fc;
 }
 #bluetooth.off,
 #bluetooth.disabled {
