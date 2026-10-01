@@ -103,6 +103,9 @@ input type:touchpad {
     natural_scroll enabled
 }
 
+# Login sound
+exec paplay /usr/share/sounds/freedesktop/stereo/service-login.oga
+
 # power options
 set $logoutSound /usr/share/sounds/freedesktop/stereo/service-logout.oga
 set $Locker swaylock -f -c 000000 && sleep 1
