@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" version="1">
- <!-- Papirus icon (GPL-3.0) redrawn on a rounded square -->
- <rect style="opacity:0.2" width="40" height="40" x="4" y="5" rx="6" ry="6"/>
- <rect style="fill:#ff5722" width="40" height="40" x="4" y="4" rx="6" ry="6"/>
- <path style="opacity:0.2;fill:#ffffff" d="M 10,4 C 6.676,4 4,6.676 4,10 v 1 C 4,7.676 6.676,5 10,5 h 28 c 3.324,0 6,2.676 6,6 V 10 C 44,6.676 41.324,4 38,4 Z"/>
+ <!-- Papirus icon (GPL-3.0) redrawn on a square -->
+ <rect style="opacity:0.2" width="40" height="40" x="4" y="5"/>
+ <rect style="fill:#ff5722" width="40" height="40" x="4" y="4"/>
+ <path style="opacity:0.2;fill:#ffffff" d="M 4,4 V 5 H 44 V 4 Z"/>
  <g transform="translate(24 24) scale(0.72) translate(-24 -24)">
   <path style="opacity:0.2" d="m 24,11 c -4.432,0 -8,3.568 -8,8 v 4 h -2 c -1.108,0 -2,0.892 -2,2 v 12 c 0,1.108 0.892,2 2,2 h 20 c 1.108,0 2,-0.892 2,-2 V 25 c 0,-1.108 -0.892,-2 -2,-2 h -2 v -4 c 0,-4.432 -3.568,-8 -8,-8 z m 0,4 c 2.216,0 4,1.784 4,4 v 4 h -8 v -4 c 0,-2.216 1.784,-4 4,-4 z"/>
   <path style="fill:#ffffff" d="m 24,10 c -4.432,0 -8,3.568 -8,8 v 4 h -2 c -1.108,0 -2,0.892 -2,2 v 12 c 0,1.108 0.892,2 2,2 h 20 c 1.108,0 2,-0.892 2,-2 V 24 c 0,-1.108 -0.892,-2 -2,-2 h -2 v -4 c 0,-4.432 -3.568,-8 -8,-8 z m 0,4 c 2.216,0 4,1.784 4,4 v 4 h -8 v -4 c 0,-2.216 1.784,-4 4,-4 z"/>

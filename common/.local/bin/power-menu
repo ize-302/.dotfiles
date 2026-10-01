@@ -1,7 +1,7 @@
 #!/bin/bash
 # ~/.local/bin/power-menu
-# Rofi power menu styled like the app launcher. Pick with arrows + Enter, a
-# click, or the key shown beside each entry. Running it again while open closes it.
+# Rofi power menu styled like the app launcher. Pick with arrows + Enter or a
+# click. Running it again while open closes it.
 if pgrep -x rofi >/dev/null; then
 	pkill -x rofi
 	exit 0
@@ -12,42 +12,23 @@ locker=(swaylock -f -c 000000)
 
 icons=~/.config/rofi/icons
 
-# label (also the icon file name), key hint
-entries=(
-	lock l
-	logout e
-	sleep s
-	hibernate h
-	reboot r
-	shutdown 'Shift+s'
-)
+# label (also the icon file name)
+entries=(lock logout sleep hibernate reboot shutdown)
 
 menu=""
-for ((i = 0; i < ${#entries[@]}; i += 2)); do
-	# \0icon\x1f<path> is rofi's per-row icon syntax; kept escaped until printed
-	printf -v row "%s <span weight='bold' size='small'>(%s)</span>%s%s" \
-		"${entries[i]}" "${entries[i + 1]}" '\0icon\x1f' "$icons/${entries[i]}.svg"
-	menu+="${menu:+|}$row"
+for entry in "${entries[@]}"; do
+	# \0icon\x1f<path> is rofi's per-row icon syntax
+	menu+="${menu:+|}$entry\0icon\x1f$icons/$entry.svg"
 done
 
-choice="$(printf '%b' "$menu" | rofi -dmenu -sep '|' -markup-rows -show-icons -format i -no-custom \
-	-theme ~/.config/rofi/powermenu.rasi \
-	-kb-custom-1 l -kb-custom-2 e -kb-custom-3 s \
-	-kb-custom-4 h -kb-custom-5 r -kb-custom-6 'Shift+s')"
-code=$?
+choice="$(printf '%b' "$menu" | rofi -dmenu -sep '|' -show-icons -no-custom \
+	-theme ~/.config/rofi/powermenu.rasi)" || exit 0
 
-# Enter/click prints the row index; the hint keys exit with 10..15.
-case "$code" in
-0) index="$choice" ;;
-1[0-5]) index=$((code - 10)) ;;
-*) exit 0 ;;
-esac
-
-case "$index" in
-0) "${locker[@]}" ;;
-1) paplay "$logout_sound" && swaymsg exit ;;
-2) systemctl suspend ;;
-3) paplay "$logout_sound" && "${locker[@]}" && sleep 1 && systemctl hibernate ;;
-4) paplay "$logout_sound" && systemctl reboot ;;
-5) paplay "$logout_sound" && systemctl poweroff -i ;;
+case "$choice" in
+lock) "${locker[@]}" ;;
+logout) paplay "$logout_sound" && swaymsg exit ;;
+sleep) systemctl suspend ;;
+hibernate) paplay "$logout_sound" && "${locker[@]}" && sleep 1 && systemctl hibernate ;;
+reboot) paplay "$logout_sound" && systemctl reboot ;;
+shutdown) paplay "$logout_sound" && systemctl poweroff -i ;;
 esac
