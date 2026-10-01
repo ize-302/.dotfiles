@@ -123,3 +123,10 @@ export PATH="/opt/postgresql17/bin:$PATH"
 
 # claude-mocx: Claude Code tied to work account (separate config/auth dir)
 alias claude-mocx='CLAUDE_CONFIG_DIR="$HOME/.claude-work" claude'
+
+# ZVM
+export ZVM_INSTALL="$HOME/.zvm/self"
+if [ -d "$ZVM_INSTALL" ]; then
+  export PATH="$PATH:$HOME/.zvm/bin"
+  export PATH="$PATH:$ZVM_INSTALL"
+fi

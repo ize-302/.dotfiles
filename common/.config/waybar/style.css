@@ -1,0 +1,138 @@
+/* Colours taken from the sway `bar { colors { ... } }` block */
+
+* {
+  font-family: "JetBrainsMono NF", monospace;
+  font-weight: 500;
+  font-size: 13pt;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+}
+
+window#waybar {
+  background-color: #15161e;
+  color: #b1b1b1;
+}
+
+/* Workspaces */
+#workspaces button {
+  padding: 0 4px;
+  margin: 0;
+  background-color: #1a1b26;
+  color: #9ece6a;
+  border: 1px solid #1a1b26;
+}
+
+#workspaces button.visible {
+  background-color: #333333;
+  color: #888888;
+  border-color: #333333;
+}
+
+#workspaces button.focused {
+  background-color: #9ece6a;
+  color: #1a1b26;
+  border-color: #1a1b26;
+}
+
+#workspaces button.urgent {
+  background-color: #7dd3fc;
+  color: #15161e;
+  border-color: #7dd3fc;
+}
+
+#workspaces button:hover {
+  box-shadow: none;
+  text-shadow: none;
+  background-image: none;
+}
+
+/* Binding mode indicator (swaybar defaults) */
+#mode {
+  padding: 0 6px;
+  background-color: #900000;
+  color: #ffffff;
+  border: 1px solid #2f343a;
+}
+
+/* Status blocks, separated by a thin line like i3blocks */
+#custom-capslock,
+#temperature,
+#cpu,
+#memory,
+#battery,
+#wireplumber,
+#custom-kernel,
+#clock {
+  padding: 0 4px;
+  margin: 4px 0;
+  border-right: 1px solid #414868;
+}
+
+/* CPU / memory usage colours (states: value >= threshold) */
+#cpu.c0,
+#memory.c0 {
+  color: #00ff00;
+}
+#cpu.c10,
+#memory.c10 {
+  color: #bfff00;
+}
+#cpu.c25,
+#memory.c25 {
+  color: #ffff00;
+}
+#cpu.c50,
+#memory.c50 {
+  color: #ffbf00;
+}
+#cpu.c60,
+#memory.c60 {
+  color: #ff8000;
+}
+#cpu.c70,
+#memory.c70 {
+  color: #ff0000;
+}
+
+/* Battery colours (states: capacity <= threshold) */
+#battery {
+  color: #00ff00;
+}
+#battery.lt80 {
+  color: #bfff00;
+}
+#battery.lt50 {
+  color: #ffff00;
+}
+#battery.lt30 {
+  color: #ff8000;
+}
+#battery.lt10 {
+  color: #ff0000;
+}
+/* Must come after the capacity states so plugged-in wins */
+#battery.charging,
+#battery.plugged,
+#battery.full {
+  color: #7dd3fc;
+}
+
+#wireplumber {
+  color: #ffffff;
+}
+#wireplumber.muted {
+  color: #808080;
+}
+
+#clock {
+  color: #ffffff;
+}
+
+#clock.time {
+  margin-right: 6px;
+}
+
+#tray {
+  padding: 0 6px;
+}

@@ -23,7 +23,7 @@ pub fn main(init: std.process.Init) !void {
     const usage_percent_f64 = @as(f64, @floatFromInt(used)) / @as(f64, @floatFromInt(total)) * 100.0;
     const usage_percent = @as(u8, @intFromFloat(usage_percent_f64));
 
-    try stdout.print(" <span color='{s}'> {:>1}% </span>\n ", .{ getColor(usage_percent), usage_percent });
+    try stdout.print(" <span color='{s}'> {:>1}% </span>\n ", .{ getColor(usage_percent), usage_percent });
     try stdout.flush();
 }
 

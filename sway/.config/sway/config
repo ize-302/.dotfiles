@@ -118,9 +118,11 @@ bindsym $mod+Escape mode "$mode_system"
 
 bindsym $mod+Return exec $term
 
+# screenshot
 bindsym $mod+s exec sh -c 'pkill -x flameshot || flameshot gui'
 
-bindsym $mod+Shift+w exec ~/.local/bin/record-toggle
+# screenrecord
+bindsym $mod+Shift+s exec ~/.local/bin/record-toggle
 
 # Kill focused window
 bindsym $mod+x kill
@@ -273,10 +275,11 @@ bindsym $mod+r mode "resize"
 #
 # Read `man 5 sway-bar` for more information about this section.
 bar {
-        status_command i3blocks
-        position bottom
-        tray_output *
-        icon_theme Papirus-Dark
+				swaybar_command waybar
+        # status_command i3blocks
+        # position bottom
+        # tray_output *
+        # icon_theme Papirus-Dark
 
         colors {
             separator #414868
