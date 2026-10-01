@@ -16,10 +16,15 @@ window#waybar {
 
 /* Workspaces */
 #workspaces button {
-  padding: 0 4px;
+  padding: 0 14px 0 6px;
   margin: 0;
   background-color: #1a1b26;
   color: #565f89;
+}
+
+/* No icons to make room for, so keep the number centred */
+#workspaces button.empty {
+  padding: 0 6px;
 }
 
 /* Shown on another output */

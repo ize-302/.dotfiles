@@ -1,15 +1,44 @@
 #!/bin/bash
-# Waybar custom/kernel: the tooltip reports the running kernel, pending
-# package updates (official repos via checkupdates, AUR via paru) and whether a
-# reboot is needed.
-# Runs continuously: prints the kernel at once, then re-checks every 30 minutes.
+# Waybar custom/kernel: a penguin whose tooltip reports the running kernel,
+# pending package updates (official repos via checkupdates, AUR via paru) and
+# whether a reboot is needed. Every so often it also types out "Arch BTW!".
+# Runs continuously: prints the penguin at once, re-checks every 30 minutes.
 kernel="$(uname -r)"
 cache="${XDG_RUNTIME_DIR:-/tmp}/waybar-kernel-updates"
 
-# The bar shows only an icon (see the module's format), so the version goes in
-# the tooltip. Text must stay non-empty or waybar hides the module.
-emit() { # tooltip
-	printf '{"text": "%s", "tooltip": "Kernel %s\\n%s"}\n' "$kernel" "$kernel" "$1"
+penguin="<span font_family='Noto Color Emoji'>🐧</span>"
+phrase="Arch BTW!"
+talk_min=10 # seconds of silence before it speaks: talk_min plus up to talk_span
+talk_span=600
+talk_hold=3 # seconds the full phrase stays up
+
+tooltip="Checking for updates…"
+
+emit() { # [speech]
+	# the speech goes in front of the penguin
+	printf '{"text": "%s%s", "tooltip": "Kernel %s\\n%s"}\n' \
+		"${1:+<span color='#1793d1'>$1</span> }" "$penguin" "$kernel" "$tooltip"
+}
+
+nap() { # seconds; cut short by USR1, or when waybar stops the script
+	sleep "$1" &
+	sleep_pid=$!
+	wait "$sleep_pid"
+	kill "$sleep_pid" 2>/dev/null
+}
+
+# Types the phrase out letter by letter, holds it, then deletes it again
+say() {
+	local i
+	for ((i = 1; i <= ${#phrase}; i++)); do
+		emit "${phrase:0:i}"
+		nap 0.09
+	done
+	nap "$talk_hold"
+	for ((i = ${#phrase} - 1; i >= 0; i--)); do
+		emit "${phrase:0:i}"
+		nap 0.04
+	done
 }
 
 # Prints "<repo> <aur>" or "error". One waybar instance runs per monitor, so the
@@ -33,29 +62,40 @@ check() {
 	) 9>"$cache.lock"
 }
 
-trap 'kill "$sleep_pid" 2>/dev/null; exit' TERM INT HUP
+# Never leave a sleep behind, whether waybar stops us or just goes away (PIPE)
+trap 'kill "$sleep_pid" 2>/dev/null' EXIT
+trap 'exit' TERM INT HUP PIPE
+# USR1 makes the penguin speak at once (it ends the current nap; if an update
+# check is running, it speaks as soon as that finishes):
+#   pkill -USR1 -f '/waybar/kernel-updates$'
+trap 'poke=1' USR1
 
-emit "Checking for updates…"
+emit
+next_check=0
 
 while true; do
-	read -r repo aur <<<"$(check)"
+	if [ "$(date +%s)" -ge "$next_check" ]; then
+		read -r repo aur <<<"$(check)"
 
-	if [ "$repo" = error ]; then
-		tooltip="Could not check for updates"
-	elif [ $((repo + aur)) -eq 0 ]; then
-		tooltip="System is up to date"
-	else
-		tooltip="$((repo + aur)) updates pending\\n$repo official · $aur AUR"
+		# anything but two numbers (failed check, damaged cache) counts as an error
+		if ! [[ "$repo" =~ ^[0-9]+$ && "$aur" =~ ^[0-9]+$ ]]; then
+			tooltip="Could not check for updates"
+		elif [ $((repo + aur)) -eq 0 ]; then
+			tooltip="System is up to date"
+		else
+			tooltip="$((repo + aur)) updates pending\\n$repo official · $aur AUR"
+		fi
+
+		# A kernel upgrade removes the running kernel's modules until the next boot
+		if [ ! -d "/usr/lib/modules/$kernel" ]; then
+			tooltip="Reboot needed: kernel $kernel is no longer installed\\n$tooltip"
+		fi
+
+		next_check=$(($(date +%s) + 1800))
+		emit
 	fi
 
-	# A kernel upgrade removes the running kernel's modules until the next boot
-	if [ ! -d "/usr/lib/modules/$kernel" ]; then
-		tooltip="Reboot needed: kernel $kernel is no longer installed\\n$tooltip"
-	fi
-
-	emit "$tooltip"
-
-	sleep 1800 &
-	sleep_pid=$!
-	wait "$sleep_pid"
+	[ -z "$poke" ] && nap $((talk_min + RANDOM % talk_span))
+	say
+	poke=
 done

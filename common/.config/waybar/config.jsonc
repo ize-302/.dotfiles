@@ -19,9 +19,27 @@
 		"bluetooth"
 	],
 
+	// {windows} adds one icon per open window, picked by app id below
+	// (Nerd Font glyphs; anything unlisted gets the generic window icon).
+	// Each icon has thin spaces (U+2009) around it, two before and one after, so an empty workspace
+	// shows the number alone.
 	"sway/workspaces": {
 		"disable-scroll": false,
-		"all-outputs": false
+		"all-outputs": false,
+		"format": "{name}{windows}",
+		"format-window-separator": "",
+		"window-rewrite-default": "   ",
+		"window-rewrite": {
+			"class<Alacritty>": "   ",
+			"class<btop>": "   ",
+			"class<zen.*|firefox.*|librewolf>": "   ",
+			"class<google-chrome.*|chromium.*>": "   ",
+			"class<[Tt]hunar>": "   ",
+			"class<com.obsproject.Studio>": "   ",
+			"class<mpv|vlc>": "   ",
+			"class<blueman-manager>": "   ",
+			"class<nm-connection-editor>": "   "
+		}
 	},
 
 	// keyboard-state needs read access to /dev/input (input group),
@@ -118,12 +136,14 @@
 		"tooltip": false
 	},
 
-	// Icon only. Hover shows the kernel version and pending package updates;
-	// the script keeps running and re-checks every 30 minutes.
+	// The script prints the penguin (and, now and then, "Arch BTW!"). Hover shows
+	// the kernel version and pending package updates.
+	// Click makes it speak at once.
 	"custom/kernel": {
 		"exec": "~/.config/waybar/kernel-updates",
 		"return-type": "json",
-		"format": " <span font_family='Noto Color Emoji'>🐧</span> "
+		"on-click": "pkill -USR1 -f '/waybar/kernel-updates$'",
+		"format": " {} "
 	},
 
 	"clock": {
