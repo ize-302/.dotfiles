@@ -120,22 +120,30 @@ window#waybar {
   color: orange;
 }
 
+/* Volume: green normally, yellow from 71%, red when boosted past 100% */
 #wireplumber {
-  color: #2ac3de;
+  color: #9ece6a;
 }
+#wireplumber.high {
+  color: #e0af68;
+}
+#wireplumber.over {
+  color: #f7768e;
+}
+/* Must come after the level states so muted wins */
 #wireplumber.muted {
   color: #808080;
 }
 
 #clock {
-  color: #ffffff;
+  color: #b0b0b2;
   margin-right: 6px;
 }
 
 /* Bluetooth sits beside the tray icons, so no separator */
 #bluetooth {
   padding: 0 10px 0 0px;
-  color: #ffffff;
+  color: #b0b0b2;
 }
 #bluetooth.off,
 #bluetooth.disabled {
@@ -144,6 +152,10 @@ window#waybar {
 
 #tray {
   padding: 0 6px 0 0px;
+}
+/* Tray icons are images, so CSS can't recolour them; dim to match #a9b1d6 */
+#tray image {
+  opacity: 0.77;
 }
 
 tooltip {
