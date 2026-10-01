@@ -112,11 +112,6 @@ input type:touchpad {
 bindgesture swipe:4:left workspace next_on_output
 bindgesture swipe:4:right workspace prev_on_output
 
-# Four-finger swipe up opens the app menu (unless a rofi menu is already up),
-# swipe down closes it
-bindgesture swipe:4:up exec pgrep -x rofi || $menu
-bindgesture swipe:4:down exec pkill -x rofi
-
 # Login sound
 exec paplay /usr/share/sounds/freedesktop/stereo/service-login.oga
 
@@ -143,10 +138,6 @@ bindsym $mod+Shift+b exec blueman-manager
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod normal
-
-# App menu running as an X11 window (see $menu): cover the whole screen like
-# the overlay version did
-for_window [class="Rofi"] border none, fullscreen enable
 
 # btop opened from waybar's cpu/memory blocks (~/.local/bin/btop-toggle) gets
 # its own workspace

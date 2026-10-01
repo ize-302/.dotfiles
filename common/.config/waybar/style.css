@@ -182,3 +182,7 @@ tooltip label {
   font-weight: 400;
   padding: 4px;
 }
+
+.modules-right {
+  background-color: #1a1b26;
+}
