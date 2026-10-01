@@ -100,6 +100,7 @@ bindswitch --reload --locked lid:off output eDP-1 enable
 
 input type:touchpad {
     tap enabled
+    natural_scroll enabled
 }
 
 # power options
