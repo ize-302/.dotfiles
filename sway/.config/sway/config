@@ -98,6 +98,10 @@ bindswitch --reload --locked lid:off output eDP-1 enable
 # You can also configure each device individually.
 # Read `man 5 sway-input` for more information about this section.
 
+input type:touchpad {
+    tap enabled
+}
+
 # power options
 set $logoutSound /usr/share/sounds/freedesktop/stereo/service-logout.oga
 set $Locker swaylock -f -c 000000 && sleep 1
