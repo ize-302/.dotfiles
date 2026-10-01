@@ -50,7 +50,11 @@ exec $term
 
 # System tray applets
 exec_always --no-startup-id "pgrep -x nm-applet || nm-applet --indicator"
-exec_always --no-startup-id "pgrep -x blueman-applet || blueman-applet"
+
+# blueman-manager auto-starts blueman-applet; stop that applet adding a tray
+# icon, since waybar's bluetooth module is the icon. ShowConnected must go
+# too: it depends on StatusIcon and would pull it back in.
+exec gsettings set org.blueman.general plugin-list "['!StatusIcon', '!ShowConnected']"
 
 # Layout: external on the left, laptop on the right
 output DP-2 pos 0 0
@@ -138,7 +142,7 @@ bindsym $mod+x kill
 # Start your launcher
 bindsym $mod+space exec $menu
 
-# Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet/blueman-applet)
+# Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet)
 bindsym $mod+n exec nm-connection-editor
 bindsym $mod+Shift+b exec blueman-manager
 

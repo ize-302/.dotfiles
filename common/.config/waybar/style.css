@@ -124,7 +124,7 @@ window#waybar {
 }
 
 #wireplumber {
-  color: #ffffff;
+  color: #2ac3de;
 }
 #wireplumber.muted {
   color: #808080;
@@ -132,12 +132,31 @@ window#waybar {
 
 #clock {
   color: #ffffff;
+  margin-right: 6px;
 }
 
-#clock.time {
-  margin-right: 6px;
+/* Bluetooth sits beside the tray icons, so no separator */
+#bluetooth {
+  padding: 0 6px;
+  color: #ffffff;
+}
+#bluetooth.connected {
+  color: #7dd3fc;
+}
+#bluetooth.off,
+#bluetooth.disabled {
+  color: #808080;
 }
 
 #tray {
   padding: 0 6px;
+}
+
+tooltip {
+  background-color: #15161e;
+  border: 1px solid #414868;
+}
+tooltip label {
+  color: #b1b1b1;
+  padding: 4px;
 }
