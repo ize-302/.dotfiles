@@ -150,6 +150,17 @@ window#waybar {
   color: #b0b0b2;
   margin-right: 6px;
 }
+/* Date and time read as one block: no separator or gap between them */
+#clock.date {
+  color: #c0caf5;
+  padding-right: 0;
+  margin-right: 0;
+  border-right: none;
+}
+#clock.time {
+  color: #c0caf5;
+  padding-left: 0;
+}
 
 /* Bluetooth sits beside the tray icons, so no separator */
 #bluetooth {

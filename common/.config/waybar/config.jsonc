@@ -14,7 +14,8 @@
 		"battery",
 		"backlight",
 		"wireplumber",
-		"clock",
+		"clock#date",
+		"clock#time",
 		"tray",
 		"bluetooth"
 	],
@@ -146,8 +147,15 @@
 		"format": " {} "
 	},
 
-	"clock": {
-		"format": " {:%a %d %b · %H:%M} ",
+	// Date and time are separate modules so style.css can colour each
+	"clock#date": {
+		"format": " {:%a %d %b} ·",
+		"interval": 60,
+		"tooltip": false
+	},
+
+	"clock#time": {
+		"format": " {:%H:%M} ",
 		"interval": 10,
 		"tooltip": false
 	},
