@@ -14,7 +14,6 @@ QtObject {
     function automaticScale(devicePixelRatio) {
         return generalScale * devicePixelRatio;
     }
-    property string backgroundFillMode: config.stringValue("background-fill-mode") || "fill" // @possible:'fill' | 'fit' | 'stretch' @desc:Fill mode for <a href="#lockscreenbackground">LockScreen/background</a> and <a href="#loginscreenbackground">LoginScreen/background</a>.<br/><table><tr><th>Value</th><th>QML equivalent</th><th>Description</th></tr><tr><td>fit</td><td><a href="https://doc.qt.io/qt-6/qml-qtquick-image.html#fillMode-prop">Image.PreserveAspectFit</a></td><td>The image is scaled uniformly to fit without cropping.</td></tr><tr><td>fill</td><td><a href="https://doc.qt.io/qt-6/qml-qtquick-image.html#fillMode-prop">Image.PreserveAspectCrop</a></td><td>The image is scaled uniformly to fill, cropping if necessary.</td></tr><tr><td>stretch</td><td><a href="https://doc.qt.io/qt-6/qml-qtquick-image.html#fillMode-prop">Image.Stretch</a></td><td>The image is scaled to fit, stretching if necessary.</td></tr></table>
 
     // [LockScreen]
     property bool lockScreenDisplay: config['LockScreen/display'] === "false" ? false : true // @desc:Whether or not to display the lock screen. If false, the theme will load straight to the login screen.
@@ -22,12 +21,7 @@ QtObject {
     property int lockScreenPaddingRight: config.intValue("LockScreen/padding-right") // @desc:Right padding of the lock screen. <br/>See also: <a href="#clockposition">Clock/position</a>, <a href="#lockmessageposition">Message/position</a>.
     property int lockScreenPaddingBottom: config.intValue("LockScreen/padding-bottom") // @desc:Bottom padding of the lock screen. <br/>See also: <a href="#clockposition">Clock/position</a>, <a href="#lockmessageposition">Message/position</a>.
     property int lockScreenPaddingLeft: config.intValue("LockScreen/padding-left") // @desc:Left padding of the lock screen. <br/>See also: <a href="#clockposition">Clock/position</a>, <a href="#lockmessageposition">Message/position</a>.
-    property string lockScreenBackground: config.stringValue("LockScreen/background") || "default.jpg" // @possible:File in `backgrounds/` @desc:Background of the lock screen.<br/>Supported formats: jpg, png. <strong>.gifs are not supported as they may cause SDDM to crash.</strong>
-    property bool lockScreenUseBackgroundColor: config.boolValue('LockScreen/use-background-color') // @desc:Whether or not to use a plain color as background of the lock screen instead of an image file.
     property color lockScreenBackgroundColor: config.stringValue("LockScreen/background-color") || "#000000" // @desc:The color to be used as background of the lock screen. <br/>See also: <a href="#lockscreenusebackgroundcolor">use-background-color<a>
-    property int lockScreenBlur: config.intValue("LockScreen/blur") // @desc:Amount of blur to be applied to the background of the lock screen. 0 means no blur.
-    property real lockScreenBrightness: config.realValue("LockScreen/brightness") // @possible:-1.0 ≤ R ≤ 1.0 @desc:Brightness of the background of the lock screen. 0.0 leaves unchanged, -1.0 makes it black and 1.0 white.
-    property real lockScreenSaturation: config.realValue("LockScreen/saturation") // @possible:-1.0 ≤ R ≤ 1.0 @desc:Saturation of the background of the lock screen. 0.0 leaves unchanged, -1.0 makes it grayscale and 1.0 very saturated.
     property bool lockScreenInputKeystroke: config.boolValue('LockScreen/input-keystroke') // @desc:If `true`, the key press used to unlock the screen will be registered in the password input.
     property bool lockScreenIgnoreShift: config.boolValue('LockScreen/ignore-shift-key') // @desc:If enabled, the [shift] key will not unlock the screen. Useful with `input-keystroke` set to `true`, if your password's first character is uppercase or a symbol.
 
@@ -59,20 +53,10 @@ QtObject {
     property string lockMessageFontFamily: config.stringValue("LockScreen.Message/font-family") || "JetBrainsMono NF" // @desc:Font family used for the custom message.
     property int lockMessageFontSize: config.intValue("LockScreen.Message/font-size") || 12 // @desc:Font size of the custom message.
     property int lockMessageFontWeight: config.intValue("LockScreen.Message/font-weight") || 400 // @desc:Font weight of the date. 400 = regular, 600 = bold, 800 = black
-    property bool lockMessageDisplayIcon: config['LockScreen.Message/display-icon'] === "false" ? false : true // @desc:Show or hide the icon above the message.
-    property string lockMessageIcon: config.stringValue("LockScreen.Message/icon") || "enter.svg" // @possible:File in `icons/` @desc:Icon above the custom message.
-    property int lockMessageIconSize: config.intValue("LockScreen.Message/icon-size") || 16 // @desc:Size of the custom message's icon.
     property color lockMessageColor: config.stringValue("LockScreen.Message/color") || "#FFFFFF" // @desc:Color of the custom message.
-    property bool lockMessagePaintIcon: config['LockScreen.Message/paint-icon'] === "false" ? false : true // @desc:Whether or not to paint the icon with the same color as the text.
-    property int lockMessageSpacing: config.intValue("LockScreen.Message/spacing") // @desc:Spacing between the icon and the text in the custom message.
 
     // [LoginScreen]
-    property string loginScreenBackground: config.stringValue("LoginScreen/background") || "default.jpg" // @possible:File in `backgrounds/` @desc:Background of the login screen.<br/>Supported formats: jpg, png. <strong>.gifs are not supported as they may cause SDDM to crash.</strong>
-    property bool loginScreenUseBackgroundColor: config.boolValue('LoginScreen/use-background-color') // @desc:Whether or not to use a plain color as background of the login screen instead of an image file.
     property color loginScreenBackgroundColor: config.stringValue("LoginScreen/background-color") || "#000000" // @desc:The color to be used as background of the login screen. <br/>See also: <a href="#loginscreenusebackgroundcolor">use-background-color<a>
-    property int loginScreenBlur: config.intValue("LoginScreen/blur") // @desc:Amount of blur to be applied to the background of the login screen. 0 means no blur.
-    property real loginScreenBrightness: config.realValue("LoginScreen/brightness") // @possible:-1.0 ≤ R ≤ 1.0 @desc:Brightness of the background of the login screen. 0.0 leaves unchanged, -1.0 makes it black and 1.0 white.
-    property real loginScreenSaturation: config.realValue("LoginScreen/saturation") // @possible:-1.0 ≤ R ≤ 1.0 @desc:Saturation of the background of the login screen. 0.0 leaves unchanged, -1.0 makes it grayscale and 1.0 very saturated.
 
     // [LoginScreen.LoginArea]
     property string loginAreaPosition: config.stringValue("LoginScreen.LoginArea/position") || "center" // @possible:'left' | 'center' | 'right' @desc:Position of the login area.

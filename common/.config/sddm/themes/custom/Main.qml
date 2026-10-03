@@ -1,7 +1,6 @@
 import "."
 import QtQuick
 import SddmComponents
-import QtQuick.Effects
 import "components"
 
 Item {
@@ -36,12 +35,6 @@ Item {
                 target: loginScreen.loginContainer
                 scale: 0.5
             }
-            PropertyChanges {
-                target: backgroundEffect
-                blurMax: Config.lockScreenBlur
-                brightness: Config.lockScreenBrightness
-                saturation: Config.lockScreenSaturation
-            }
         },
         State {
             name: "loginState"
@@ -57,12 +50,6 @@ Item {
                 target: loginScreen.loginContainer
                 scale: 1.0
             }
-            PropertyChanges {
-                target: backgroundEffect
-                blurMax: Config.loginScreenBlur
-                brightness: Config.loginScreenBrightness
-                saturation: Config.loginScreenSaturation
-            }
         }
     ]
     transitions: Transition {
@@ -71,18 +58,6 @@ Item {
             duration: 150
             properties: "opacity"
         }
-        PropertyAnimation {
-            duration: 400
-            properties: "blurMax"
-        }
-        PropertyAnimation {
-            duration: 400
-            properties: "brightness"
-        }
-        PropertyAnimation {
-            duration: 400
-            properties: "saturation"
-        }
     }
 
     Item {
@@ -90,54 +65,10 @@ Item {
 
         anchors.fill: parent
 
-        Image {
-            // Background
-            id: backgroundImage
-            property string tsource: root.state === "lockState" ? Config.lockScreenBackground : Config.loginScreenBackground
-
-            property bool displayColor: root.state === "lockState" && Config.lockScreenUseBackgroundColor || root.state === "loginState" && Config.loginScreenUseBackgroundColor
-
+        Rectangle {
+            id: background
             anchors.fill: parent
-            source: "backgrounds/" + tsource
-            cache: true
-            mipmap: true
-            fillMode: {
-                if (Config.backgroundFillMode === "stretch") {
-                    return Image.Stretch;
-                } else if (Config.backgroundFillMode === "fit") {
-                    return Image.PreserveAspectFit;
-                } else {
-                    return Image.PreserveAspectCrop;
-                }
-            }
-
-            onStatusChanged: {
-                if (status === Image.Error) {
-                    if (source !== "backgrounds/default.jpg" && source !== "") {
-                        source = "backgrounds/default.jpg";
-                    } else if (source === "backgrounds/default.jpg") {
-                        // If even default fails, show color background
-                        displayColor = true;
-                    }
-                }
-            }
-
-            Rectangle {
-                id: backgroundColor
-                anchors.fill: parent
-                anchors.margins: 0
-                color: root.state === "lockState" && Config.lockScreenUseBackgroundColor ? Config.lockScreenBackgroundColor : root.state === "loginState" && Config.loginScreenUseBackgroundColor ? Config.loginScreenBackgroundColor : "black"
-                visible: parent.displayColor
-            }
-        }
-        MultiEffect {
-            // Background effects
-            id: backgroundEffect
-            source: backgroundImage
-            anchors.fill: parent
-            blurEnabled: backgroundImage.visible && blurMax > 0
-            blur: blurMax > 0 ? 1.0 : 0.0
-            autoPaddingEnabled: false
+            color: root.state === "lockState" ? Config.lockScreenBackgroundColor : Config.loginScreenBackgroundColor
         }
 
         Item {

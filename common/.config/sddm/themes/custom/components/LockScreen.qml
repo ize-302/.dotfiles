@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Window
-import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Controls
 
@@ -73,31 +72,6 @@ Item {
     ColumnLayout {
         id: messagePositioner
         visible: Config.lockMessageDisplay
-        spacing: Config.lockMessageSpacing
-        Item {
-            Layout.alignment: Config.lockMessageAlign === "left" ? Qt.AlignLeft : (Config.lockMessageAlign === "right" ? Qt.AlignRight : Qt.AlignHCenter)
-            Layout.preferredWidth: Config.lockMessageIconSize * Config.automaticScale(Screen.devicePixelRatio)
-            Layout.preferredHeight: Config.lockMessageIconSize * Config.automaticScale(Screen.devicePixelRatio)
-
-            Image {
-                id: lockIcon
-                source: Config.getIcon(Config.lockMessageIcon)
-                width: Config.lockMessageIconSize * Config.automaticScale(Screen.devicePixelRatio)
-                height: width
-                sourceSize: Qt.size(width, height)
-                fillMode: Image.PreserveAspectFit
-                visible: false
-            }
-            MultiEffect {
-                source: lockIcon
-                anchors.fill: lockIcon
-                colorization: Config.lockMessagePaintIcon ? 1 : 0
-                colorizationColor: Config.lockMessageColor
-                visible: Config.lockMessageDisplayIcon
-                antialiasing: true
-            }
-        }
-
         Text {
             id: lockMessage
             Layout.alignment: Config.lockMessageAlign === "left" ? Qt.AlignLeft : (Config.lockMessageAlign === "right" ? Qt.AlignRight : Qt.AlignHCenter)
