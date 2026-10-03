@@ -73,16 +73,14 @@ bindswitch --reload --locked lid:off output eDP-1 enable
 
 ### Idle configuration
 #
-# Example configuration:
-#
-# exec swayidle -w \
-         # timeout 10 'swaylock -f -c 000000' \
-         # timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-         # before-sleep 'swaylock -f -c 000000'
-#
-# This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 300 seconds, and turn your screens back on when
-# resumed. It will also lock your screen before your computer goes to sleep.
+# Lock after 5 minutes idle. The session is also locked before a manual
+# suspend (power menu).
+exec swayidle -w \
+         timeout 300 '~/.local/bin/lock-screen' \
+         before-sleep '~/.local/bin/lock-screen'
+
+# Don't go idle while something is fullscreen (video, presentations)
+for_window [shell=".*"] inhibit_idle fullscreen
 
 ### Input configuration
 #
