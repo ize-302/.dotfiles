@@ -46,7 +46,10 @@ shadows_on_csd enable
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
 # output * bg /home/ize/Downloads/sung-jinwoo.jpg fill
 exec ~/.azotebg
-exec $term
+
+# Startup apps: browser on workspace 2, terminal on workspace 1 (left focused).
+# Sway places each window on the workspace it was launched from.
+exec swaymsg "workspace number 2; exec zen-browser; workspace number 1; exec $term"
 
 # System tray applets
 exec_always --no-startup-id "pgrep -x nm-applet || nm-applet --indicator"
