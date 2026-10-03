@@ -7,7 +7,7 @@ kernel="$(uname -r)"
 cache="${XDG_RUNTIME_DIR:-/tmp}/waybar-kernel-updates"
 
 penguin="<span font_family='Noto Color Emoji'>🐧</span>"
-phrase="Arch BTW!"
+phrase="Linux Inside"
 talk_min=10 # seconds of silence before it speaks: talk_min plus up to talk_span
 talk_span=600
 talk_hold=3 # seconds the full phrase stays up

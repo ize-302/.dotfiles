@@ -127,6 +127,7 @@
 
 	// Above 50% switches to the loud icon. Only the highest matching state
 	// applies, so high/over repeat the loud format; style.css colours them.
+	// Click toggles mute.
 	"wireplumber": {
 		"states": { "loud": 51, "high": 71, "over": 101 },
 		"format": "  {volume}% ",
@@ -134,6 +135,7 @@
 		"format-high": "   {volume}% ",
 		"format-over": "   {volume}% ",
 		"format-muted": "  {volume}% ",
+		"on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
 		"tooltip": false
 	},
 
