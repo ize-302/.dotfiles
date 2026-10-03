@@ -8,7 +8,7 @@ if pgrep -x rofi >/dev/null; then
 fi
 
 logout_sound=/usr/share/sounds/freedesktop/stereo/service-logout.oga
-locker=(swaylock -f -c 000000)
+locker=(~/.local/bin/lock-screen)
 
 icons=~/.config/rofi/icons
 
