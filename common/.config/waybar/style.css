@@ -67,7 +67,7 @@ window#waybar {
   border: 1px solid #2f343a;
 }
 
-/* Status blocks, separated by a thin line like i3blocks */
+/* Status blocks, separated by a thin line */
 #custom-kernel,
 #custom-capslock,
 #temperature,

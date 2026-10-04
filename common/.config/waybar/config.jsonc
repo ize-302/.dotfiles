@@ -1,5 +1,4 @@
 {
-	// Mirrors the old swaybar + i3blocks setup using waybar's built-in modules.
 	// Glyphs are written as \u escapes so editors can't mangle Nerd Font codepoints.
 	"layer": "top",
 	"position": "bottom",
@@ -44,10 +43,10 @@
 	},
 
 	// keyboard-state needs read access to /dev/input (input group),
-	// so caps lock still uses the i3blocks binary.
+	// so caps lock uses the small binary in ./capslock instead.
 	// Sway signals RTMIN+8 on Caps_Lock release; the interval is a fallback.
 	"custom/capslock": {
-		"exec": "$HOME/.config/i3blocks/capslock/capslock",
+		"exec": "$HOME/.config/waybar/capslock/capslock",
 		"interval": 5,
 		"signal": 8,
 		"tooltip": false
