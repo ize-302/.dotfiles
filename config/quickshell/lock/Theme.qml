@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 
 // Tokyo Night, flat and square. Values mirror the SDDM theme
-// (common/.config/sddm/themes/custom/configs/default.conf) so the login and
+// (config/sddm/themes/custom/configs/default.conf) so the login and
 // lock screens look the same.
 Singleton {
     readonly property string fontFamily: "JetBrainsMono NF"

@@ -4,14 +4,13 @@ This directory contains the .dotfiles for my computer, a Wayland / **Sway** setu
 
 The old Xorg/i3 configs are kept as a frozen backup in [.dotfiles-i3](https://github.com/ize-302/.dotfiles-i3) (tag `pre-wayland-only` here marks the last commit that carried them).
 
-> NOTE: For easy 'stowing', each top-level directory is a separate GNU Stow package whose contents mirror my $HOME directory.
+> NOTE: For easy 'stowing', the repo is split into two GNU Stow packages: `config/` mirrors `~/.config` and `home/` mirrors `$HOME`.
 
 ## Layout
 
-- `common/` — shell, nvim, tmux, terminal, rofi, dunst, waybar, etc.
-- `sway/` — Sway and the Quickshell lock screen
-
-Stow both packages together.
+- `config/` — everything that lands in `~/.config`: Sway, waybar, nvim, tmux, terminal, rofi, dunst, the Quickshell lock screen, etc.
+- `home/` — everything that lands directly in `$HOME`: `.bashrc`, `.bash_aliases`, `.gitconfig`, `.local/bin` scripts
+- `etc/` — system files copied into `/etc` by `install.sh` (SDDM theme selection)
 
 ## Requirements
 
@@ -84,11 +83,14 @@ cd .dotfiles
 Then use GNU stow to create symlinks:
 
 ```sh
-stow --adopt -v -t $HOME common sway # to install
+mkdir -p $HOME/.config
+stow --adopt -v -t $HOME/.config config # to install
+stow --adopt -v -t $HOME home
 ```
 
 ```sh
-stow -v -t $HOME -D common sway # to uninstall
+stow -v -t $HOME/.config -D config # to uninstall
+stow -v -t $HOME -D home
 ```
 
 #### Method 2 (Using .sh script)
