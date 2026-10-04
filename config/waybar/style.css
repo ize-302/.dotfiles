@@ -71,6 +71,7 @@ window#waybar {
 #custom-kernel,
 #custom-capslock,
 #temperature,
+#disk,
 #cpu,
 #memory,
 #battery,
@@ -111,6 +112,26 @@ window#waybar {
 }
 #cpu.c70,
 #memory.c70 {
+  color: #ff0000;
+}
+
+/* Disk usage colours (states: percentage used >= threshold) */
+#disk.d0 {
+  color: #00ff00;
+}
+#disk.d50 {
+  color: #bfff00;
+}
+#disk.d65 {
+  color: #ffff00;
+}
+#disk.d75 {
+  color: #ffbf00;
+}
+#disk.d85 {
+  color: #ff8000;
+}
+#disk.d92 {
   color: #ff0000;
 }
 

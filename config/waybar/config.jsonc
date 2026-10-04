@@ -8,6 +8,7 @@
 		"custom/kernel",
 		"custom/capslock",
 		"temperature",
+		"disk",
 		"cpu",
 		"memory",
 		"battery",
@@ -75,6 +76,18 @@
 			"<span color='#ff0000'>", "<span color='#ff0000'>"
 		],
 		"tooltip": false
+	},
+
+	// Percentage used of the root filesystem. Hover shows used, free and total
+	// in GiB (same units as `df -h`).
+	// States match on percentage used; style.css colours them.
+	"disk": {
+		"path": "/",
+		"interval": 30,
+		"unit": "GiB",
+		"format": "  {percentage_used}% ",
+		"states": { "d0": 0, "d50": 50, "d65": 65, "d75": 75, "d85": 85, "d92": 92 },
+		"tooltip-format": "Used  {specific_used:0.0f}G\nFree  {specific_free:0.0f}G\nTotal {specific_total:0.0f}G"
 	},
 
 	// Colours come from the state classes in style.css.
