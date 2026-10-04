@@ -1,16 +1,17 @@
 # My .dotfiles configuration
 
-This directory contains the .dotfiles for my computer, covering both **i3** and **Sway** setups.
+This directory contains the .dotfiles for my computer, a Wayland / **Sway** setup.
+
+The old Xorg/i3 configs are kept as a frozen backup in [.dotfiles-i3](https://github.com/ize-302/.dotfiles-i3) (tag `pre-wayland-only` here marks the last commit that carried them).
 
 > NOTE: For easy 'stowing', each top-level directory is a separate GNU Stow package whose contents mirror my $HOME directory.
 
 ## Layout
 
-- `common/` — configs shared by both window managers (shell, nvim, tmux, terminal, rofi, dunst, i3blocks, etc.)
-- `i3/` — i3-only configs (`i3`)
-- `sway/` — Sway-only configs (`sway`)
+- `common/` — shell, nvim, tmux, terminal, rofi, dunst, waybar, etc.
+- `sway/` — Sway and the Quickshell lock screen
 
-Always stow `common` together with exactly one of `i3` or `sway`.
+Stow both packages together.
 
 ## Requirements
 
@@ -80,16 +81,14 @@ cd .dotfiles
 
 #### Method 1 (Manual setup)
 
-Then use GNU stow to create symlinks, picking exactly one of `i3` or `sway` alongside `common`:
+Then use GNU stow to create symlinks:
 
 ```sh
-stow --adopt -v -t $HOME common i3   # to install i3
-stow --adopt -v -t $HOME common sway # to install Sway
+stow --adopt -v -t $HOME common sway # to install
 ```
 
 ```sh
-stow -v -t $HOME -D common i3   # to uninstall i3
-stow -v -t $HOME -D common sway # to uninstall Sway
+stow -v -t $HOME -D common sway # to uninstall
 ```
 
 #### Method 2 (Using .sh script)
@@ -103,12 +102,10 @@ chmod +x install.sh uninstall.sh
 Step ii. Run:
 
 ```sh
-./install.sh i3    # or: ./install.sh sway
+./install.sh
 ```
 
 ```sh
-./uninstall.sh i3   # or: ./uninstall.sh sway
+./uninstall.sh
 ```
-
-Running either script with no argument will prompt you to choose interactively.
 
