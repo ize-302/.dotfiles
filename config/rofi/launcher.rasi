@@ -23,25 +23,31 @@ configuration {
 @import                          "./colors.rasi"
 @import                          "./fonts.rasi"
 
+/* dpi is 180, so 7 lands near the status bar's text size */
+* {
+    font:                        "JetBrainsMono 7";
+}
+
 * {
     border-colour:               var(selected);
     handle-colour:               var(selected);
     background-colour:           var(background);
     foreground-colour:           var(foreground);
     alternate-background:        var(background-alt);
-    normal-background:           var(background);
+    normal-background:           transparent;
     normal-foreground:           var(foreground);
     urgent-background:           var(urgent);
     urgent-foreground:           var(background);
     active-background:           var(active);
     active-foreground:           var(background);
-    selected-normal-background:  var(highlight);
+    /* Tint, like the bar's focused workspace button */
+    selected-normal-background:  #C0CAF51F;
     selected-normal-foreground:  var(foreground);
     selected-urgent-background:  var(active);
     selected-urgent-foreground:  var(background);
     selected-active-background:  var(urgent);
     selected-active-foreground:  var(background);
-    alternate-normal-background: var(background);
+    alternate-normal-background: transparent;
     alternate-normal-foreground: var(foreground);
     alternate-urgent-background: var(urgent);
     alternate-urgent-foreground: var(background);
@@ -53,11 +59,10 @@ configuration {
 window {
     /* properties for window widget */
     transparency:                "real";
-    location:                    center;
-    anchor:                      center;
-    fullscreen:                  true;
-    width:                       1366px;
-    height:                      768px;
+    location:                    south west;
+    anchor:                      south west;
+    fullscreen:                  false;
+    width:                       22%;
     x-offset:                    0px;
     y-offset:                    0px;
 
@@ -65,19 +70,23 @@ window {
     enabled:                     true;
     margin:                      0px;
     padding:                     0px;
-    border:                      0px solid;
+    /* Same glass as the status bar (waybar/style.css): translucent #15161e
+       with a sheen fading down and a lit edge. sway's `layer_effects "rofi"`
+       blurs what's behind. Left and bottom touch the screen edge and the bar. */
+    border:                      1px 1px 0px 0px solid;
     border-radius:               0px;
-    border-color:                @border-colour;
+    border-color:                #FFFFFF29;
     cursor:                      "default";
-    background-color:            @background-colour;
+    background-color:            #15161EF5;
+    background-image:            linear-gradient(to bottom, #FFFFFF0D, #FFFFFF03, #FFFFFF00);
 }
 
 /*****----- Main Box -----*****/
 mainbox {
     enabled:                     true;
-    spacing:                     20px;
+    spacing:                     12px;
     margin:                      0px;
-    padding:                     35%;
+    padding:                     14px;
     border:                      0px solid;
     border-radius:               0px 0px 0px 0px;
     border-color:                @border-colour;
@@ -90,13 +99,14 @@ inputbar {
     enabled:                     true;
     spacing:                     10px;
     margin:                      0px;
-    padding:                     0px;
-    border:                      0px;
+    padding:                     0px 4px 10px 4px;
+    /* Divider under the search row, same colour as the bar's separators */
+    border:                      0px 0px 1px 0px solid;
     border-radius:               0px;
-    border-color:                @border-colour;
-    background-color:            @background-colour;
+    border-color:                #414868FF;
+    background-color:            transparent;
     text-color:                  @foreground-colour;
-    children:                    [ "prompt", "entry" ];
+    children:                    [ "textbox-prompt-colon", "entry" ];
 }
 
 prompt {
@@ -107,17 +117,18 @@ prompt {
 textbox-prompt-colon {
     enabled:                     true;
     expand:                      false;
-    str:                         "::";
+    /* Nerd Font search glyph (U+F002) */
+    str:                         "";
     background-color:            inherit;
-    text-color:                  inherit;
+    text-color:                  #565F89FF;
 }
 entry {
     enabled:                     true;
     background-color:            inherit;
     text-color:                  inherit;
     cursor:                      text;
-    placeholder:                 "";
-    placeholder-color:           inherit;
+    placeholder:                 "Search…";
+    placeholder-color:           #565F89FF;
 }
 
 /*****----- Listview -----*****/
@@ -130,10 +141,11 @@ listview {
     scrollbar:                   false;
     layout:                      vertical;
     reverse:                     false;
-    fixed-height:                true;
+    /* Panel is only as tall as the results, growing up from the bar */
+    fixed-height:                false;
     fixed-columns:               true;
     
-    spacing:                     10px;
+    spacing:                     4px;
     margin:                      0px;
     padding:                     0px;
     border:                      0px solid;
@@ -155,7 +167,7 @@ element {
     enabled:                     true;
     spacing:                     10px;
     margin:                      0px;
-    padding:                     5px 10px;
+    padding:                     4px 8px;
     border:                      0px solid;
     border-radius:               0px;
     border-color:                @border-colour;
@@ -202,7 +214,7 @@ element alternate.active {
 element-icon {
     background-color:            transparent;
     text-color:                  inherit;
-    size:                        30px;
+    size:                        22px;
     cursor:                      inherit;
 }
 element-text {

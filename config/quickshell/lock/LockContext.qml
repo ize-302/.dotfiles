@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pam
+import qs
 
 // State shared by the lock surfaces of every monitor, so they all show the
 // same prompt and typed password.

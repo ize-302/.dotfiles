@@ -10,7 +10,7 @@ set $right l
 
 set $term alacritty
 
-set $menu rofi -show drun
+set $menu ~/.local/bin/app-menu
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -29,12 +29,15 @@ blur_noise 0.06
 # blur_contrast <float value 0 - 2>
 blur_saturation 1.4
 
-# Frosted glass behind waybar and dunst (their backgrounds are translucent in
-# style.css / dunstrc). Independent of the window `blur` setting above.
+# Frosted glass behind waybar, dunst, rofi and the launcher (their backgrounds are translucent in
+# style.css / dunstrc / launcher.rasi / Theme.qml). Independent of the window
+# `blur` setting above.
 layer_effects "waybar" blur enable; blur_ignore_transparent enable
 layer_effects "notifications" blur enable; blur_ignore_transparent enable
+layer_effects "rofi" blur enable; blur_ignore_transparent enable
+layer_effects "launcher" blur enable; blur_ignore_transparent enable
 
-corner_radius 0
+corner_radius 1
 
 gaps inner 10
 
@@ -55,7 +58,7 @@ exec ~/.azotebg
 
 # Startup apps: browser on workspace 2, terminal on workspace 1 (left focused).
 # Sway places each window on the workspace it was launched from.
-exec swaymsg "workspace number 2; exec zen-browser; workspace number 1; exec $term"
+exec swaymsg "workspace number 1; exec $term"
 
 # System tray applets
 exec_always --no-startup-id "pgrep -x nm-applet || nm-applet --indicator"
@@ -68,6 +71,11 @@ exec gsettings set org.blueman.general plugin-list "['!StatusIcon', '!ShowConnec
 # Clipboard history: store every copy so it survives the source app closing
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
+
+# App launcher, power menu and clipboard menu daemon, toggled by
+# ~/.local/bin/app-menu ($menu), ~/.local/bin/power-menu
+# and ~/.local/bin/clipboard-menu
+exec qs -c launcher -d
 
 # Layout: external on the left, laptop on the right
 output DP-2 pos 0 0
@@ -126,7 +134,7 @@ bindgesture swipe:4:right workspace prev_on_output
 # Login sound
 exec paplay /usr/share/sounds/freedesktop/stereo/service-login.oga
 
-# power options: centred rofi menu (lock, logout, sleep, hibernate, reboot, shutdown)
+# power options: menu in the bottom left corner (lock, logout, sleep, hibernate, reboot, shutdown)
 bindsym $mod+Escape exec ~/.local/bin/power-menu
 
 bindsym $mod+Return exec $term
@@ -144,7 +152,7 @@ bindsym $mod+x kill
 bindsym $mod+space exec $menu
 
 # Clipboard history picker
-bindsym $mod+c exec cliphist list | rofi -dmenu -p clipboard | cliphist decode | wl-copy
+bindsym $mod+c exec ~/.local/bin/clipboard-menu
 
 # Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet)
 bindsym $mod+n exec nm-connection-editor

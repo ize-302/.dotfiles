@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import qs
 
 // The lock UI in a normal window, for working on it without locking the
 // session: `qs -p ~/.config/quickshell/lock/test.qml`. The password is still

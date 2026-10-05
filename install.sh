@@ -3,6 +3,10 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+# Quickshell only generates the QML language server config (for editors) where
+# this file already exists. Not tracked, as it gets replaced by a link.
+touch config/quickshell/*/.qmlls.ini
+
 mkdir -p "$HOME/.config"
 stow --adopt -v -t "$HOME/.config" config
 stow --adopt -v -t "$HOME" home
@@ -14,6 +18,8 @@ if [ -d /usr/share/sddm/themes ]; then
   sudo rsync -a --delete --chown=root:root config/sddm/themes/custom/ /usr/share/sddm/themes/custom/
   # Selects the theme. Settings in /etc/sddm.conf, if present, win over this
   sudo install -Dm644 etc/sddm.conf.d/custom-theme.conf /etc/sddm.conf.d/custom-theme.conf
+  # Arranges the outputs for the greeter, needs xorg-xrandr
+  sudo install -Dm755 etc/sddm/Xsetup /etc/sddm/Xsetup
 fi
 
 # Reload shell once installed

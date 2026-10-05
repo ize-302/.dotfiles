@@ -1,2 +1,4 @@
 .claude-mocx
 .claude-personal
+# Replaced by Quickshell with a link to a generated file
+config/quickshell/*/.qmlls.ini

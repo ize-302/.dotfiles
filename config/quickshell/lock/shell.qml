@@ -1,6 +1,9 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import qs
 
 // Session locker, started by ~/.local/bin/lock-screen (`qs -c lock`).
 // Preview the UI in a normal window with `qs -p ~/.config/quickshell/lock/test.qml`.

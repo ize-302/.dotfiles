@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import qs
 
 // What one monitor shows while locked: the clock, then the unlock prompt once
 // a key is pressed. Mirrors LockScreen.qml and LoginScreen.qml of the SDDM theme.
@@ -103,7 +104,7 @@ Rectangle {
                 color: Theme.inputBackgroundColor
 
                 // The user's picture where SDDM looks for it, falling back to the penguin
-                readonly property list<string> sources: [
+                readonly property list<url> sources: [
                     "file:///usr/share/sddm/faces/" + Quickshell.env("USER") + ".face.icon",
                     "file://" + Quickshell.env("HOME") + "/.face.icon",
                     "file://" + Quickshell.env("HOME") + "/.face",

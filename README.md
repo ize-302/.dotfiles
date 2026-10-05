@@ -8,7 +8,7 @@ The old Xorg/i3 configs are kept as a frozen backup in [.dotfiles-i3](https://gi
 
 ## Layout
 
-- `config/` — everything that lands in `~/.config`: Sway, waybar, nvim, tmux, terminal, rofi, dunst, the Quickshell lock screen, etc.
+- `config/` — everything that lands in `~/.config`: Sway, waybar, nvim, tmux, terminal, rofi, dunst, the Quickshell lock screen and app launcher, etc.
 - `home/` — everything that lands directly in `$HOME`: `.bashrc`, `.bash_aliases`, `.gitconfig`, `.local/bin` scripts
 - `etc/` — system files copied into `/etc` by `install.sh` (SDDM theme selection)
 

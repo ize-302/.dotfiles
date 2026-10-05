@@ -1,19 +1,60 @@
 #!/bin/bash
 # ~/.local/bin/power-menu
-# Rofi power menu styled like the app launcher. Pick with arrows + Enter or a
-# click. Running it again while open closes it.
+# Power menu in the same corner panel as the app launcher. Pick with arrows +
+# Enter or a click. Running it again while open closes it, as do Escape and
+# Backspace.
+#
+# Without arguments it toggles the Quickshell menu
+# (~/.config/quickshell/launcher), falling back to rofi if Quickshell is
+# missing or fails to start. With an entry (`power-menu reboot`) it carries
+# that entry out, which is how the Quickshell menu acts on a choice.
+logout_sound=/usr/share/sounds/freedesktop/stereo/service-logout.oga
+locker=(~/.local/bin/lock-screen)
+
+# label (also the icon file name)
+entries=(lock logout sleep hibernate reboot shutdown)
+
+# The running sway's socket. $SWAYSOCK can't be trusted: long-lived parents
+# such as tmux keep the one from an earlier session.
+sway_socket="/run/user/$UID/sway-ipc.$UID.$(pgrep -x -u "$UID" sway | head -1).sock"
+
+run() {
+	case "$1" in
+	lock) "${locker[@]}" ;;
+	logout) paplay "$logout_sound" && swaymsg -s "$sway_socket" exit ;;
+	sleep) systemctl suspend ;;
+	hibernate) paplay "$logout_sound" && "${locker[@]}" && sleep 1 && systemctl hibernate ;;
+	reboot) paplay "$logout_sound" && systemctl reboot ;;
+	shutdown) paplay "$logout_sound" && systemctl poweroff -i ;;
+	esac
+}
+
+if [ $# -gt 0 ]; then
+	run "$1"
+	exit
+fi
+
+toggle=(qs -c launcher ipc call power toggle)
+
+if command -v qs >/dev/null && [ -f ~/.config/quickshell/launcher/PowerMenu.qml ]; then
+	"${toggle[@]}" >/dev/null 2>&1 && exit 0
+
+	# Not running yet: start it and wait for it to answer
+	if qs -c launcher -d >/dev/null 2>&1; then
+		for _ in {1..20}; do
+			"${toggle[@]}" >/dev/null 2>&1 && exit 0
+			sleep 0.1
+		done
+	fi
+fi
+
+# Fallback: rofi
 if pgrep -x rofi >/dev/null; then
 	pkill -x rofi
 	exit 0
 fi
 
-logout_sound=/usr/share/sounds/freedesktop/stereo/service-logout.oga
-locker=(~/.local/bin/lock-screen)
-
 icons=~/.config/rofi/icons
-
-# label (also the icon file name)
-entries=(lock logout sleep hibernate reboot shutdown)
 
 menu=""
 for entry in "${entries[@]}"; do
@@ -24,11 +65,4 @@ done
 choice="$(printf '%b' "$menu" | rofi -dmenu -sep '|' -show-icons -no-custom \
 	-theme ~/.config/rofi/powermenu.rasi)" || exit 0
 
-case "$choice" in
-lock) "${locker[@]}" ;;
-logout) paplay "$logout_sound" && swaymsg exit ;;
-sleep) systemctl suspend ;;
-hibernate) paplay "$logout_sound" && "${locker[@]}" && sleep 1 && systemctl hibernate ;;
-reboot) paplay "$logout_sound" && systemctl reboot ;;
-shutdown) paplay "$logout_sound" && systemctl poweroff -i ;;
-esac
+run "$choice"
