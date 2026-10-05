@@ -20,6 +20,7 @@ require("conform").setup({
 		go = { "goimports", "gofumpt" },
 		java = { "google-java-format", "spotless" },
 		php = { "php-cs-fixer" },
+		qml = { "qmlformat" },
 	},
 	format_on_save = { timeout_ms = 500, lsp_format = "fallback" },
 })

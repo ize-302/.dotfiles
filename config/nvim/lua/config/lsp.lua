@@ -25,6 +25,7 @@ vim.lsp.enable("clangd")
 vim.lsp.enable("html")
 vim.lsp.enable("markdown_oxide")
 vim.lsp.enable("jdtls")
+vim.lsp.enable("qmlls")
 
 -- Diagnostic display
 vim.diagnostic.config({
