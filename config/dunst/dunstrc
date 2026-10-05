@@ -25,7 +25,7 @@
     # dynamic width from 0 to 300
     # width = (0, 300)
     # constant width of 300
-    width = 300
+    width = 360
 
     # The height of a single notification, excluding the frame.
     # dynamic height from 0 to 300
@@ -41,7 +41,9 @@
     # Offset from the origin
     # NOTE: Dunst from version 1.11 and older use this alternative notation
     # offset = 10x50
-    offset = (10, 35)
+    # Flush with the right screen edge, sitting on the status bar (the bar
+    # reserves its own space, so no offset is needed to clear it)
+    offset = (0, 0)
 
     # Scale factor. It is auto-detected if value is 0.
     scale = 0
@@ -57,16 +59,16 @@
 
     # Set the progress bar height. This includes the frame, so make sure
     # it's at least twice as big as the frame width.
-    progress_bar_height = 10
+    progress_bar_height = 6
 
     # Set the frame width of the progress bar
-    progress_bar_frame_width = 1
+    progress_bar_frame_width = 0
 
     # Set the minimum width for the progress bar
     progress_bar_min_width = 150
 
     # Set the maximum width for the progress bar
-    progress_bar_max_width = 300
+    progress_bar_max_width = 360
 
     # Corner radius for the progress bar. 0 disables rounded corners.
     progress_bar_corner_radius = 0
@@ -95,23 +97,23 @@
     # notifications.
     # Set to 0 to disable.
     # If gap_size is greater than 0, this setting will be ignored.
-    separator_height = 2
+    separator_height = 1
 
     # Padding between text and separator.
-    padding = 8
+    padding = 12
 
     # Horizontal padding.
-    horizontal_padding = 8
+    horizontal_padding = 14
 
     # Padding between text and icon.
-    text_icon_padding = 0
+    text_icon_padding = 10
 
     # Defines width in pixels of frame around the notification window.
     # Set to 0 to disable.
     frame_width = 0
 
     # Defines color of the frame around the notification window.
-    frame_color = "#aaaaaa"
+    frame_color = "#3a3b42f6"
 
     # Size of gap to display between notifications - requires a compositor.
     # If value is greater than 0, separator_height will be ignored and a border
@@ -125,7 +127,7 @@
     #  * foreground: use the same color as the foreground;
     #  * frame: use the same color as the frame;
     #  * anything else will be interpreted as a X color.
-    separator_color = frame
+    separator_color = "#414868"
 
     # Sort type.
     # possible values are:
@@ -144,7 +146,7 @@
 
     ### Text ###
 
-    font = JetBrainsMono 8
+    font = JetBrainsMono NF Medium 10
 
     # The spacing between lines.  If the height is smaller than the
     # font height, it will get raised to the font height.
@@ -184,7 +186,7 @@
     #   %n  progress value if set without any extra characters
     #   %%  Literal %
     # Markup is allowed
-    format = "<b>%s</b>\n%b"
+    format = "<b>%s</b>\n<span foreground='#a9b1d6'>%b</span>"
 
     # Alignment of message text.
     # Possible values are "left", "center" and "right".
@@ -201,7 +203,7 @@
 
     # Specify where to make an ellipsis in long lines.
     # Possible values are "start", "middle" and "end".
-    ellipsize = middle
+    ellipsize = end
 
     # Ignore newlines '\n' in notifications.
     ignore_newline = no
@@ -222,7 +224,7 @@
     enable_recursive_icon_lookup = true
 
     # Set icon theme (only used for recursive icon lookup)
-    icon_theme = Adwaita
+    icon_theme = "Papirus-Dark, Adwaita"
     # You can also set multiple icon themes, with the leftmost one being used first.
     # icon_theme = "Adwaita, breeze"
 
@@ -235,7 +237,7 @@
     min_icon_size = 32
 
     # Scale larger icons down to this size, set to 0 to disable
-    max_icon_size = 128
+    max_icon_size = 48
 
     # Paths to default icons (only necessary when not using recursive icon lookup)
     icon_path = /usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
@@ -266,12 +268,13 @@
     # Define the class of the windows spawned by dunst (X11 only)
     class = Dunst
 
+    # Same as sway's `corner_radius` and the menus (Theme.qml).
     # Define the corner radius of the notification window
     # in pixel size. If the radius is 0, you have no rounded
     # corners.
     # The radius will be automatically lowered if it exceeds half of the
     # notification height to avoid clipping text and/or icons.
-    corner_radius = 0
+    corner_radius = 1
 
     # Define which corners to round when drawing the window. If the corner radius
     # is set to 0 this option will be ignored.
@@ -338,27 +341,33 @@
     per_monitor_dpi = false
 
 
+# Same glass as the status bar (config/waybar/style.css) and the menus
+# (config/quickshell/launcher/Theme.qml): #15161e at 96% with #c0caf5 text.
+# sway's `layer_effects "notifications"` blurs what's behind.
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
     # Otherwise the "#" and following would be interpreted as a comment.
-    background = "#15161e"
-    foreground = "#ffffff"
+    background = "#15161ef5"
+    foreground = "#a9b1d6"
+    highlight = "#565f89"
     timeout = 10
     # Icon for notifications with low urgency
     default_icon = dialog-information
 
 [urgency_normal]
-    background = "#15161e"
-    foreground = "#ffffff"
+    background = "#15161ef5"
+    foreground = "#c0caf5"
+    highlight = "#c0caf5"
     timeout = 10
     override_pause_level = 30
     # Icon for notifications with normal urgency
     default_icon = dialog-information
 
+# Same glass, with the bar's urgent red on the summary and the progress bar
 [urgency_critical]
-    background = "#900000"
-    foreground = "#ffffff"
-    frame_color = "#ff0000"
+    background = "#15161ef5"
+    foreground = "#f7768e"
+    highlight = "#f7768e"
     timeout = 0
     override_pause_level = 60
     # Icon for notifications with critical urgency
