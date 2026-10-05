@@ -151,14 +151,13 @@
 		"tooltip": false
 	},
 
-	// The script prints the penguin (and, now and then, "Arch BTW!"). Hover shows
-	// the kernel version and pending package updates.
-	// Click makes it speak at once.
+	// The script prints the penguin.
+	// Hover shows the kernel version 
 	"custom/kernel": {
-		"exec": "~/.config/waybar/kernel-updates",
+ 		"exec": "printf '{\"tooltip\": \"Linux Kernel %s\"}\\n' \"$(uname -r)\"",
 		"return-type": "json",
-		"on-click": "pkill -USR1 -f '/waybar/kernel-updates$'",
-		"format": " {} "
+		"interval": "once",
+		"format": " 🐧 "
 	},
 
 	// Date and time are separate modules so style.css can colour each
