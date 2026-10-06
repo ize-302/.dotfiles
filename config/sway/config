@@ -29,12 +29,11 @@ blur_noise 0.06
 # blur_contrast <float value 0 - 2>
 blur_saturation 1.4
 
-# Frosted glass behind waybar, dunst, rofi and the launcher (their backgrounds are translucent in
-# style.css / dunstrc / launcher.rasi / Theme.qml). Independent of the window
+# Frosted glass behind waybar, dunst and the launcher (their backgrounds are translucent in
+# style.css / dunstrc / Theme.qml). Independent of the window
 # `blur` setting above.
 layer_effects "waybar" blur enable; blur_ignore_transparent enable
 layer_effects "notifications" blur enable; blur_ignore_transparent enable
-layer_effects "rofi" blur enable; blur_ignore_transparent enable
 layer_effects "launcher" blur enable; blur_ignore_transparent enable
 
 corner_radius 1
@@ -67,6 +66,10 @@ exec_always --no-startup-id "pgrep -x nm-applet || nm-applet --indicator"
 # icon, since waybar's bluetooth module is the icon. ShowConnected must go
 # too: it depends on StatusIcon and would pull it back in.
 exec gsettings set org.blueman.general plugin-list "['!StatusIcon', '!ShowConnected']"
+
+# Notification daemon. D-Bus would start it on the first notification, but
+# flameshot only notifies if one is already running.
+exec dunst
 
 # Clipboard history: store every copy so it survives the source app closing
 exec wl-paste --type text --watch cliphist store

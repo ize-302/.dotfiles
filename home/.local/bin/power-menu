@@ -5,14 +5,11 @@
 # Backspace.
 #
 # Without arguments it toggles the Quickshell menu
-# (~/.config/quickshell/launcher), falling back to rofi if Quickshell is
-# missing or fails to start. With an entry (`power-menu reboot`) it carries
-# that entry out, which is how the Quickshell menu acts on a choice.
+# (~/.config/quickshell/launcher), starting its daemon first if it isn't
+# running. With an entry (`power-menu reboot`) it carries that entry out, which
+# is how the Quickshell menu acts on a choice.
 logout_sound=/usr/share/sounds/freedesktop/stereo/service-logout.oga
 locker=(~/.local/bin/lock-screen)
-
-# label (also the icon file name)
-entries=(lock logout sleep hibernate reboot shutdown)
 
 # The running sway's socket. $SWAYSOCK can't be trusted: long-lived parents
 # such as tmux keep the one from an earlier session.
@@ -36,33 +33,14 @@ fi
 
 toggle=(qs -c launcher ipc call power toggle)
 
-if command -v qs >/dev/null && [ -f ~/.config/quickshell/launcher/PowerMenu.qml ]; then
-	"${toggle[@]}" >/dev/null 2>&1 && exit 0
+"${toggle[@]}" >/dev/null 2>&1 && exit 0
 
-	# Not running yet: start it and wait for it to answer
-	if qs -c launcher -d >/dev/null 2>&1; then
-		for _ in {1..20}; do
-			"${toggle[@]}" >/dev/null 2>&1 && exit 0
-			sleep 0.1
-		done
-	fi
+# Not running yet: start it and wait for it to answer
+if qs -c launcher -d >/dev/null 2>&1; then
+	for _ in {1..20}; do
+		"${toggle[@]}" >/dev/null 2>&1 && exit 0
+		sleep 0.1
+	done
 fi
 
-# Fallback: rofi
-if pgrep -x rofi >/dev/null; then
-	pkill -x rofi
-	exit 0
-fi
-
-icons=~/.config/rofi/icons
-
-menu=""
-for entry in "${entries[@]}"; do
-	# \0icon\x1f<path> is rofi's per-row icon syntax
-	menu+="${menu:+|}$entry\0icon\x1f$icons/$entry.svg"
-done
-
-choice="$(printf '%b' "$menu" | rofi -dmenu -sep '|' -show-icons -no-custom \
-	-theme ~/.config/rofi/powermenu.rasi)" || exit 0
-
-run "$choice"
+exit 1

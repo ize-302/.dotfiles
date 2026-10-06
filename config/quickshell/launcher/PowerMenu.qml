@@ -17,9 +17,8 @@ Scope {
     readonly property list<string> entries: ["lock", "logout", "sleep", "hibernate", "reboot", "shutdown"]
     property int current: 0
 
-    // Shared with the rofi fallback
     function iconSource(entry) {
-        return "file://" + Quickshell.env("HOME") + "/.config/rofi/icons/" + entry + ".svg";
+        return Qt.resolvedUrl("icons/" + entry + ".svg");
     }
 
     function run(entry) {

@@ -3,7 +3,7 @@
 [SddmGreeterTheme]
 Name=Custom
 Type=sddm-theme
-Description=Flat Tokyo Night login screen matching my sway, waybar and rofi setup.
+Description=Flat Tokyo Night login screen matching my sway, waybar and Quickshell setup.
 License=GPL-3.0-or-later
 Version=1.5.0
 Theme-Id=custom

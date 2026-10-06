@@ -1,20 +1,17 @@
 #!/bin/bash
 # ~/.local/bin/clipboard-menu
 # Toggles the Quickshell clipboard history menu (~/.config/quickshell/launcher),
-# starting its daemon first if it isn't running. Falls back to rofi if
-# Quickshell is missing or the menu fails to start.
+# starting its daemon first if it isn't running.
 toggle=(qs -c launcher ipc call clipboard toggle)
 
-if command -v qs >/dev/null && [ -f ~/.config/quickshell/launcher/ClipboardMenu.qml ]; then
-	"${toggle[@]}" >/dev/null 2>&1 && exit 0
+"${toggle[@]}" >/dev/null 2>&1 && exit 0
 
-	# Not running yet: start it and wait for it to answer
-	if qs -c launcher -d >/dev/null 2>&1; then
-		for _ in {1..20}; do
-			"${toggle[@]}" >/dev/null 2>&1 && exit 0
-			sleep 0.1
-		done
-	fi
+# Not running yet: start it and wait for it to answer
+if qs -c launcher -d >/dev/null 2>&1; then
+	for _ in {1..20}; do
+		"${toggle[@]}" >/dev/null 2>&1 && exit 0
+		sleep 0.1
+	done
 fi
 
-cliphist list | rofi -dmenu -p clipboard | cliphist decode | wl-copy
+exit 1

@@ -4,8 +4,11 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Quickshell only generates the QML language server config (for editors) where
-# this file already exists. Not tracked, as it gets replaced by a link.
-touch config/quickshell/*/.qmlls.ini
+# this file already exists. Not tracked, as it gets replaced by a link, which
+# dangles while that shell isn't running.
+for dir in config/quickshell/*/; do
+  [ -e "$dir.qmlls.ini" ] || [ -L "$dir.qmlls.ini" ] || touch "$dir.qmlls.ini"
+done
 
 mkdir -p "$HOME/.config"
 stow --adopt -v -t "$HOME/.config" config
