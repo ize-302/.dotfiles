@@ -69,7 +69,7 @@ window#waybar {
 
 /* Status blocks, separated by a thin line */
 #custom-kernel,
-#custom-capslock,
+#keyboard-state label.locked,
 #temperature,
 #disk,
 #cpu,
@@ -81,6 +81,11 @@ window#waybar {
   padding: 0 4px;
   margin: 4px 0;
   border-right: 1px solid #414868;
+}
+
+/* Only drawn while caps lock is on */
+#keyboard-state label.locked {
+  color: #ff5555;
 }
 
 /* Kernel icon is a colour emoji, so no text colour applies. The emoji has

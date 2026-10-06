@@ -290,9 +290,6 @@ bindsym $mod+r mode "resize"
     bindsym --locked XF86MonBrightnessDown exec brightnessctl --min-val=1 -q set 3%-
     bindsym --locked XF86MonBrightnessUp exec brightnessctl -q set 3%+
 
-    # Refresh waybar's caps lock block (signal must match custom/capslock)
-    bindsym --locked --release Caps_Lock exec pkill -RTMIN+8 waybar
-
     # Special keys to control media via playerctl
     bindsym --locked XF86AudioPlay exec playerctl play-pause
     bindsym --locked XF86AudioPause exec playerctl play-pause

@@ -5,8 +5,8 @@
 	"spacing": 0,
 	"modules-left": ["sway/workspaces", "sway/mode"],
 	"modules-right": [
+		"keyboard-state",
 		"custom/kernel",
-		"custom/capslock",
 		"temperature",
 		"disk",
 		"cpu",
@@ -43,14 +43,16 @@
 		}
 	},
 
-	// keyboard-state needs read access to /dev/input (input group),
-	// so caps lock uses the small binary in ./capslock instead.
-	// Sway signals RTMIN+8 on Caps_Lock release; the interval is a fallback.
-	"custom/capslock": {
-		"exec": "$HOME/.config/waybar/capslock/capslock",
-		"interval": 5,
-		"signal": 8,
-		"tooltip": false
+	// Caps lock only, and only while it's on: the unlocked label is empty and
+	// style.css draws the block on the locked one.
+	// Needs read access to /dev/input (input group).
+	"keyboard-state": {
+		"capslock": true,
+		"format": "{icon}",
+		"format-icons": {
+			"locked": " \uf023 ON ",
+			"unlocked": ""
+		}
 	},
 
 	// temperature has no `states`, so the colour lives in the icon.
