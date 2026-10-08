@@ -47,6 +47,9 @@ Singleton {
     readonly property real clipboardWidth: 0.35
     readonly property string clipboardEmptyText: "Nothing found"
 
+    // Scratchpad menu
+    readonly property string scratchpadEmptyText: "No windows in the scratchpad"
+
     readonly property int animationDuration: 120
 
     // For entries with Terminal=true

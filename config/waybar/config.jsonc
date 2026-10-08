@@ -3,7 +3,7 @@
 	"layer": "top",
 	"position": "bottom",
 	"spacing": 0,
-	"modules-left": ["sway/workspaces", "sway/mode"],
+	"modules-left": ["sway/workspaces", "sway/scratchpad", "sway/mode"],
 	"modules-right": [
 		"keyboard-state",
 		"custom/kernel",
@@ -41,6 +41,17 @@
 			"class<blueman-manager>": "   ",
 			"class<nm-connection-editor>": "   "
 		}
+	},
+
+	// One dot per window in the scratchpad, hidden while there are none.
+	// The icon is picked by window count, so the last one covers 5 and up.
+	// Hover lists them; click opens the menu to take one out.
+	"sway/scratchpad": {
+		"format": "{icon}",
+		"format-icons": ["", "\u2022", "\u2022\u2022", "\u2022\u2022\u2022", "\u2022\u2022\u2022\u2022", "\u2022\u2022\u2022\u2022+"],
+		"show-empty": false,
+		"tooltip-format": "{app}: {title}",
+		"on-click": "~/.local/bin/scratchpad-menu"
 	},
 
 	// Caps lock only, and only while it's on: the unlocked label is empty and

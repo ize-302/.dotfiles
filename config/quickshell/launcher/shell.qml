@@ -8,14 +8,14 @@ import qs
 // App launcher: a glass panel in the bottom left corner, on top of the status
 // bar. Runs as a daemon (`qs -c launcher -d`) and is toggled by
 // ~/.local/bin/app-menu (`qs -c launcher ipc call launcher toggleAppMenu`). The same
-// daemon serves the power menu (PowerMenu.qml) and the clipboard menu
-// (ClipboardMenu.qml).
+// daemon serves the power menu (PowerMenu.qml), the clipboard menu
+// (ClipboardMenu.qml) and the scratchpad menu (ScratchpadMenu.qml).
 ShellRoot {
     id: root
 
     // Desktop entry id -> times launched. Most used apps are listed first.
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu]
 
     // The menus share the corner, so only one is open at a time
     function closeOthers(menu) {
@@ -92,6 +92,12 @@ ShellRoot {
         id: clipboardMenu
         onOpenChanged: if (open)
             root.closeOthers(clipboardMenu)
+    }
+
+    ScratchpadMenu {
+        id: scratchpadMenu
+        onOpenChanged: if (open)
+            root.closeOthers(scratchpadMenu)
     }
 
     IpcHandler {

@@ -59,6 +59,16 @@ window#waybar {
   background-image: none;
 }
 
+/* Scratchpad dots: one more workspace button, for the windows put away */
+#scratchpad {
+  padding: 0 8px;
+  background-color: rgba(192, 202, 245, 0.03);
+  color: #565f89;
+}
+#scratchpad:hover {
+  color: #c0caf5;
+}
+
 /* Binding mode indicator (swaybar defaults) */
 #mode {
   padding: 0 6px;

@@ -74,9 +74,9 @@ exec dunst
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 
-# App launcher, power menu and clipboard menu daemon, toggled by
-# ~/.local/bin/app-menu ($menu), ~/.local/bin/power-menu
-# and ~/.local/bin/clipboard-menu
+# App launcher, power menu, clipboard menu and scratchpad menu daemon, toggled
+# by ~/.local/bin/app-menu ($menu), ~/.local/bin/power-menu,
+# ~/.local/bin/clipboard-menu and ~/.local/bin/scratchpad-menu
 exec qs -c launcher -d
 
 # Open the app launcher on every new, empty workspace, close it on leaving
@@ -250,9 +250,9 @@ bindsym $mod+Shift+space floating toggle
     # Move the currently focused window to the scratchpad
     bindsym $mod+Shift+minus move scratchpad
 
-    # Show the next scratchpad window or hide the focused scratchpad window.
-    # If there are multiple scratchpad windows, this command cycles through them.
-    bindsym $mod+minus scratchpad show
+    # List the scratchpad windows (waybar shows how many there are). Picking
+    # one takes it out and tiles it on the current workspace.
+    bindsym $mod+minus exec ~/.local/bin/scratchpad-menu
 
 #
 # Resizing containers:
