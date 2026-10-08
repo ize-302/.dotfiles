@@ -152,10 +152,11 @@
 	},
 
 	// Above 50% switches to the loud icon. Only the highest matching state
-	// applies, so high/over repeat the loud format; style.css colours them.
+	// applies, so high/over repeat the loud format; style.css colours them
+	// (mid only changes the colour, so it keeps the default format).
 	// Click toggles mute.
 	"wireplumber": {
-		"states": { "loud": 51, "high": 71, "over": 101 },
+		"states": { "mid": 31, "loud": 51, "high": 71, "over": 101 },
 		"format": "  {volume}% ",
 		"format-loud": "   {volume}% ",
 		"format-high": "   {volume}% ",

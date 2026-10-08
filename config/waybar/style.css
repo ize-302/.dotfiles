@@ -177,19 +177,26 @@ window#waybar {
   color: orange;
 }
 
-/* Volume: green normally, yellow from 71%, red when boosted past 100% */
+/* Volume: the clock's colour, more opaque the louder it gets, red when boosted past
+   100%. Faintest when muted. */
 #wireplumber {
-  color: #9ece6a;
+  color: rgba(192, 202, 245, 0.35);
+}
+#wireplumber.mid {
+  color: rgba(192, 202, 245, 0.55);
+}
+#wireplumber.loud {
+  color: rgba(192, 202, 245, 0.75);
 }
 #wireplumber.high {
-  color: #e0af68;
+  color: rgba(192, 202, 245, 1);
 }
 #wireplumber.over {
   color: #f7768e;
 }
 /* Must come after the level states so muted wins */
 #wireplumber.muted {
-  color: #808080;
+  color: rgba(192, 202, 245, 0.2);
 }
 
 #clock {

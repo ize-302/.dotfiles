@@ -342,7 +342,7 @@ bar {
 set $base00 #282828
 set $base01 #fbf1c7
 set $base02 #cc241d
-set $base03 #9ece6a
+set $base03 #FF7518
 set $base04 #ffffff
 
 ## Window Colours
