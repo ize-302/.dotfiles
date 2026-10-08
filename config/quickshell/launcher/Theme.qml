@@ -47,6 +47,10 @@ Singleton {
     readonly property real clipboardWidth: 0.35
     readonly property string clipboardEmptyText: "Nothing found"
 
+    // Key bindings menu: wider, a description and its keys share the row
+    readonly property real keybindWidth: 0.35
+    readonly property string keybindEmptyText: "No bindings found"
+
     // Scratchpad menu
     readonly property string scratchpadEmptyText: "No windows in the scratchpad"
 

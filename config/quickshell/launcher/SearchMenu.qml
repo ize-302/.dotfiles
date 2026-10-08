@@ -15,9 +15,11 @@ PanelWindow { // qmllint disable uncreatable-type
     // Rows to show, already filtered by `query`
     property var results: []
     readonly property alias query: input.text
-    // Text for a result, and optionally the image beside it
+    // Text for a result, and optionally the image beside it and the dimmed
+    // text at the end of the row
     property var label: item => ""
     property var icon: null
+    property var hint: null
     property string emptyText: ""
     // Fraction of the screen width
     property real panelWidth: Theme.panelWidth
@@ -183,12 +185,24 @@ PanelWindow { // qmllint disable uncreatable-type
 
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - (icon.visible ? icon.width + parent.spacing : 0)
+                                width: parent.width - (icon.visible ? icon.width + parent.spacing : 0) - (hint.visible ? hint.width + parent.spacing : 0)
                                 text: window.label(row.modelData)
                                 // Clipboard contents can look like markup
                                 textFormat: Text.PlainText
                                 color: Theme.textColor
                                 elide: Text.ElideRight
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSize
+                                font.weight: Theme.fontWeight
+                            }
+
+                            Text {
+                                id: hint
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: window.hint !== null
+                                text: visible ? window.hint(row.modelData) : ""
+                                textFormat: Text.PlainText
+                                color: Theme.dimColor
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSize
                                 font.weight: Theme.fontWeight

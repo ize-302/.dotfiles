@@ -74,9 +74,10 @@ exec dunst
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 
-# App launcher, power menu, clipboard menu and scratchpad menu daemon, toggled
-# by ~/.local/bin/app-menu ($menu), ~/.local/bin/power-menu,
-# ~/.local/bin/clipboard-menu and ~/.local/bin/scratchpad-menu
+# App launcher, power menu, clipboard menu, scratchpad menu and key bindings
+# menu daemon, toggled by ~/.local/bin/app-menu ($menu),
+# ~/.local/bin/power-menu, ~/.local/bin/clipboard-menu,
+# ~/.local/bin/scratchpad-menu and ~/.local/bin/keybind-menu
 exec qs -c launcher -d
 
 # Open the app launcher on every new, empty workspace, close it on leaving
@@ -139,15 +140,16 @@ bindgesture swipe:4:right workspace prev_on_output
 # Login sound
 exec paplay /usr/share/sounds/freedesktop/stereo/service-login.oga
 
-# power options: menu in the bottom left corner (lock, logout, sleep, hibernate, reboot, shutdown)
+# Power menu
 bindsym $mod+Escape exec ~/.local/bin/power-menu
 
+# Open a terminal
 bindsym $mod+Return exec $term
 
-# screenshot
+# Screenshot
 bindsym $mod+s exec sh -c 'pkill -x flameshot || flameshot gui'
 
-# screenrecord
+# Start or stop screen recording
 bindsym $mod+Shift+s exec ~/.local/bin/record-toggle
 
 # Kill focused window
@@ -159,8 +161,15 @@ bindsym $mod+space exec $menu
 # Clipboard history picker
 bindsym $mod+c exec ~/.local/bin/clipboard-menu
 
+# Key bindings cheat sheet
+bindsym $mod+Shift+slash exec ~/.local/bin/keybind-menu
+
 # Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet)
+
+# Network connections
 bindsym $mod+n exec nm-connection-editor
+
+# Bluetooth devices
 bindsym $mod+Shift+b exec blueman-manager
 
 # Use Mouse+$mod to drag floating windows to their wanted position
@@ -173,7 +182,7 @@ for_window [app_id="btop"] move container to workspace btop, workspace btop
 # Reload the configuration file
 bindsym $mod+Shift+r reload
 
-# Exit SwayFX (logs you out of your Wayland session)
+# Exit SwayFX
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit SwayFX? This will end your Wayland session.' -B 'Yes, exit SwayFX' 'swaymsg exit'
 
 #
@@ -229,16 +238,17 @@ bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. 
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
 
-# split in horizontal orientation
+# Split horizontally
 bindsym $mod+b splith
-# split in vertical orientation
+
+# Split vertically
 bindsym $mod+v splitv
 
 
 # Make the current focus fullscreen
 bindsym $mod+f fullscreen
 
-# Toggle the current focus between tiling and floating mode
+# Toggle between tiling and floating
 bindsym $mod+Shift+space floating toggle
 
 #
@@ -247,11 +257,13 @@ bindsym $mod+Shift+space floating toggle
   # SwayFX has a "scratchpad", which is a bag of holding for windows.
     # You can send windows there and get them back later.
 
-    # Move the currently focused window to the scratchpad
+    # Send the focused window to the scratchpad
     bindsym $mod+Shift+minus move scratchpad
 
-    # List the scratchpad windows (waybar shows how many there are). Picking
-    # one takes it out and tiles it on the current workspace.
+    # The menu lists the scratchpad windows (waybar shows how many there
+    # are). Picking one takes it out and tiles it on the current workspace.
+
+    # Scratchpad windows
     bindsym $mod+minus exec ~/.local/bin/scratchpad-menu
 
 #
@@ -278,6 +290,8 @@ mode "resize" {
     bindsym Escape mode "default"
     bindsym $mod+r mode "default"
 }
+
+# Resize mode
 bindsym $mod+r mode "resize"
 #
 # Utilities:
@@ -299,7 +313,7 @@ bindsym $mod+r mode "resize"
     bindsym --locked XF86AudioNext exec playerctl next
     bindsym --locked XF86AudioStop exec playerctl stop
 
-    # Special key to take a screenshot with grim
+    # Screenshot of the whole screen
     bindsym Print exec grim
 
 #
