@@ -222,6 +222,7 @@ tooltip {
   background-color: #15161e;
   border: none;
   box-shadow: none;
+	border-radius: 1px;
 }
 tooltip label {
   color: #b1b1b1;
