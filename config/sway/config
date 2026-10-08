@@ -51,9 +51,8 @@ shadows disable
 shadows_on_csd enable
 
 #
-# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-# output * bg /home/ize/Downloads/sung-jinwoo.jpg fill
-exec ~/.azotebg
+# Random wallpaper from ~/Pictures/wallpapers, changed every 30 minutes
+exec_always ~/.local/bin/wallpaper-rotate
 
 # Startup apps: browser on workspace 2, terminal on workspace 1 (left focused).
 # Sway places each window on the workspace it was launched from.
