@@ -2,7 +2,7 @@
 # ~/.local/bin/app-menu
 # Toggles the Quickshell app launcher (~/.config/quickshell/launcher), starting
 # its daemon first if it isn't running.
-toggle=(qs -c launcher ipc call launcher toggle)
+toggle=(qs -c launcher ipc call launcher toggleAppMenu)
 
 "${toggle[@]}" >/dev/null 2>&1 && exit 0
 

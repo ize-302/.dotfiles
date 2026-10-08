@@ -1,0 +1,23 @@
+#!/bin/bash
+# ~/.local/bin/workspace-menu
+# Opens the app launcher on every new, empty workspace and closes it on moving
+# to any other one. Sway announces a new workspace ("init") right before
+# focusing it. Only those count as new, not an empty workspace that was already
+# there, like the one on the other monitor. Stops with the sway session.
+swaymsg -t subscribe -m '["workspace"]' |
+	jq --unbuffered -rn '
+		foreach inputs as $event ({};
+			{
+				new: (if $event.change == "init" then $event.current.id
+					elif $event.change == "focus" then null
+					else .new end),
+				call: (if $event.change != "focus" then null
+					elif $event.current.id == .new
+						and ($event.current.nodes + $event.current.floating_nodes | length) == 0
+					then "openAppMenu"
+					else "closeAppMenu" end)
+			};
+			.call // empty)' |
+	while read -r call; do
+		qs -c launcher ipc call launcher "$call" >/dev/null 2>&1
+	done

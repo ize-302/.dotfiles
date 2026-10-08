@@ -8,7 +8,7 @@ import qs
 
 // Power menu: the same corner panel as the app launcher, just wide enough
 // for its labels. Toggled by ~/.local/bin/power-menu
-// (`qs -c launcher ipc call power toggle`), which also carries out the choice.
+// (`qs -c launcher ipc call power togglePowerMenu`), which also carries out the choice.
 Scope {
     id: root
 
@@ -29,7 +29,7 @@ Scope {
     IpcHandler {
         target: "power"
 
-        function toggle(): void {
+        function togglePowerMenu(): void {
             root.open = !root.open;
         }
     }

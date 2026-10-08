@@ -79,6 +79,9 @@ exec wl-paste --type image --watch cliphist store
 # and ~/.local/bin/clipboard-menu
 exec qs -c launcher -d
 
+# Open the app launcher on every new, empty workspace, close it on leaving
+exec ~/.local/bin/workspace-menu
+
 # Layout: external on the left, laptop on the right
 output DP-2 pos 0 0
 output eDP-1 pos 1920 0 scale 1.4

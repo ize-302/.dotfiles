@@ -31,7 +31,7 @@ if [ $# -gt 0 ]; then
 	exit
 fi
 
-toggle=(qs -c launcher ipc call power toggle)
+toggle=(qs -c launcher ipc call power togglePowerMenu)
 
 "${toggle[@]}" >/dev/null 2>&1 && exit 0
 

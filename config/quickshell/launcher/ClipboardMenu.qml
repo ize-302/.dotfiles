@@ -5,7 +5,7 @@ import qs
 
 // Clipboard history (cliphist) in the same corner panel as the app launcher.
 // Toggled by ~/.local/bin/clipboard-menu
-// (`qs -c launcher ipc call clipboard toggle`). Enter copies the entry again.
+// (`qs -c launcher ipc call clipboard toggleClipboardMenu`). Enter copies the entry again.
 Scope {
     id: root
 
@@ -31,7 +31,7 @@ Scope {
     IpcHandler {
         target: "clipboard"
 
-        function toggle(): void {
+        function toggleClipboardMenu(): void {
             root.open = !root.open;
         }
     }

@@ -2,7 +2,7 @@
 # ~/.local/bin/clipboard-menu
 # Toggles the Quickshell clipboard history menu (~/.config/quickshell/launcher),
 # starting its daemon first if it isn't running.
-toggle=(qs -c launcher ipc call clipboard toggle)
+toggle=(qs -c launcher ipc call clipboard toggleClipboardMenu)
 
 "${toggle[@]}" >/dev/null 2>&1 && exit 0
 

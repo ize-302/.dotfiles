@@ -7,7 +7,7 @@ import qs
 
 // App launcher: a glass panel in the bottom left corner, on top of the status
 // bar. Runs as a daemon (`qs -c launcher -d`) and is toggled by
-// ~/.local/bin/app-menu (`qs -c launcher ipc call launcher toggle`). The same
+// ~/.local/bin/app-menu (`qs -c launcher ipc call launcher toggleAppMenu`). The same
 // daemon serves the power menu (PowerMenu.qml) and the clipboard menu
 // (ClipboardMenu.qml).
 ShellRoot {
@@ -97,8 +97,16 @@ ShellRoot {
     IpcHandler {
         target: "launcher"
 
-        function toggle(): void {
+        function toggleAppMenu(): void {
             appMenu.open = !appMenu.open;
+        }
+
+        function openAppMenu(): void {
+            appMenu.open = true;
+        }
+
+        function closeAppMenu(): void {
+            appMenu.open = false;
         }
     }
 
