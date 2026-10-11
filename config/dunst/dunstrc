@@ -377,6 +377,11 @@
     appname = *
     urgency = critical
 
+# Notification sound (message.oga from the freedesktop sound theme)
+[sound]
+    appname = *
+    script = ~/.config/dunst/notify-sound
+
 # Every section that isn't one of the above is interpreted as a rules to
 # override settings for certain messages.
 #

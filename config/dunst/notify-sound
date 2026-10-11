@@ -1,0 +1,5 @@
+#!/bin/bash
+# ~/.config/dunst/notify-sound
+# Plays the notification sound. dunst runs it for every notification (the
+# [sound] rule in dunstrc).
+exec paplay /usr/share/sounds/freedesktop/stereo/message.oga
