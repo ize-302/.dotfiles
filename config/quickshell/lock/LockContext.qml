@@ -15,6 +15,9 @@ Scope {
     property bool unlockInProgress: false
     property string message: ""
     property bool messageIsError: false
+    // Last thing PAM said during the current attempt, e.g. pam_faillock's
+    // "The account is locked due to 3 failed logins"
+    property string pamInfo: ""
 
     onCurrentTextChanged: {
         if (currentText !== "")
@@ -35,6 +38,7 @@ Scope {
 
         unlockInProgress = true;
         message = "";
+        pamInfo = "";
         pam.start();
     }
 
@@ -62,6 +66,7 @@ Scope {
             if (responseRequired) {
                 respond(root.currentText);
             } else if (message !== "") {
+                root.pamInfo = message;
                 root.message = message;
                 root.messageIsError = messageIsError;
             }
@@ -76,7 +81,9 @@ Scope {
             } else if (result === PamResult.Error) {
                 root.fail("Authentication error");
             } else {
-                root.fail("Wrong password");
+                // Keep PAM's own reason: a locked out account rejects the
+                // correct password too, which "Wrong password" would hide.
+                root.fail(root.pamInfo || "Wrong password");
             }
         }
 
