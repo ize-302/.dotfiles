@@ -66,6 +66,12 @@ exec_always --no-startup-id "pgrep -x nm-applet || nm-applet --indicator"
 # too: it depends on StatusIcon and would pull it back in.
 exec gsettings set org.blueman.general plugin-list "['!StatusIcon', '!ShowConnected']"
 
+# GTK theme. On Wayland GTK3/4 apps read these from gsettings and ignore
+# ~/.config/gtk-3.0/settings.ini, so set them here to keep apps dark.
+exec_always gsettings set org.gnome.desktop.interface gtk-theme 'Arc-Dark'
+exec_always gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+exec_always gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
+
 # Notification daemon. D-Bus would start it on the first notification, but
 # flameshot only notifies if one is already running.
 exec dunst
