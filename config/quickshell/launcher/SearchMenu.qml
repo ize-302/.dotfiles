@@ -33,7 +33,7 @@ PanelWindow { // qmllint disable uncreatable-type
     // Small drop shadow under the panel; floating panels always have one
     property bool shadow: floating
     property int cornerRadius: Theme.cornerRadius
-    property color panelColor: Theme.panelColor
+    property color panelColor: Theme.glassPanelColor
     // Space between the panel's edges and its content
     property int panelPadding: Theme.panelPadding
     // Sheen over the panel background; off for a plain fill

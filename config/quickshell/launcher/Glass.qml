@@ -15,7 +15,7 @@ Rectangle {
     // Fading sheen over the top; off leaves a plain fill
     property bool sheen: true
 
-    color: Theme.panelColor
+    color: Theme.glassPanelColor
     radius: floating ? cornerRadius : 0
     // The one corner that touches neither the screen edge nor the bar
     topRightRadius: fullWidth ? 0 : cornerRadius

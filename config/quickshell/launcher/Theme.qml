@@ -15,11 +15,13 @@ Singleton {
     readonly property real panelWidth: 0.22
     readonly property int panelPadding: 14
     readonly property color panelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.96)
+    // The menus' panels, more see-through than the bar
+    readonly property color glassPanelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.8)
     readonly property color sheenTop: Qt.rgba(1, 1, 1, 0.05)
     readonly property color sheenMiddle: Qt.rgba(1, 1, 1, 0.01)
     readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.16)
     // Top right corner of the menus
-    readonly property int cornerRadius: 3
+    readonly property int cornerRadius: 4
 
     // Search row
     readonly property int searchFontSize: 15
@@ -66,8 +68,6 @@ Singleton {
 
     // Scratchpad menu: a full width strip of window previews on the bar
     readonly property string scratchpadEmptyText: "No windows in the scratchpad"
-    // Panel colour, more see-through than the other menus
-    readonly property color scratchpadPanelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.8)
     // Card width as a fraction of the screen width
     readonly property real cardWidth: 0.15
     // Two lone Super taps within this many ms open the strip

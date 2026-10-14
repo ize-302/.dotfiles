@@ -259,7 +259,6 @@ Scope {
 
         shadow: true
         sheen: false
-        panelColor: Theme.scratchpadPanelColor
         // The cards keep cardSpacing around them too
         panelPadding: Theme.cardSpacing
         card: windowCard
