@@ -9,11 +9,12 @@ Rectangle {
     id: glass
 
     property bool floating: false
+    property int cornerRadius: Theme.cornerRadius
 
     color: Theme.panelColor
-    radius: floating ? Theme.cornerRadius : 0
+    radius: floating ? cornerRadius : 0
     // The one corner that touches neither the screen edge nor the bar
-    topRightRadius: Theme.cornerRadius
+    topRightRadius: cornerRadius
 
     // Rises out of the bar
     function appear() {

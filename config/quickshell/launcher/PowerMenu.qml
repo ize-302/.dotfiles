@@ -50,7 +50,8 @@ Scope {
         implicitWidth: panel.width
         implicitHeight: panel.height
 
-        WlrLayershell.namespace: "launcher"
+        // With the drop shadow (`layer_effects "launcher-shadow"` in sway)
+        WlrLayershell.namespace: "launcher-shadow"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 

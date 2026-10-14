@@ -19,7 +19,7 @@ Singleton {
     readonly property color sheenMiddle: Qt.rgba(1, 1, 1, 0.01)
     readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.16)
     // Top right corner of the menus
-    readonly property int cornerRadius: 1
+    readonly property int cornerRadius: 3
 
     // Search row
     readonly property int searchFontSize: 15
@@ -61,6 +61,7 @@ Singleton {
 
     // Key bindings menu: wider, a description and its keys share the row
     readonly property real keybindWidth: 0.35
+    readonly property int keybindRadius: cornerRadius
     readonly property string keybindEmptyText: "No bindings found"
 
     // Scratchpad menu

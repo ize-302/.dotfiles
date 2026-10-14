@@ -132,6 +132,7 @@ Scope {
         id: menu
 
         floating: true
+        cornerRadius: Theme.keybindRadius
         panelWidth: Theme.keybindWidth
         results: root.search(query, root.entries)
         label: entry => entry.label

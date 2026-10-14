@@ -35,9 +35,9 @@ blur_saturation 1.4
 layer_effects "waybar" blur enable; blur_ignore_transparent enable
 layer_effects "notifications" blur enable; blur_ignore_transparent enable
 layer_effects "launcher" blur enable; blur_ignore_transparent enable
-# Floating menus (key bindings) also get a small, soft drop shadow. The
-# shadow_* settings only show here: window shadows are off below.
-layer_effects "launcher-floating" blur enable; blur_ignore_transparent enable; shadows enable
+# Menus with a small, soft drop shadow (app, power, clipboard and key bindings
+# menus). The shadow_* settings only show here: window shadows are off below.
+layer_effects "launcher-shadow" blur enable; blur_ignore_transparent enable; shadows enable
 shadow_blur_radius 12
 shadow_color #00000059
 shadow_offset 0 3

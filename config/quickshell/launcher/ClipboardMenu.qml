@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Io
 import qs
 
-// Clipboard history (cliphist) in the same corner panel as the app launcher.
+// Clipboard history (cliphist), floating in the middle of the screen.
 // Toggled by ~/.local/bin/clipboard-menu
 // (`qs -c launcher ipc call clipboard toggleClipboardMenu`). Enter copies the entry again.
 Scope {
@@ -12,6 +12,11 @@ Scope {
     property alias open: menu.open
     // Lines of `cliphist list`, newest first: "<id>\t<preview>"
     property list<string> entries
+
+    // cliphist's preview of an image: "[[ binary data 326 KiB png 1919x1026 ]]"
+    function image(entry) {
+        return entry.match(/\t\[\[ binary data (\S+ \S+) (\S+) (\d+)x(\d+) \]\]$/);
+    }
 
     // Every word of the query has to appear in the preview
     function search(query, entries) {
@@ -48,9 +53,16 @@ Scope {
     SearchMenu {
         id: menu
 
+        floating: true
+        showCount: true
         panelWidth: Theme.clipboardWidth
         results: root.search(query, root.entries)
-        label: entry => entry.slice(entry.indexOf("\t") + 1)
+        label: entry => root.image(entry) ? "Image" : entry.slice(entry.indexOf("\t") + 1)
+        // Images get their type, dimensions and size as key caps
+        hint: entry => {
+            const image = root.image(entry);
+            return image ? [image[2].toUpperCase(), image[3] + "×" + image[4], image[1]] : [];
+        }
         emptyText: Theme.clipboardEmptyText
 
         // cliphist finds the entry by the id at the start of the line

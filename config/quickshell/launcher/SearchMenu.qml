@@ -29,6 +29,9 @@ PanelWindow { // qmllint disable uncreatable-type
     property real panelWidth: Theme.panelWidth
     // Float in the middle of the screen instead of sitting in the corner
     property bool floating: false
+    // Small drop shadow under the panel; floating panels always have one
+    property bool shadow: floating
+    property int cornerRadius: Theme.cornerRadius
 
     signal accepted(var item)
 
@@ -46,8 +49,8 @@ PanelWindow { // qmllint disable uncreatable-type
     implicitWidth: Math.round(screen.width * panelWidth)
     implicitHeight: panel.height
 
-    // sway draws the floating panel's shadow (`layer_effects "launcher-floating"`)
-    WlrLayershell.namespace: floating ? "launcher-floating" : "launcher"
+    // sway draws the shadow (`layer_effects "launcher-shadow"`)
+    WlrLayershell.namespace: shadow ? "launcher-shadow" : "launcher"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
@@ -71,6 +74,7 @@ PanelWindow { // qmllint disable uncreatable-type
         id: panel
 
         floating: window.floating
+        cornerRadius: window.cornerRadius
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         width: parent.width
