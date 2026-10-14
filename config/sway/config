@@ -164,7 +164,10 @@ bindsym $mod+s exec sh -c 'pkill -x flameshot || flameshot gui'
 # Start or stop screen recording
 bindsym $mod+Shift+s exec ~/.local/bin/record-toggle
 
-# Kill focused window
+# Move the focused window to the scratchpad
+bindsym $mod+BackSpace move scratchpad
+
+# Close the focused window
 bindsym $mod+x kill
 
 # Start your launcher
@@ -267,16 +270,18 @@ bindsym $mod+Shift+space floating toggle
 # Scratchpad:
 #
   # SwayFX has a "scratchpad", which is a bag of holding for windows.
-    # You can send windows there and get them back later.
-
-    # Send the focused window to the scratchpad
-    bindsym $mod+Shift+minus move scratchpad
+    # You can send windows there and get them back later: $mod+BackSpace
+    # parks the focused window ($mod+x closes it).
 
     # The menu lists the scratchpad windows (waybar shows how many there
     # are). Picking one takes it out and tiles it on the current workspace.
+    # A release binding on Super alone only fires when no other key was
+    # pressed with it. `nop` runs nothing: the menu daemon hears the binding
+    # over sway IPC and opens on the second of two quick taps
+    # (config/quickshell/launcher/ScratchpadMenu.qml).
 
-    # Scratchpad windows
-    bindsym $mod+minus exec ~/.local/bin/scratchpad-menu
+    # Scratchpad windows (double tap Super)
+    bindsym --release Super_L nop scratchpad-tap
 
 #
 # Resizing containers:

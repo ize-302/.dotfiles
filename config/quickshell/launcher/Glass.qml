@@ -4,17 +4,19 @@ import qs
 // Panel background shared by the menus: translucent, with a sheen fading down
 // from the top and a lit top and right edge. Left and bottom touch the screen
 // edge and the bar, unless the panel is floating: then every corner is
-// rounded and every edge lit.
+// rounded and every edge lit. A full width panel, like the bar, only has its
+// top edge lit and no rounded corner.
 Rectangle {
     id: glass
 
     property bool floating: false
     property int cornerRadius: Theme.cornerRadius
+    property bool fullWidth: false
 
     color: Theme.panelColor
     radius: floating ? cornerRadius : 0
     // The one corner that touches neither the screen edge nor the bar
-    topRightRadius: cornerRadius
+    topRightRadius: fullWidth ? 0 : cornerRadius
 
     // Rises out of the bar
     function appear() {
@@ -74,6 +76,7 @@ Rectangle {
             anchors.fill: parent
             anchors.leftMargin: glass.floating ? 0 : -border.width
             anchors.bottomMargin: glass.floating ? 0 : -border.width
+            anchors.rightMargin: glass.fullWidth ? -border.width : 0
             color: "transparent"
             radius: glass.radius
             topRightRadius: glass.topRightRadius

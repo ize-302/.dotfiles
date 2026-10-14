@@ -64,8 +64,22 @@ Singleton {
     readonly property int keybindRadius: cornerRadius
     readonly property string keybindEmptyText: "No bindings found"
 
-    // Scratchpad menu
+    // Scratchpad menu: a full width strip of window previews on the bar
     readonly property string scratchpadEmptyText: "No windows in the scratchpad"
+    // Card width as a fraction of the screen width
+    readonly property real cardWidth: 0.15
+    // Two lone Super taps within this many ms open the strip
+    readonly property int doubleTapInterval: 400
+    // Close button on a hovered card, red like the bar's urgent workspace
+    readonly property int closeButtonSize: 24
+    readonly property color closeColor: "#f7768e"
+    // Fade over an edge of the strip with more cards past it
+    readonly property int stripFadeWidth: 64
+    // Card height as a fraction of the screen height; the card inside leaves
+    // cardSpacing around it
+    readonly property real cardHeight: 0.2
+    readonly property int cardSpacing: 6
+    readonly property int cardTitleHeight: 34
 
     readonly property int animationDuration: 120
 

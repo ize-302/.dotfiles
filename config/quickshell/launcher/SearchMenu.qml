@@ -7,7 +7,8 @@ import Quickshell.Widgets
 import qs
 
 // Searchable list in the corner panel: a search row over a fixed number of
-// result rows. The owner filters `results` by `query` and handles `accepted`.
+// result rows, or a strip of cards when the owner gives a `card` delegate. The
+// owner filters `results` by `query` and handles `accepted`.
 PanelWindow { // qmllint disable uncreatable-type
     id: window
 
@@ -32,6 +33,21 @@ PanelWindow { // qmllint disable uncreatable-type
     // Small drop shadow under the panel; floating panels always have one
     property bool shadow: floating
     property int cornerRadius: Theme.cornerRadius
+    // Delegate for a strip of cards instead of rows: one row across the
+    // whole screen, sitting on the bar and scrolling sideways. Its root gets
+    // the ListView's `modelData` and `index`; ListView.isCurrentItem marks
+    // the selected card.
+    property Component card: null
+    readonly property bool strip: card !== null
+    readonly property int cardWidth: Math.round(screen.width * Theme.cardWidth)
+    readonly property Item view: strip ? cards : list
+    // Extra keys: called with the key event and the selected result before
+    // the menu's own keys; returns true when it handled the key
+    property var keyHandler: null
+
+    // Without the search row the results aren't filtered and keys go
+    // straight to the menu
+    property bool searchable: true
 
     signal accepted(var item)
 
@@ -43,10 +59,49 @@ PanelWindow { // qmllint disable uncreatable-type
         accepted(item);
     }
 
+    // Keys for the search box, or for the menu itself when it has none
+    function handleKey(event) {
+        const selected = window.results[window.view.currentIndex];
+        if (window.keyHandler && selected !== undefined && window.keyHandler(event, selected)) {
+            event.accepted = true;
+            return;
+        }
+
+        const ctrl = event.modifiers & Qt.ControlModifier;
+        const count = window.results.length;
+        const view = window.view;
+        const current = view.currentIndex;
+        // A page is the cards (or rows) that fit
+        const page = window.strip ? Math.max(1, Math.floor(cards.width / window.cardWidth)) : Theme.maxRows;
+
+        if (event.key === Qt.Key_Escape) {
+            window.open = false;
+        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            window.accept(window.results[current]);
+        } else if (count === 0) {
+            return;
+        } else if (event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N) || (window.strip && event.key === Qt.Key_Right)) {
+            view.currentIndex = (current + 1) % count;
+        } else if (event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P) || (window.strip && event.key === Qt.Key_Left)) {
+            view.currentIndex = (current + count - 1) % count;
+        } else if (event.key === Qt.Key_Down) {
+            view.currentIndex = (current + 1) % count;
+        } else if (event.key === Qt.Key_Up) {
+            view.currentIndex = (current + count - 1) % count;
+        } else if (event.key === Qt.Key_PageDown) {
+            view.currentIndex = Math.min(current + page, count - 1);
+        } else if (event.key === Qt.Key_PageUp) {
+            view.currentIndex = Math.max(current - page, 0);
+        } else {
+            return;
+        }
+        event.accepted = true;
+    }
+
     visible: open
     color: "transparent"
     exclusionMode: ExclusionMode.Normal
-    implicitWidth: Math.round(screen.width * panelWidth)
+    implicitWidth: strip ? screen.width : Math.round(screen.width * panelWidth)
     implicitHeight: panel.height
 
     // sway draws the shadow (`layer_effects "launcher-shadow"`)
@@ -54,10 +109,12 @@ PanelWindow { // qmllint disable uncreatable-type
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
-    // With no edges anchored, the layer shell centres the window
+    // With no edges anchored, the layer shell centres the window; the strip
+    // spans the bottom edge, on top of the bar
     anchors {
-        bottom: !window.floating
-        left: !window.floating
+        bottom: !window.floating || window.strip
+        left: !window.floating || window.strip
+        right: window.strip
     }
 
     onVisibleChanged: {
@@ -65,8 +122,8 @@ PanelWindow { // qmllint disable uncreatable-type
             return;
 
         input.text = "";
-        list.currentIndex = 0;
-        input.forceActiveFocus();
+        window.view.currentIndex = 0;
+        (searchable ? input : keys).forceActiveFocus();
         panel.appear();
     }
 
@@ -75,10 +132,16 @@ PanelWindow { // qmllint disable uncreatable-type
 
         floating: window.floating
         cornerRadius: window.cornerRadius
+        fullWidth: window.strip
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         width: parent.width
         height: content.implicitHeight + Theme.panelPadding * 2
+
+        Item {
+            id: keys
+            Keys.onPressed: event => window.handleKey(event)
+        }
 
         Column {
             id: content
@@ -92,6 +155,7 @@ PanelWindow { // qmllint disable uncreatable-type
             Row {
                 x: Theme.rowPadding
                 width: parent.width - x * 2
+                visible: window.searchable
                 spacing: Theme.iconSpacing
 
                 Text {
@@ -114,32 +178,9 @@ PanelWindow { // qmllint disable uncreatable-type
                     font.weight: Theme.fontWeight
                     clip: true
 
-                    onTextChanged: list.currentIndex = 0
+                    onTextChanged: window.view.currentIndex = 0
 
-                    Keys.onPressed: event => {
-                        const ctrl = event.modifiers & Qt.ControlModifier;
-                        const count = window.results.length;
-                        const page = Theme.maxRows;
-
-                        if (event.key === Qt.Key_Escape) {
-                            window.open = false;
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            window.accept(window.results[list.currentIndex]);
-                        } else if (count === 0) {
-                            return;
-                        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N)) {
-                            list.currentIndex = (list.currentIndex + 1) % count;
-                        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P)) {
-                            list.currentIndex = (list.currentIndex + count - 1) % count;
-                        } else if (event.key === Qt.Key_PageDown) {
-                            list.currentIndex = Math.min(list.currentIndex + page, count - 1);
-                        } else if (event.key === Qt.Key_PageUp) {
-                            list.currentIndex = Math.max(list.currentIndex - page, 0);
-                        } else {
-                            return;
-                        }
-                        event.accepted = true;
-                    }
+                    Keys.onPressed: event => window.handleKey(event)
 
                     Text {
                         visible: input.text.length === 0
@@ -165,19 +206,83 @@ PanelWindow { // qmllint disable uncreatable-type
             Rectangle {
                 width: parent.width
                 height: 1
+                visible: window.searchable
                 color: Theme.dividerColor
             }
 
-            // Always room for maxRows, however many results there are
+            // Always room for maxRows (or one row of cards), however many
+            // results there are
             Item {
                 width: parent.width
-                height: Theme.maxRows * (Theme.rowHeight + Theme.rowSpacing) - Theme.rowSpacing
+                height: window.strip ? Math.round(window.screen.height * Theme.cardHeight) : Theme.maxRows * (Theme.rowHeight + Theme.rowSpacing) - Theme.rowSpacing
+
+                ListView {
+                    id: cards
+
+                    anchors.fill: parent
+                    visible: window.strip
+                    orientation: ListView.Horizontal
+                    model: window.strip ? window.results : []
+                    clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    highlightMoveDuration: 0
+                    delegate: window.card
+
+                    // The mouse wheel scrolls the strip sideways, half a card
+                    // a notch; sideways swipes are left to the list itself
+                    WheelHandler {
+                        orientation: Qt.Vertical
+                        onWheel: event => {
+                            const delta = event.pixelDelta.y !== 0 ? event.pixelDelta.y : event.angleDelta.y / 120 * window.cardWidth / 2;
+                            const end = cards.originX + Math.max(0, cards.contentWidth - cards.width);
+                            cards.contentX = Math.max(cards.originX, Math.min(cards.contentX - delta, end));
+                        }
+                    }
+                }
+
+                // Fades over the strip's edges while there are more cards
+                // that way
+                Repeater {
+                    model: window.strip ? [false, true] : []
+
+                    delegate: Rectangle {
+                        id: fade
+
+                        required property bool modelData
+                        readonly property bool atRight: modelData
+
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: atRight ? undefined : parent.left
+                        anchors.right: atRight ? parent.right : undefined
+                        width: Theme.stripFadeWidth
+                        opacity: (atRight ? cards.atXEnd : cards.atXBeginning) ? 0 : 1
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop {
+                                position: 0
+                                color: fade.atRight ? "transparent" : Theme.panelColor
+                            }
+                            GradientStop {
+                                position: 1
+                                color: fade.atRight ? Theme.panelColor : "transparent"
+                            }
+                        }
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.animationDuration
+                            }
+                        }
+                    }
+                }
 
                 ListView {
                     id: list
 
                     anchors.fill: parent
-                    model: window.results
+                    visible: !window.strip
+                    model: window.strip ? [] : window.results
                     spacing: Theme.rowSpacing
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds

@@ -15,12 +15,14 @@ Scope {
 
     readonly property var keyNames: ({
             "Mod4": "Super",
+            "Super_L": "Super",
             "Mod1": "Alt",
             "Return": "Enter",
             "space": "Space",
             "minus": "-",
             "slash": "/",
-            "question": "?"
+            "question": "?",
+            "BackSpace": "Backspace"
         })
 
     // "Mod4+Shift+r" -> ["Super", "Shift", "R"]
