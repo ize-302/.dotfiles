@@ -35,6 +35,12 @@ blur_saturation 1.4
 layer_effects "waybar" blur enable; blur_ignore_transparent enable
 layer_effects "notifications" blur enable; blur_ignore_transparent enable
 layer_effects "launcher" blur enable; blur_ignore_transparent enable
+# Floating menus (key bindings) also get a small, soft drop shadow. The
+# shadow_* settings only show here: window shadows are off below.
+layer_effects "launcher-floating" blur enable; blur_ignore_transparent enable; shadows enable
+shadow_blur_radius 12
+shadow_color #00000059
+shadow_offset 0 3
 
 corner_radius 1
 
@@ -168,7 +174,7 @@ bindsym $mod+space exec $menu
 bindsym $mod+c exec ~/.local/bin/clipboard-menu
 
 # Key bindings cheat sheet
-bindsym $mod+Shift+slash exec ~/.local/bin/keybind-menu
+bindsym $mod+question exec ~/.local/bin/keybind-menu
 
 # Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet)
 

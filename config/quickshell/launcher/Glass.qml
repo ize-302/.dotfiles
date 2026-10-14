@@ -3,11 +3,15 @@ import qs
 
 // Panel background shared by the menus: translucent, with a sheen fading down
 // from the top and a lit top and right edge. Left and bottom touch the screen
-// edge and the bar.
+// edge and the bar, unless the panel is floating: then every corner is
+// rounded and every edge lit.
 Rectangle {
     id: glass
 
+    property bool floating: false
+
     color: Theme.panelColor
+    radius: floating ? Theme.cornerRadius : 0
     // The one corner that touches neither the screen edge nor the bar
     topRightRadius: Theme.cornerRadius
 
@@ -42,6 +46,7 @@ Rectangle {
 
     Rectangle {
         anchors.fill: parent
+        radius: glass.radius
         topRightRadius: glass.topRightRadius
         gradient: Gradient {
             GradientStop {
@@ -59,16 +64,17 @@ Rectangle {
         }
     }
     // The lit edge is an outline that follows the corner; its left and bottom
-    // sides hang outside the panel and are clipped away
+    // sides hang outside the panel and are clipped away (unless floating)
     Item {
         anchors.fill: parent
         clip: true
 
         Rectangle {
             anchors.fill: parent
-            anchors.leftMargin: -border.width
-            anchors.bottomMargin: -border.width
+            anchors.leftMargin: glass.floating ? 0 : -border.width
+            anchors.bottomMargin: glass.floating ? 0 : -border.width
             color: "transparent"
+            radius: glass.radius
             topRightRadius: glass.topRightRadius
             border.width: 1
             border.color: Theme.edgeColor

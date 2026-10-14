@@ -40,6 +40,18 @@ Singleton {
     // Tint, like the bar's focused workspace button
     readonly property color selectedColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.12)
 
+    // Key caps, tinted like the bar's workspace buttons
+    readonly property color keyColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.05)
+    readonly property color keyTextColor: "#a9b1d6"
+    readonly property int keyFontSize: 13
+    readonly property int keyHeight: 22
+    readonly property int keyPadding: 7
+    readonly property int keySpacing: 4
+
+    // Group headers
+    readonly property int sectionFontSize: 12
+    readonly property int sectionHeight: 30
+
     // Shown instead of the list when nothing matches
     readonly property string emptyText: "No apps found"
 

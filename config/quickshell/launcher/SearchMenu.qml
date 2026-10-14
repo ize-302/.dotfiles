@@ -16,13 +16,19 @@ PanelWindow { // qmllint disable uncreatable-type
     property var results: []
     readonly property alias query: input.text
     // Text for a result, and optionally the image beside it and the dimmed
-    // text at the end of the row
     property var label: item => ""
     property var icon: null
+    // text at the end of the row; a hint that is a list is drawn as key caps
     property var hint: null
+    // Property of a result that groups the rows under a header, and whether
+    // to show the number of results in the search row
+    property string section: ""
+    property bool showCount: false
     property string emptyText: ""
     // Fraction of the screen width
     property real panelWidth: Theme.panelWidth
+    // Float in the middle of the screen instead of sitting in the corner
+    property bool floating: false
 
     signal accepted(var item)
 
@@ -40,13 +46,15 @@ PanelWindow { // qmllint disable uncreatable-type
     implicitWidth: Math.round(screen.width * panelWidth)
     implicitHeight: panel.height
 
-    WlrLayershell.namespace: "launcher"
+    // sway draws the floating panel's shadow (`layer_effects "launcher-floating"`)
+    WlrLayershell.namespace: floating ? "launcher-floating" : "launcher"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
+    // With no edges anchored, the layer shell centres the window
     anchors {
-        bottom: true
-        left: true
+        bottom: !window.floating
+        left: !window.floating
     }
 
     onVisibleChanged: {
@@ -62,6 +70,7 @@ PanelWindow { // qmllint disable uncreatable-type
     Glass {
         id: panel
 
+        floating: window.floating
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         width: parent.width
@@ -92,7 +101,7 @@ PanelWindow { // qmllint disable uncreatable-type
                 TextInput {
                     id: input
 
-                    width: parent.width - searchIcon.width - parent.spacing
+                    width: parent.width - searchIcon.width - parent.spacing - (count.visible ? count.width + parent.spacing : 0)
                     color: Theme.textColor
                     selectionColor: Theme.dividerColor
                     selectedTextColor: Theme.textColor
@@ -135,6 +144,17 @@ PanelWindow { // qmllint disable uncreatable-type
                         font: input.font
                     }
                 }
+
+                Text {
+                    id: count
+                    visible: window.showCount
+                    text: window.results.length
+                    color: Theme.dimColor
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.sectionFontSize
+                    font.weight: Theme.fontWeight
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
 
             // Divider under the search row, same colour as the bar's separators
@@ -158,6 +178,9 @@ PanelWindow { // qmllint disable uncreatable-type
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
                     highlightMoveDuration: 0
+
+                    section.property: window.section
+                    section.delegate: window.section ? sectionHeader : null
 
                     delegate: Rectangle {
                         id: row
@@ -196,16 +219,55 @@ PanelWindow { // qmllint disable uncreatable-type
                                 font.weight: Theme.fontWeight
                             }
 
-                            Text {
+                            Row {
                                 id: hint
+
+                                readonly property var value: visible ? window.hint(row.modelData) : ""
+                                readonly property bool caps: typeof value === "object"
+
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: window.hint !== null
-                                text: visible ? window.hint(row.modelData) : ""
-                                textFormat: Text.PlainText
-                                color: Theme.dimColor
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSize
-                                font.weight: Theme.fontWeight
+                                spacing: Theme.keySpacing
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: !hint.caps
+                                    text: hint.caps ? "" : hint.value
+                                    textFormat: Text.PlainText
+                                    color: Theme.dimColor
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: Theme.fontSize
+                                    font.weight: Theme.fontWeight
+                                }
+
+                                // One tinted cap per key, like the bar's
+                                // workspace buttons; brighter on the selected row
+                                Repeater {
+                                    model: hint.caps ? hint.value : []
+
+                                    delegate: Rectangle {
+                                        id: cap
+
+                                        required property string modelData
+
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: capText.implicitWidth + Theme.keyPadding * 2
+                                        height: Theme.keyHeight
+                                        radius: Theme.cornerRadius
+                                        color: row.ListView.isCurrentItem ? Theme.selectedColor : Theme.keyColor
+
+                                        Text {
+                                            id: capText
+                                            anchors.centerIn: parent
+                                            text: cap.modelData
+                                            textFormat: Text.PlainText
+                                            color: row.ListView.isCurrentItem ? Theme.textColor : Theme.keyTextColor
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.keyFontSize
+                                            font.weight: Theme.fontWeight
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -227,6 +289,43 @@ PanelWindow { // qmllint disable uncreatable-type
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize
                 }
+            }
+        }
+    }
+
+    // Group header: dimmed name, then a thin line like the bar's separators
+    Component {
+        id: sectionHeader
+
+        Item {
+            id: header
+
+            required property string section
+
+            width: ListView.view.width
+            height: Theme.sectionHeight
+
+            Text {
+                id: sectionText
+                x: Theme.rowPadding
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: Theme.rowSpacing
+                text: header.section.toUpperCase()
+                color: Theme.dimColor
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.sectionFontSize
+                font.weight: Theme.fontWeight
+                font.letterSpacing: 1
+            }
+
+            Rectangle {
+                anchors.left: sectionText.right
+                anchors.leftMargin: Theme.iconSpacing
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.rowPadding
+                anchors.verticalCenter: sectionText.verticalCenter
+                height: 1
+                color: Theme.dividerColor
             }
         }
     }
