@@ -86,10 +86,11 @@ exec dunst
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 
-# App launcher, power menu, clipboard menu, scratchpad menu and key bindings
-# menu daemon, toggled by ~/.local/bin/app-menu ($menu),
+# App launcher, power menu, clipboard menu, scratchpad menu, key bindings
+# menu and control panel daemon, toggled by ~/.local/bin/app-menu ($menu),
 # ~/.local/bin/power-menu, ~/.local/bin/clipboard-menu,
-# ~/.local/bin/scratchpad-menu and ~/.local/bin/keybind-menu
+# ~/.local/bin/scratchpad-menu, ~/.local/bin/keybind-menu and
+# ~/.local/bin/control-panel. It also shows the volume popup.
 exec qs -c launcher -d
 
 # Open the app launcher on every new, empty workspace, close it on leaving
@@ -178,6 +179,9 @@ bindsym $mod+c exec ~/.local/bin/clipboard-menu
 
 # Key bindings cheat sheet
 bindsym $mod+question exec ~/.local/bin/keybind-menu
+
+# Control panel: brightness, volumes, audio devices and apps
+bindsym $mod+a exec ~/.local/bin/control-panel
 
 # Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet)
 

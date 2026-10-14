@@ -215,6 +215,15 @@ window#waybar {
   padding-left: 0;
 }
 
+/* Control panel button, before the tray icons, so no separator either */
+#custom-control-panel {
+  padding: 0 8px 0 2px;
+  color: #b0b0b2;
+}
+#custom-control-panel:hover {
+  color: #c0caf5;
+}
+
 /* Bluetooth sits beside the tray icons, so no separator */
 #bluetooth {
   padding: 0 10px 0 0px;

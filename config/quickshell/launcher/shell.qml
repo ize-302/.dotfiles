@@ -9,14 +9,15 @@ import qs
 // bar. Runs as a daemon (`qs -c launcher -d`) and is toggled by
 // ~/.local/bin/app-menu (`qs -c launcher ipc call launcher toggleAppMenu`). The same
 // daemon serves the power menu (PowerMenu.qml), the clipboard menu
-// (ClipboardMenu.qml), the scratchpad menu (ScratchpadMenu.qml) and the key
-// bindings menu (KeybindMenu.qml).
+// (ClipboardMenu.qml), the scratchpad menu (ScratchpadMenu.qml), the key
+// bindings menu (KeybindMenu.qml), the control panel (ControlPanel.qml) and the
+// volume popup (VolumeOsd.qml).
 ShellRoot {
     id: root
 
     // Desktop entry id -> times launched. Most used apps are listed first.
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel]
 
     // The menus share the corner, so only one is open at a time
     function closeOthers(menu) {
@@ -74,6 +75,7 @@ ShellRoot {
         id: appMenu
 
         shadow: true
+        standing: true
         results: root.search(query, DesktopEntries.applications.values, root.history)
         label: app => app.name
         icon: app => Quickshell.iconPath(app.icon, "application-x-executable")
@@ -106,6 +108,16 @@ ShellRoot {
         id: keybindMenu
         onOpenChanged: if (open)
             root.closeOthers(keybindMenu)
+    }
+
+    ControlPanel {
+        id: controlPanel
+        onOpenChanged: if (open)
+            root.closeOthers(controlPanel)
+    }
+
+    VolumeOsd {
+        suppressed: controlPanel.open
     }
 
     IpcHandler {

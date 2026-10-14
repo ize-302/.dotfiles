@@ -16,6 +16,7 @@
 		"wireplumber",
 		"clock#date",
 		"clock#time",
+		"custom/control-panel",
 		"tray",
 		"bluetooth"
 	],
@@ -154,7 +155,7 @@
 	// Above 50% switches to the loud icon. Only the highest matching state
 	// applies, so high/over repeat the loud format; style.css colours them
 	// (mid only changes the colour, so it keeps the default format).
-	// Click toggles mute.
+	// Click opens the control panel, right click toggles mute.
 	"wireplumber": {
 		"states": { "mid": 31, "loud": 51, "high": 71, "over": 101 },
 		"format": "  {volume}% ",
@@ -162,7 +163,8 @@
 		"format-high": "   {volume}% ",
 		"format-over": "   {volume}% ",
 		"format-muted": "  {volume}% ",
-		"on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+		"on-click": "~/.local/bin/control-panel",
+		"on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
 		"tooltip": false
 	},
 
@@ -186,6 +188,15 @@
 		"format": " {:%H:%M} ",
 		"interval": 10,
 		"tooltip": false
+	},
+
+	// Opens the control panel (brightness, audio, bluetooth), like Super+A.
+	// Three sliders, U+F066A (md-tune_vertical), as a surrogate pair: JSON's
+	// \u takes four digits.
+	"custom/control-panel": {
+		"format": "\udb81\ude6a",
+		"tooltip": false,
+		"on-click": "~/.local/bin/control-panel"
 	},
 
 	// Replaces blueman-applet. Hover lists connected devices;

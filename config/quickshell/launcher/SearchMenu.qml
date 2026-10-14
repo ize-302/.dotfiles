@@ -30,6 +30,9 @@ PanelWindow { // qmllint disable uncreatable-type
     property real panelWidth: Theme.panelWidth
     // Float in the middle of the screen instead of sitting in the corner
     property bool floating: false
+    // Stand on the bar a little in from the left edge, instead of in the
+    // corner
+    property bool standing: false
     // Small drop shadow under the panel; floating panels always have one
     property bool shadow: floating
     property int cornerRadius: Theme.cornerRadius
@@ -123,6 +126,7 @@ PanelWindow { // qmllint disable uncreatable-type
         left: !window.floating || window.strip
         right: window.strip
     }
+    margins.left: standing ? Theme.edgeMargin : 0
 
     onVisibleChanged: {
         if (!visible)
@@ -138,6 +142,7 @@ PanelWindow { // qmllint disable uncreatable-type
         id: panel
 
         floating: window.floating
+        standing: window.standing
         cornerRadius: window.cornerRadius
         fullWidth: window.strip
         sheen: window.sheen
@@ -363,27 +368,12 @@ PanelWindow { // qmllint disable uncreatable-type
                                 Repeater {
                                     model: hint.caps ? hint.value : []
 
-                                    delegate: Rectangle {
-                                        id: cap
-
+                                    delegate: KeyCap {
                                         required property string modelData
 
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: capText.implicitWidth + Theme.keyPadding * 2
-                                        height: Theme.keyHeight
-                                        radius: Theme.cornerRadius
-                                        color: row.ListView.isCurrentItem ? Theme.selectedColor : Theme.keyColor
-
-                                        Text {
-                                            id: capText
-                                            anchors.centerIn: parent
-                                            text: cap.modelData
-                                            textFormat: Text.PlainText
-                                            color: row.ListView.isCurrentItem ? Theme.textColor : Theme.keyTextColor
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.keyFontSize
-                                            font.weight: Theme.fontWeight
-                                        }
+                                        y: (hint.height - height) / 2
+                                        text: modelData
+                                        lit: row.ListView.isCurrentItem
                                     }
                                 }
                             }
@@ -411,40 +401,15 @@ PanelWindow { // qmllint disable uncreatable-type
         }
     }
 
-    // Group header: dimmed name, then a thin line like the bar's separators
+    // Group header, named by the section property's value
     Component {
         id: sectionHeader
 
-        Item {
-            id: header
-
+        SectionHeader {
             required property string section
 
             width: ListView.view.width
-            height: Theme.sectionHeight
-
-            Text {
-                id: sectionText
-                x: Theme.rowPadding
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: Theme.rowSpacing
-                text: header.section.toUpperCase()
-                color: Theme.dimColor
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.sectionFontSize
-                font.weight: Theme.fontWeight
-                font.letterSpacing: 1
-            }
-
-            Rectangle {
-                anchors.left: sectionText.right
-                anchors.leftMargin: Theme.iconSpacing
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.rowPadding
-                anchors.verticalCenter: sectionText.verticalCenter
-                height: 1
-                color: Theme.dividerColor
-            }
+            text: section
         }
     }
 }

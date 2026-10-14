@@ -59,6 +59,7 @@ Scope {
             bottom: true
             left: true
         }
+        margins.left: Theme.edgeMargin
 
         onVisibleChanged: {
             if (!visible)
@@ -75,6 +76,7 @@ Scope {
             // Tighter than the right: the icons carry their own inset
             readonly property int leftPadding: Theme.panelPadding - 4
 
+            standing: true
             // Fitted to the longest label
             width: Math.ceil(longest.advanceWidth) + Theme.iconSize + Theme.iconSpacing + Theme.rowPadding * 2 + leftPadding + Theme.panelPadding
             height: rows.height + Theme.panelPadding * 2
