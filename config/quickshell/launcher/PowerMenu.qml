@@ -77,6 +77,7 @@ Scope {
             readonly property int leftPadding: Theme.panelPadding - 4
 
             standing: true
+
             // Fitted to the longest label
             width: Math.ceil(longest.advanceWidth) + Theme.iconSize + Theme.iconSpacing + Theme.rowPadding * 2 + leftPadding + Theme.panelPadding
             height: rows.height + Theme.panelPadding * 2
