@@ -16,7 +16,7 @@ Singleton {
     readonly property int panelPadding: 14
     readonly property color panelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.96)
     // The menus' panels, more see-through than the bar
-    readonly property color glassPanelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.8)
+    readonly property color glassPanelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.9)
     readonly property color sheenTop: Qt.rgba(1, 1, 1, 0.05)
     readonly property color sheenMiddle: Qt.rgba(1, 1, 1, 0.01)
     readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.16)
@@ -87,6 +87,8 @@ Singleton {
 
     // Control panel: on the bar near the right edge, by the bar's volume
     readonly property real controlWidth: 0.18
+    // Extra room above each of the control panel's sections
+    readonly property int sectionGap: 12
     // Rows, padding and headers are the other menus', the text smaller: the
     // names and glyphs, then the percentages, caps and details after them
     readonly property int controlFontSize: 14
@@ -158,6 +160,32 @@ Singleton {
     function volumeIcon(volume, muted) {
         return muted ? volumeMutedIcon : Math.round(volume * 100) > 50 ? volumeHighIcon : volumeLowIcon;
     }
+
+    // Notifications: cards stacked up from the bar's right end, where dunst
+    // put them, as wide as dunst's
+    readonly property int notificationWidth: 360
+    readonly property int notificationSpacing: 6
+    readonly property int notificationIconSize: 32
+    // Popups at once; the rest only go to the history
+    readonly property int maxPopups: 3
+    // For notifications that don't say how long to stay; critical ones stay
+    // until closed
+    readonly property int notificationTimeout: 5000
+    // Kept for the notification centre, oldest dropped first
+    readonly property int maxNotifications: 50
+    readonly property int notificationBodyLines: 3
+    // Played for each one, as dunst did (message.oga from the freedesktop
+    // sound theme)
+    readonly property string notificationSound: "/usr/share/sounds/freedesktop/stereo/message.oga"
+    readonly property string closeIcon: String.fromCodePoint(0xf0156)
+    // The notification centre's bell, with a badge while there are new ones
+    readonly property string bellIcon: String.fromCodePoint(0xf009a)
+    readonly property string bellUnreadIcon: String.fromCodePoint(0xf116b)
+    readonly property int notificationRowIconSize: 20
+    // Do not disturb, on the bell row and the bar's button
+    readonly property string doNotDisturbIcon: String.fromCodePoint(0xf009b)
+    // The bar's control panel button (config/waybar/config.jsonc)
+    readonly property string controlPanelIcon: String.fromCodePoint(0xf066a)
 
     readonly property int animationDuration: 120
 

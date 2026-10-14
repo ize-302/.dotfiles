@@ -16,9 +16,9 @@
 		"wireplumber",
 		"clock#date",
 		"clock#time",
-		"custom/control-panel",
 		"tray",
-		"bluetooth"
+		"bluetooth",
+		"custom/control-panel"
 	],
 
 	// {windows} adds one icon per open window, picked by app id below
@@ -189,11 +189,15 @@
 		"tooltip": false
 	},
 
-	// Opens the control panel (brightness, audio, bluetooth), like Super+A.
-	// Three sliders, U+F066A (md-tune_vertical), as a surrogate pair: JSON's
-	// \u takes four digits.
+	// Opens the control panel, like Super+A. Quickshell writes what it shows
+	// (config/quickshell/launcher/Notifications.qml): its sliders glyph, an
+	// orange dot while there are new notifications, a bell with a line
+	// through it during do not disturb. It signals SIGRTMIN+8 on a change.
 	"custom/control-panel": {
-		"format": "\udb81\ude6a",
+		"exec": "cat \"$XDG_RUNTIME_DIR/control-panel.json\" 2>/dev/null || echo '{\"text\": \"\udb81\ude6a\"}'",
+		"return-type": "json",
+		"interval": "once",
+		"signal": 8,
 		"tooltip": false,
 		"on-click": "~/.local/bin/control-panel"
 	},

@@ -23,17 +23,17 @@ blur disable
 blur_xray disable
 blur_passes 4
 blur_radius 8
-# Grain + richer colour so the blur reads as frosted glass, not a flat tint
+# Grain so the blur reads as frosted glass, not a flat tint. Saturation stays
+# at 1: any more and the wallpaper in the gaps glows through the menus
 blur_noise 0.06
 # blur_brightness <float value 0 - 2>
 # blur_contrast <float value 0 - 2>
-blur_saturation 1.4
+blur_saturation 1.0
 
-# Frosted glass behind waybar, dunst and the launcher (their backgrounds are translucent in
-# style.css / dunstrc / Theme.qml). Independent of the window
-# `blur` setting above.
+# Frosted glass behind waybar and the launcher's menus and notifications
+# (their backgrounds are translucent in style.css / Theme.qml). Independent
+# of the window `blur` setting above.
 layer_effects "waybar" blur enable; blur_ignore_transparent enable
-layer_effects "notifications" blur enable; blur_ignore_transparent enable
 layer_effects "launcher" blur enable; blur_ignore_transparent enable
 # Menus with a small, soft drop shadow (app, power, clipboard and key bindings
 # menus). The shadow_* settings only show here: window shadows are off below.
@@ -78,10 +78,6 @@ exec_always gsettings set org.gnome.desktop.interface gtk-theme 'Arc-Dark'
 exec_always gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 exec_always gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
 
-# Notification daemon. D-Bus would start it on the first notification, but
-# flameshot only notifies if one is already running.
-exec dunst
-
 # Clipboard history: store every copy so it survives the source app closing
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
@@ -90,7 +86,9 @@ exec wl-paste --type image --watch cliphist store
 # menu and control panel daemon, toggled by ~/.local/bin/app-menu ($menu),
 # ~/.local/bin/power-menu, ~/.local/bin/clipboard-menu,
 # ~/.local/bin/scratchpad-menu, ~/.local/bin/keybind-menu and
-# ~/.local/bin/control-panel. It also shows the volume and brightness popup.
+# ~/.local/bin/control-panel. It also shows the volume and brightness popup,
+# and the notifications (in place of dunst; flameshot only notifies if
+# something already shows notifications, and this is started first).
 exec qs -c launcher -d
 
 # Open the app launcher on every new, empty workspace, close it on leaving
@@ -182,6 +180,9 @@ bindsym $mod+question exec ~/.local/bin/keybind-menu
 
 # Control panel: brightness, volumes, audio devices and apps
 bindsym $mod+a exec ~/.local/bin/control-panel
+
+# Notifications
+bindsym $mod+Shift+n exec ~/.local/bin/control-panel Notifications
 
 # Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet)
 

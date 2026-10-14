@@ -17,6 +17,8 @@ Rectangle {
     property bool standing: false
     // Fading sheen over the top; off leaves a plain fill
     property bool sheen: true
+    // The lit edge's colour; red for a critical notification
+    property color edgeColor: Theme.edgeColor
 
     color: Theme.glassPanelColor
     radius: floating ? cornerRadius : 0
@@ -91,7 +93,7 @@ Rectangle {
             topLeftRadius: glass.topLeftRadius
             topRightRadius: glass.topRightRadius
             border.width: 1
-            border.color: Theme.edgeColor
+            border.color: glass.edgeColor
         }
     }
 }

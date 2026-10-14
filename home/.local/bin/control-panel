@@ -1,8 +1,13 @@
 #!/bin/bash
-# ~/.local/bin/control-panel
-# Toggles the Quickshell control panel (~/.config/quickshell/launcher),
-# starting its daemon first if it isn't running.
-toggle=(qs -c launcher ipc call controlPanel toggleControlPanel)
+# ~/.local/bin/control-panel [section]
+# Toggles the Quickshell control panel (~/.config/quickshell/launcher), or
+# with a section ("Notifications", "Network", ...) opens it on that section's
+# page, starting its daemon first if it isn't running.
+if [ -n "$1" ]; then
+	toggle=(qs -c launcher ipc call controlPanel openSection "$1")
+else
+	toggle=(qs -c launcher ipc call controlPanel toggleControlPanel)
+fi
 
 "${toggle[@]}" >/dev/null 2>&1 && exit 0
 

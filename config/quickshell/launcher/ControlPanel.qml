@@ -7,19 +7,22 @@ import Quickshell.Io
 import Quickshell.Networking
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
+import Quickshell.Widgets
 import qs
 
 // Control panel: the glass panel of the other menus, standing on the bar a
-// little in from the right edge, by the bar's volume. The output and input
-// volume, the devices to pick the default from, a volume per app that's
+// little in from the right edge, by the bar's volume. The notifications,
+// the output and input volume, the devices to pick the default from, a volume per app that's
 // playing, Wi-Fi and bluetooth. Toggled by
 // ~/.local/bin/control-panel (`qs -c launcher ipc call controlPanel toggleControlPanel`).
 //
 // Up and Down move between rows, Left and Right (or h and l) move the
 // selected slider, m mutes a volume, Enter mutes a volume, makes a device
 // the default, turns Wi-Fi or bluetooth on or off, or connects to a network
-// or device (asking for a new network's password), Delete forgets a network
-// or bluetooth device, and s searches for bluetooth devices.
+// or device (asking for a new network's password) or runs a notification's
+// action, Delete forgets a network or bluetooth device or dismisses a
+// notification, s searches for bluetooth devices, c clears the
+// notifications, and d turns do not disturb on or off.
 //
 // The main view has a card per section with just its slider or switch. The
 // lists of devices and networks are on a page per section: a click on the
@@ -30,6 +33,9 @@ Scope {
 
     property bool open: false
     property int current: 0
+    // The notification server (Notifications.qml), for the centre
+    property var notifications: null
+    readonly property var notificationList: notifications ? Array.from(notifications.notifications) : []
 
     readonly property list<PwNode> sinks: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSink)
     readonly property list<PwNode> sources: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSource)
@@ -79,6 +85,33 @@ Scope {
     // section's page; the rest are on the main view.
     readonly property var rows: {
         const rows = [];
+        if (notifications) {
+            rows.push({
+                section: "Notifications",
+                kind: "bell"
+            });
+            // Grouped by app, the app with the newest first
+            const groups = new Map();
+            for (const notification of notificationList) {
+                const app = notification.appName || "Other";
+                groups.set(app, (groups.get(app) ?? []).concat([notification]));
+            }
+            for (const [app, list] of groups)
+                for (const notification of list)
+                    rows.push({
+                        section: "Notifications",
+                        kind: "notification",
+                        list: true,
+                        group: app,
+                        notification: notification
+                    });
+            if (notificationList.length === 0)
+                rows.push({
+                    section: "Notifications",
+                    kind: "empty",
+                    list: true
+                });
+        }
         const add = (section, devices, fallback) => {
             if (fallback)
                 rows.push({
@@ -282,7 +315,7 @@ Scope {
     // Sections with a list to fold: audio devices, networks, and bluetooth
     // devices (only while it's on)
     function expandable(section) {
-        if (section === "Output" || section === "Input")
+        if (section === "Output" || section === "Input" || section === "Notifications")
             return true;
         if (section === "Network")
             return Networking.wifiEnabled;
@@ -297,6 +330,8 @@ Scope {
             return;
         page = section;
         current = 0;
+        if (section === "Notifications")
+            notifications.markRead();
         pageSlide.direction = 1;
         pageSlide.restart();
     }
@@ -330,8 +365,21 @@ Scope {
             adapter.discovering = !adapter.discovering;
     }
 
+    // "3 new", "5 notifications", "No notifications"
+    function bellLabel() {
+        const unread = Math.min(notifications.unread, notificationList.length);
+        if (unread > 0)
+            return unread + " new";
+        const count = notificationList.length;
+        return count === 0 ? "No notifications" : count === 1 ? "1 notification" : count + " notifications";
+    }
+
     function activate(row) {
-        if (row.kind === "device") {
+        if (row.kind === "bell") {
+            root.openPage("Notifications");
+        } else if (row.kind === "notification") {
+            notifications.activate(row.notification);
+        } else if (row.kind === "device") {
             if (row.node.type === PwNodeType.AudioSink)
                 Pipewire.preferredDefaultAudioSink = row.node;
             else
@@ -376,7 +424,12 @@ Scope {
         }
 
         // Opens the panel on a section's page ("Output", "Network", ...)
+        // Again on the same page closes it
         function openSection(section: string): void {
+            if (root.open && root.page === section) {
+                root.open = false;
+                return;
+            }
             root.open = true;
             root.openPage(section);
         }
@@ -486,6 +539,12 @@ Scope {
                         root.activate(row);
                     } else if (event.key === Qt.Key_Space && root.page === "") {
                         root.openPage(row.section);
+                    } else if (event.key === Qt.Key_Delete && row.kind === "notification") {
+                        row.notification.dismiss();
+                    } else if (event.key === Qt.Key_D && notifications) {
+                        notifications.doNotDisturb = !notifications.doNotDisturb;
+                    } else if (event.key === Qt.Key_C && root.page === "Notifications") {
+                        notifications.clear();
                     } else if (event.key === Qt.Key_S && root.page === "Bluetooth") {
                         root.toggleSearch();
                     } else if (event.key === Qt.Key_M && row.kind === "volume") {
@@ -527,6 +586,7 @@ Scope {
                         readonly property var device: modelData.device ?? null
                         readonly property WifiNetwork network: modelData.network ?? null
                         readonly property bool slider: root.isSlider(modelData)
+                        // Wi-Fi and bluetooth on or off
                         readonly property bool toggle: kind === "bluetooth" || kind === "wifi"
                         // Sliders, switches and the password are full size;
                         // lists are a little smaller
@@ -541,6 +601,8 @@ Scope {
 
                         // Glyph before a main row; lists are plain text
                         readonly property string glyph: {
+                            if (kind === "bell")
+                                return root.notifications.doNotDisturb ? Theme.doNotDisturbIcon : root.notifications.unread > 0 ? Theme.bellUnreadIcon : Theme.bellIcon;
                             if (kind === "volume" && !app)
                                 return node.type === PwNodeType.AudioSink ? Theme.volumeIcon(level, muted) : muted ? Theme.micMutedIcon : Theme.micIcon;
                             if (kind === "bluetooth")
@@ -550,6 +612,8 @@ Scope {
                             return "";
                         }
                         readonly property color glyphColor: {
+                            if (kind === "bell")
+                                return root.notifications.doNotDisturb ? Theme.bluetoothOffColor : root.notifications.unread > 0 ? Theme.accentColor : Theme.bluetoothColor;
                             if (toggle)
                                 return on ? Theme.bluetoothColor : Theme.bluetoothOffColor;
                             return Theme.volumeColor(level, muted);
@@ -557,6 +621,10 @@ Scope {
                         // A switch's row says what it's connected to
                         readonly property bool on: kind === "wifi" ? Networking.wifiEnabled : kind === "bluetooth" ? root.bluetoothOn : false
                         readonly property string label: {
+                            if (kind === "bell")
+                                return root.bellLabel();
+                            if (kind === "empty")
+                                return "No notifications";
                             if (app)
                                 return root.appName(node);
                             if (kind === "device")
@@ -621,7 +689,8 @@ Scope {
                                 return network.connected;
                             return false;
                         }
-                        readonly property bool bright: checked || active || (main && kind !== "bluetooth" && kind !== "wifi") || on
+                        readonly property bool bright: kind !== "empty" && (checked || active || (main && kind !== "bluetooth" && kind !== "wifi") || on)
+                        readonly property var notification: modelData.notification ?? null
 
                         // A failed connection shows on the row; a missing
                         // password asks for one
@@ -644,10 +713,29 @@ Scope {
                         spacing: Theme.rowSpacing
                         bottomPadding: Theme.rowSpacing
 
+                        // On the main view, a line across between one
+                        // section and the next, with room either side; the
+                        // headers themselves have none
+                        Item {
+                            width: parent.width
+                            height: Theme.sectionGap
+                            visible: entry.first && entry.index > 0 && root.page === ""
+
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width
+                                height: 1
+                                color: Theme.dividerColor
+                            }
+                        }
+
                         SectionHeader {
                             width: parent.width
                             visible: entry.first
                             text: entry.modelData.section
+                            // Just the name, like the notifications' app
+                            // headers
+                            line: false
                             expandable: root.page === "" && root.expandable(entry.modelData.section)
                             // On a page, the header is the title and goes
                             // back
@@ -659,30 +747,168 @@ Scope {
                             // A slider has no label of its own, so the header
                             // says which device it's for
                             summary: !back && (entry.modelData.section === "Output" || entry.modelData.section === "Input") ? root.summary(entry.modelData.section) : ""
-                            // The bluetooth page searches from its title
-                            action: back && entry.modelData.section === "Bluetooth" && root.bluetoothOn ? (root.adapter.discovering ? "Searching…" : "Search") : ""
-                            actionActive: root.adapter?.discovering ?? false
+                            // The bluetooth page searches from its title,
+                            // the notifications page clears
+                            action: {
+                                if (!back)
+                                    return "";
+                                if (entry.modelData.section === "Bluetooth" && root.bluetoothOn)
+                                    return root.adapter.discovering ? "Searching…" : "Search";
+                                if (entry.modelData.section === "Notifications" && root.notificationList.length > 0)
+                                    return "Clear";
+                                return "";
+                            }
+                            actionActive: entry.modelData.section === "Bluetooth" && (root.adapter?.discovering ?? false)
                             onClicked: back ? root.closePage() : root.openPage(entry.modelData.section)
-                            onActionClicked: root.toggleSearch()
+                            onActionClicked: entry.modelData.section === "Notifications" ? root.notifications.clear() : root.toggleSearch()
+                        }
+
+                        // The app over its notifications, just its name
+                        SectionHeader {
+                            width: parent.width
+                            visible: entry.kind === "notification" && (entry.index === 0 || root.rows[entry.index - 1].group !== entry.modelData.group)
+                            text: entry.modelData.group ?? ""
+                            inset: 0
+                            line: false
                         }
 
                         Item {
                             width: parent.width
-                            height: Theme.rowHeight
+                            height: entry.kind === "notification" ? notificationView.implicitHeight + Theme.rowSpacing * 2 : Theme.rowHeight
 
                             MouseArea {
+                                id: rowMouse
+
                                 anchors.fill: parent
                                 hoverEnabled: true
-                                cursorShape: entry.slider ? Qt.ArrowCursor : Qt.PointingHandCursor
+                                cursorShape: entry.slider || entry.kind === "empty" ? Qt.ArrowCursor : Qt.PointingHandCursor
                                 onPositionChanged: root.current = entry.index
                                 onClicked: if (!entry.slider)
                                     root.activate(entry.modelData)
+                            }
+
+                            // A notification: its icon, summary and age, the
+                            // body under them, then its actions
+                            Column {
+                                id: notificationView
+
+                                y: Theme.rowSpacing
+                                width: parent.width
+                                visible: entry.kind === "notification"
+                                spacing: Theme.rowSpacing / 2
+
+                                Row {
+                                    width: parent.width
+                                    spacing: Theme.iconSpacing
+
+                                    IconImage {
+                                        property int tried: 0
+                                        readonly property list<string> candidates: entry.notification ? root.notifications.icons(entry.notification) : []
+
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        implicitSize: Theme.notificationRowIconSize
+                                        source: candidates[tried] ?? ""
+                                        onStatusChanged: if (status === Image.Error && tried < candidates.length - 1)
+                                            tried++
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width - Theme.notificationRowIconSize - age.width - dismiss.width - parent.spacing * 3
+                                        text: entry.notification?.summary ?? ""
+                                        textFormat: Text.PlainText
+                                        elide: Text.ElideRight
+                                        color: Theme.textColor
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.controlFontSize
+                                        font.weight: Theme.fontWeight
+                                    }
+
+                                    Text {
+                                        id: age
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: entry.notification ? root.notifications.age(entry.notification) : ""
+                                        color: Theme.dimColor
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.controlSmallFontSize
+                                        font.weight: Theme.fontWeight
+                                    }
+
+                                    // Dismisses it, shown under the mouse
+                                    Text {
+                                        id: dismiss
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        opacity: entry.active ? 1 : 0
+                                        text: Theme.closeIcon
+                                        color: dismissMouse.containsMouse ? Theme.textColor : Theme.keyTextColor
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.controlFontSize
+
+                                        MouseArea {
+                                            id: dismissMouse
+                                            anchors.fill: parent
+                                            anchors.margins: -4
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: entry.notification.dismiss()
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    x: Theme.notificationRowIconSize + Theme.iconSpacing
+                                    width: parent.width - x
+                                    visible: text !== ""
+                                    text: entry.notification?.body ?? ""
+                                    textFormat: Text.StyledText
+                                    wrapMode: Text.Wrap
+                                    maximumLineCount: 2
+                                    elide: Text.ElideRight
+                                    color: Theme.keyTextColor
+                                    linkColor: Theme.textColor
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: Theme.controlSmallFontSize + 1
+                                    font.weight: Theme.fontWeight
+                                }
+
+                                Flow {
+                                    readonly property list<var> actions: (entry.notification?.actions ?? []).filter(action => action.identifier !== "default")
+
+                                    x: Theme.notificationRowIconSize + Theme.iconSpacing
+                                    width: parent.width - x
+                                    visible: actions.length > 0
+                                    topPadding: Theme.rowSpacing / 2
+                                    spacing: Theme.keySpacing
+
+                                    Repeater {
+                                        model: parent.actions
+
+                                        KeyCap {
+                                            id: actionCap
+
+                                            required property var modelData
+
+                                            text: modelData.text
+                                            fontSize: Theme.controlSmallFontSize
+                                            lit: actionMouse.containsMouse
+
+                                            MouseArea {
+                                                id: actionMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: actionCap.modelData.invoke()
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                             Row {
                                 id: content
 
                                 anchors.verticalCenter: parent.verticalCenter
+                                visible: entry.kind !== "notification"
                                 // Flush with a page's title and divider, like
                                 // the title itself
                                 x: root.page !== "" ? 0 : Theme.rowPadding
@@ -838,18 +1064,18 @@ Scope {
                                 }
 
                                 // A check on what's in use or connected, or
-                                // the switch
+                                // the switch, or the do not disturb button
                                 Item {
                                     id: end
 
                                     anchors.verticalCenter: parent.verticalCenter
-                                    visible: !entry.slider && entry.kind !== "password"
-                                    width: entry.toggle ? Theme.toggleWidth : Theme.iconSize
+                                    visible: !entry.slider && entry.kind !== "password" && entry.kind !== "empty"
+                                    width: entry.toggle ? Theme.toggleWidth : entry.kind === "bell" ? doNotDisturb.width : Theme.iconSize
                                     height: Theme.iconSize
 
                                     Text {
                                         anchors.centerIn: parent
-                                        visible: !entry.toggle
+                                        visible: !entry.toggle && entry.kind !== "bell"
                                         text: entry.checked ? Theme.checkIcon : ""
                                         color: Theme.accentColor
                                         font.family: Theme.fontFamily
@@ -860,6 +1086,30 @@ Scope {
                                         anchors.verticalCenter: parent.verticalCenter
                                         visible: entry.toggle
                                         checked: entry.on
+                                    }
+
+                                    // A key cap with the bell struck through,
+                                    // lit and orange while do not disturb is on
+                                    KeyCap {
+                                        id: doNotDisturb
+
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        visible: entry.kind === "bell"
+                                        minWidth: height
+                                        text: Theme.doNotDisturbIcon
+                                        fontSize: Theme.controlFontSize
+                                        lit: root.notifications?.doNotDisturb ?? false
+                                        textColor: doNotDisturbMouse.containsMouse ? Theme.textColor : Theme.keyTextColor
+                                        litTextColor: Theme.accentColor
+
+                                        MouseArea {
+                                            id: doNotDisturbMouse
+                                            anchors.fill: parent
+                                            anchors.margins: -4
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.notifications.doNotDisturb = !root.notifications.doNotDisturb
+                                        }
                                     }
                                 }
                             }
