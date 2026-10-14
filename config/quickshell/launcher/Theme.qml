@@ -105,10 +105,6 @@ Singleton {
     readonly property string volumeHighIcon: "\uf028"
     readonly property string micIcon: "\uf130"
     readonly property string micMutedIcon: "\uf131"
-    // The bar's brightness emoji and colour (config/waybar/config.jsonc and
-    // style.css)
-    readonly property string brightnessIcon: "\u2600\ufe0f"
-    readonly property color brightnessColor: "orange"
     // The bar's bluetooth glyphs and colours: on, a device connected, off
     readonly property string bluetoothIcon: String.fromCodePoint(0xf00af)
     readonly property string bluetoothConnectedIcon: String.fromCodePoint(0xf00b1)
@@ -139,7 +135,7 @@ Singleton {
     // Marks what's in use or connected
     readonly property string checkIcon: "\uf00c"
 
-    // Popup: floats above the bar while the volume or brightness changes
+    // Volume popup: floats above the bar while the volume changes
     readonly property int osdWidth: 320
     readonly property int osdMargin: 24
     readonly property int osdTimeout: 1500

@@ -86,7 +86,7 @@ exec wl-paste --type image --watch cliphist store
 # menu and control panel daemon, toggled by ~/.local/bin/app-menu ($menu),
 # ~/.local/bin/power-menu, ~/.local/bin/clipboard-menu,
 # ~/.local/bin/scratchpad-menu, ~/.local/bin/keybind-menu and
-# ~/.local/bin/control-panel. It also shows the volume and brightness popup,
+# ~/.local/bin/control-panel. It also shows the volume popup,
 # and the notifications (in place of dunst; flameshot only notifies if
 # something already shows notifications, and this is started first).
 exec qs -c launcher -d
@@ -324,10 +324,9 @@ bindsym $mod+r mode "resize"
     bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
     bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
 
-    # Special keys to adjust brightness via brightnessctl, then show it in the
-    # popup over the bar (config/quickshell/launcher/Osd.qml)
-    bindsym --locked XF86MonBrightnessDown exec brightnessctl --min-val=1 -q set 3%- && qs -c launcher ipc call osd showBrightness
-    bindsym --locked XF86MonBrightnessUp exec brightnessctl -q set 3%+ && qs -c launcher ipc call osd showBrightness
+    # Special keys to adjust brightness via brightnessctl
+    bindsym --locked XF86MonBrightnessDown exec brightnessctl --min-val=1 -q set 3%-
+    bindsym --locked XF86MonBrightnessUp exec brightnessctl -q set 3%+
 
     # Special keys to control media via playerctl
     bindsym --locked XF86AudioPlay exec playerctl play-pause

@@ -1,40 +1,29 @@
 import QtQuick
 import Quickshell
 import Quickshell.I3
-import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
 
-// Popup: a small floating glass gauge above the middle of the bar, drawn like
-// the control panel's rows, shown for a moment whenever the output volume
-// changes or the output or microphone is muted (from the volume keys, the
-// bar or any app), or the brightness keys are pressed. Clicks go through it.
-//
-// The brightness has no change to watch (sysfs doesn't report one), so the
-// brightness keys call `qs -c launcher ipc call osd showBrightness` after
-// brightnessctl (config/sway/config).
+// Volume popup: a small floating glass gauge above the middle of the bar,
+// drawn like the control panel's rows, shown for a moment on the screen with
+// the focus whenever the output volume changes or the output or microphone
+// is muted (from the volume keys, the bar or any app). Clicks go through it.
 Scope {
     id: root
 
     // Not while the control panel is open: it shows the same thing
     property bool suppressed: false
     property bool shown: false
-    // "output", "input" (the microphone) or "brightness"
+    // "output", or "input" (the microphone)
     property string mode: "output"
     // Volumes report in once when the daemon starts; that isn't a change
     property bool armed: false
-    // Backlight brightness, 0 to 1, read with brightnessctl
-    property real brightness: 0
 
-    // The backlight is the laptop's own screen's, so brightness shows there;
-    // volume shows on the screen with the focus
-    readonly property var laptopScreen: Quickshell.screens.find(screen => screen.name.startsWith("eDP")) ?? null
     readonly property var focusedScreen: Quickshell.screens.find(screen => screen.name === I3.focusedMonitor?.name) ?? null
-
     readonly property PwNode node: mode === "input" ? Pipewire.defaultAudioSource : Pipewire.defaultAudioSink
-    readonly property bool muted: mode !== "brightness" && (node?.audio?.muted ?? false)
-    readonly property real level: mode === "brightness" ? brightness : node?.audio?.volume ?? 0
+    readonly property bool muted: node?.audio?.muted ?? false
+    readonly property real level: node?.audio?.volume ?? 0
 
     function show(mode) {
         if (!armed || suppressed)
@@ -46,31 +35,6 @@ Scope {
             panel.appear();
         }
         hide.restart();
-    }
-
-    IpcHandler {
-        target: "osd"
-
-        // Reads the brightness, then shows it
-        function showBrightness(): void {
-            brightnessRead.running = true;
-        }
-    }
-
-    // "intel_backlight,backlight,3158,13%,24242": current, then max
-    Process {
-        id: brightnessRead
-
-        command: ["brightnessctl", "-m", "-c", "backlight"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const fields = text.trim().split(",");
-                if (fields.length < 5)
-                    return;
-                root.brightness = parseInt(fields[2]) / parseInt(fields[4]);
-                root.show("brightness");
-            }
-        }
     }
 
     PwObjectTracker {
@@ -116,7 +80,7 @@ Scope {
 
     PanelWindow { // qmllint disable uncreatable-type
         visible: root.shown
-        screen: root.mode === "brightness" && root.laptopScreen ? root.laptopScreen : root.focusedScreen
+        screen: root.focusedScreen
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
         implicitWidth: panel.width
@@ -145,14 +109,14 @@ Scope {
                 width: parent.width - x * 2
                 spacing: Theme.iconSpacing
 
-                // The control panel's glyphs: the bar's sun, speaker or
+                // The control panel's glyphs: the bar's speaker, or the
                 // microphone
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     width: Theme.iconSize
                     horizontalAlignment: Text.AlignHCenter
-                    text: root.mode === "brightness" ? Theme.brightnessIcon : root.mode === "input" ? (root.muted ? Theme.micMutedIcon : Theme.micIcon) : Theme.volumeIcon(root.level, root.muted)
-                    color: root.mode === "brightness" ? Theme.brightnessColor : Theme.volumeColor(root.level, root.muted)
+                    text: root.mode === "input" ? (root.muted ? Theme.micMutedIcon : Theme.micIcon) : Theme.volumeIcon(root.level, root.muted)
+                    color: Theme.volumeColor(root.level, root.muted)
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.controlFontSize
                 }
@@ -162,7 +126,7 @@ Scope {
                     width: parent.width - Theme.iconSize - percent.width - parent.spacing * 2
                     interactive: false
                     value: root.level
-                    color: root.mode === "brightness" ? Theme.brightnessColor : Theme.volumeColor(root.level, root.muted)
+                    color: Theme.volumeColor(root.level, root.muted)
                 }
 
                 // A key cap, as wide as "100%" so it doesn't jump
@@ -173,7 +137,6 @@ Scope {
                     minWidth: Math.ceil(percentWidth.advanceWidth) + Theme.keyPadding * 2
                     text: root.muted ? "mute" : Math.round(root.level * 100) + "%"
                     fontSize: Theme.controlSmallFontSize
-                    textColor: root.mode === "brightness" ? Theme.brightnessColor : Theme.keyTextColor
                 }
             }
         }
