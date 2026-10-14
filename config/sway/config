@@ -178,7 +178,7 @@ bindsym $mod+c exec ~/.local/bin/clipboard-menu
 # Key bindings cheat sheet
 bindsym $mod+question exec ~/.local/bin/keybind-menu
 
-# Control panel: brightness, volumes, audio devices and apps
+# Control panel: notifications, volumes, Wi-Fi and bluetooth
 bindsym $mod+a exec ~/.local/bin/control-panel
 
 # Notifications

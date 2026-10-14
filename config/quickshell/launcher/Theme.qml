@@ -125,7 +125,7 @@ Singleton {
     readonly property int toggleHeight: 18
     readonly property color toggleOnColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.35)
     // Opens a section's page, and goes back from it
-    readonly property string collapsedIcon: String.fromCodePoint(0xf0142)
+    readonly property string pageIcon: String.fromCodePoint(0xf0142)
     readonly property string backIcon: String.fromCodePoint(0xf0141)
     // How far a page slides in
     readonly property int pageSlide: 24

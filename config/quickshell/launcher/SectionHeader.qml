@@ -2,8 +2,8 @@ import QtQuick
 import qs
 
 // Group header: dimmed name, then (unless `line` is off) a thin line like the
-// bar's separators. An expandable one ends in a key cap with a short summary
-// and a chevron, which brighten under the mouse, and emits `clicked`.
+// bar's separators. One that opens a page ends in a key cap with a short
+// summary and a chevron, which brighten under the mouse, and emits `clicked`.
 //
 // A `back` one is a page's title, styled like the menus' search row: a back
 // chevron and the title, a divider under them, and maybe an `action` key cap
@@ -13,7 +13,7 @@ Item {
 
     property string text: ""
     property string summary: ""
-    property bool expandable: false
+    property bool opensPage: false
     property bool line: true
     property bool back: false
     // Space from the edges to the text
@@ -80,8 +80,8 @@ Item {
         id: mouse
 
         anchors.fill: parent
-        hoverEnabled: header.expandable || header.back
-        enabled: header.expandable || header.back
+        hoverEnabled: header.opensPage || header.back
+        enabled: header.opensPage || header.back
         cursorShape: Qt.PointingHandCursor
         onClicked: header.clicked()
     }
@@ -101,8 +101,8 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: header.inset
         anchors.verticalCenter: label.verticalCenter
-        visible: header.expandable && !header.back
-        text: Theme.collapsedIcon
+        visible: header.opensPage && !header.back
+        text: Theme.pageIcon
         color: mouse.containsMouse ? Theme.textColor : Theme.keyTextColor
         font.family: Theme.fontFamily
         font.pixelSize: Theme.sectionFontSize

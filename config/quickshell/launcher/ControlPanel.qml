@@ -11,10 +11,12 @@ import Quickshell.Widgets
 import qs
 
 // Control panel: the glass panel of the other menus, standing on the bar a
-// little in from the right edge, by the bar's volume. The notifications,
-// the output and input volume, the devices to pick the default from, a volume per app that's
-// playing, Wi-Fi and bluetooth. Toggled by
-// ~/.local/bin/control-panel (`qs -c launcher ipc call controlPanel toggleControlPanel`).
+// little in from the right edge. Notifications (with do not disturb), the
+// output and input volume, a volume per app that's playing, Wi-Fi and
+// bluetooth. Toggled by ~/.local/bin/control-panel
+// (`qs -c launcher ipc call controlPanel toggleControlPanel`), Super+A or the
+// bar's button; `control-panel Notifications` (Super+Shift+N) opens it on
+// that page.
 //
 // Up and Down move between rows, Left and Right (or h and l) move the
 // selected slider, m mutes a volume, Enter mutes a volume, makes a device
@@ -24,10 +26,12 @@ import qs
 // notification, s searches for bluetooth devices, c clears the
 // notifications, and d turns do not disturb on or off.
 //
-// The main view has a card per section with just its slider or switch. The
-// lists of devices and networks are on a page per section: a click on the
-// section's header, or Space, opens the selected row's page in place of the
-// main view, and Escape, Backspace or a click on the page's header goes back.
+// The main view has a section per thing, split by lines, with just its
+// slider or switch. The lists (notifications, audio devices, networks,
+// bluetooth devices) are on a page per section: a click on the section's
+// header, Space, or Right on a switch opens the selected row's page in place
+// of the main view, and Escape, Backspace, Left or a click on the page's
+// title goes back.
 Scope {
     id: root
 
@@ -312,9 +316,9 @@ Scope {
         list.forceActiveFocus();
     }
 
-    // Sections with a list to fold: audio devices, networks, and bluetooth
-    // devices (only while it's on)
-    function expandable(section) {
+    // Sections with a page: notifications, audio devices, and networks and
+    // bluetooth devices while they're on
+    function hasPage(section) {
         if (section === "Output" || section === "Input" || section === "Notifications")
             return true;
         if (section === "Network")
@@ -326,7 +330,7 @@ Scope {
 
     // Slides in from the side it's going to
     function openPage(section) {
-        if (!root.expandable(section))
+        if (!root.hasPage(section))
             return;
         page = section;
         current = 0;
@@ -345,8 +349,8 @@ Scope {
         pageSlide.restart();
     }
 
-    // What a folded section is set to: the device in use, the connected
-    // network, the connected bluetooth devices
+    // What a section is set to, for the main view: the device in use, the
+    // connected network, the connected bluetooth devices
     function summary(section) {
         if (section === "Output")
             return Pipewire.defaultAudioSink ? root.deviceName(Pipewire.defaultAudioSink) : "";
@@ -736,7 +740,7 @@ Scope {
                             // Just the name, like the notifications' app
                             // headers
                             line: false
-                            expandable: root.page === "" && root.expandable(entry.modelData.section)
+                            opensPage: root.page === "" && root.hasPage(entry.modelData.section)
                             // On a page, the header is the title and goes
                             // back
                             back: root.page !== ""
