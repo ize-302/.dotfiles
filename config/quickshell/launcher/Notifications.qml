@@ -262,9 +262,12 @@ Scope {
                     // the ones above it float
                     floating: index < root.popups.length - 1
                     standing: !floating
+                    // A plain fill, no sheen
+                    sheen: false
                     width: cards.width
                     height: content.implicitHeight + Theme.panelPadding * 2
-                    edgeColor: critical ? Theme.closeColor : Theme.edgeColor
+                    // No lit edge, except red on a critical one
+                    edgeColor: critical ? Theme.closeColor : "transparent"
 
                     Component.onCompleted: appear()
 
