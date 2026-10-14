@@ -10,9 +10,9 @@ import Quickshell.Wayland
 import qs
 
 // Control panel: the glass panel of the other menus, standing on the bar a
-// little in from the right edge, by the bar's volume. The screen's
-// brightness, the output and input volume, the devices to pick the default
-// from, a volume per app that's playing, Wi-Fi and bluetooth. Toggled by
+// little in from the right edge, by the bar's volume. The output and input
+// volume, the devices to pick the default from, a volume per app that's
+// playing, Wi-Fi and bluetooth. Toggled by
 // ~/.local/bin/control-panel (`qs -c launcher ipc call controlPanel toggleControlPanel`).
 //
 // Up and Down move between rows, Left and Right (or h and l) move the
@@ -30,14 +30,6 @@ Scope {
 
     property bool open: false
     property int current: 0
-
-    // Backlight brightness, 0 to 1, read with brightnessctl; no row when
-    // there's no backlight
-    property real brightness: 0
-    property bool hasBacklight: false
-    // When the slider last set it, so a read from before that doesn't move
-    // it back
-    property real brightnessSetAt: 0
 
     readonly property list<PwNode> sinks: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSink)
     readonly property list<PwNode> sources: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSource)
@@ -77,9 +69,8 @@ Scope {
         return devices.sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
     }
 
-    // One per row, with the section it's in: the brightness
-    // ({ kind: "brightness" }), a volume ({ kind: "volume", node, app }), an
-    // audio device to make the default ({ kind: "device", node }), a cable
+    // One per row, with the section it's in: a volume
+    // ({ kind: "volume", node, app }), an audio device to make the default ({ kind: "device", node }), a cable
     // ({ kind: "wired", device }), the Wi-Fi switch ({ kind: "wifi" }), a
     // network ({ kind: "network", network }) and the password for it
     // ({ kind: "password", network }), the bluetooth switch
@@ -88,11 +79,6 @@ Scope {
     // section's page; the rest are on the main view.
     readonly property var rows: {
         const rows = [];
-        if (hasBacklight)
-            rows.push({
-                section: "Display",
-                kind: "brightness"
-            });
         const add = (section, devices, fallback) => {
             if (fallback)
                 rows.push({
@@ -173,7 +159,7 @@ Scope {
     }
 
     function isSlider(row) {
-        return row.kind === "brightness" || row.kind === "volume";
+        return row.kind === "volume";
     }
 
     function appName(node) {
@@ -209,22 +195,12 @@ Scope {
             node.audio.muted = muted;
     }
 
-    // One step up or down a slider, on the step grid. Never pushes a volume
-    // past 100%, but leaves one already past it there.
+    // One step up or down a volume, on the step grid. Never pushes past
+    // 100%, but leaves a volume already past it there.
     function step(row, direction) {
-        const value = row.kind === "brightness" ? brightness : row.node.audio.volume;
+        const value = row.node.audio.volume;
         const next = Math.round((value + direction * Theme.volumeStep) * 20) / 20;
-        if (row.kind === "brightness")
-            root.setBrightness(next);
-        else
-            root.setVolume(row, Math.max(0, Math.min(next, Math.max(value, 1))));
-    }
-
-    // Never all the way off, like the brightness keys
-    function setBrightness(value) {
-        brightness = Math.max(0.01, Math.min(value, 1));
-        brightnessSetAt = Date.now();
-        Quickshell.execDetached(["brightnessctl", "-q", "-c", "backlight", "set", Math.round(brightness * 100) + "%"]);
+        root.setVolume(row, Math.max(0, Math.min(next, Math.max(value, 1))));
     }
 
     // Blocked by rfkill (like the bar's click, which this mirrors) can't be
@@ -406,31 +382,6 @@ Scope {
         }
     }
 
-    // "intel_backlight,backlight,3158,13%,24242": current, then max
-    Process {
-        id: brightnessRead
-
-        running: true
-        command: ["brightnessctl", "-m", "-c", "backlight"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const fields = text.trim().split(",");
-                root.hasBacklight = fields.length >= 5;
-                if (root.hasBacklight && Date.now() - root.brightnessSetAt > 1000)
-                    root.brightness = parseInt(fields[2]) / parseInt(fields[4]);
-            }
-        }
-    }
-
-    // The brightness keys can change it while the panel is open
-    Timer {
-        running: root.open
-        triggeredOnStart: true
-        repeat: true
-        interval: 1000
-        onTriggered: brightnessRead.running = true
-    }
-
     // Volumes, and the app names the streams are grouped by, are only
     // there for nodes that are tracked. Not taken from the rows, which are
     // built from those names.
@@ -582,7 +533,7 @@ Scope {
                         readonly property bool main: !modelData.list || kind === "password"
                         readonly property bool app: modelData.app ?? false
                         readonly property bool muted: node?.audio?.muted ?? false
-                        readonly property real level: kind === "brightness" ? root.brightness : node?.audio?.volume ?? 0
+                        readonly property real level: node?.audio?.volume ?? 0
                         // Under the mouse or picked with the keys: there's
                         // no highlight, the row's text, knob or switch
                         // brightens instead
@@ -590,8 +541,6 @@ Scope {
 
                         // Glyph before a main row; lists are plain text
                         readonly property string glyph: {
-                            if (kind === "brightness")
-                                return Theme.brightnessIcon;
                             if (kind === "volume" && !app)
                                 return node.type === PwNodeType.AudioSink ? Theme.volumeIcon(level, muted) : muted ? Theme.micMutedIcon : Theme.micIcon;
                             if (kind === "bluetooth")
@@ -601,8 +550,6 @@ Scope {
                             return "";
                         }
                         readonly property color glyphColor: {
-                            if (kind === "brightness")
-                                return Theme.brightnessColor;
                             if (toggle)
                                 return on ? Theme.bluetoothColor : Theme.bluetoothOffColor;
                             return Theme.volumeColor(level, muted);
@@ -775,7 +722,7 @@ Scope {
 
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: (!entry.slider || entry.app) && entry.kind !== "password"
-                                    width: entry.slider ? parent.width * 0.3 : parent.width - end.width - parent.spacing - (icon.visible ? icon.width + parent.spacing : 0) - (detail.visible ? detail.width + parent.spacing : 0) - (signal.visible ? signal.width + parent.spacing : 0)
+                                    width: entry.slider ? parent.width * 0.3 : parent.width - (end.visible ? end.width + parent.spacing : 0) - (icon.visible ? icon.width + parent.spacing : 0) - (detail.visible ? detail.width + parent.spacing : 0) - (signal.visible ? signal.width + parent.spacing : 0)
                                     text: entry.label
                                     textFormat: Text.PlainText
                                     elide: Text.ElideRight
@@ -845,13 +792,10 @@ Scope {
                                     width: parent.width - percent.width - parent.spacing - (icon.visible ? icon.width + parent.spacing : 0) - (label.visible ? label.width + parent.spacing : 0)
                                     active: entry.active
                                     value: entry.level
-                                    color: entry.kind === "brightness" ? Theme.brightnessColor : Theme.volumeColor(entry.level, entry.muted)
+                                    color: Theme.volumeColor(entry.level, entry.muted)
                                     onMoved: value => {
                                         root.current = entry.index;
-                                        if (entry.kind === "brightness")
-                                            root.setBrightness(value);
-                                        else
-                                            root.setVolume(entry.modelData, value);
+                                        root.setVolume(entry.modelData, value);
                                     }
                                 }
 
@@ -865,9 +809,6 @@ Scope {
                                     minWidth: Math.ceil(percentWidth.advanceWidth) + Theme.keyPadding * 2
                                     text: entry.muted ? "mute" : Math.round(entry.level * 100) + "%"
                                     fontSize: Theme.controlSmallFontSize
-                                    // Brightness reads out in the bar's orange
-                                    textColor: entry.kind === "brightness" ? Theme.brightnessColor : Theme.keyTextColor
-                                    litTextColor: entry.kind === "brightness" ? Theme.brightnessColor : Theme.textColor
                                     lit: entry.active
                                 }
 

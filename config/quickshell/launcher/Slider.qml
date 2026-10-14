@@ -9,7 +9,7 @@ Item {
 
     property real value: 0
     property color color: Theme.textColor
-    // Off for a read-only gauge, like the volume popup
+    // Off for a read-only gauge, like the popup over the bar
     property bool interactive: true
     // Selected or under the mouse: the knob grows
     property bool active: false

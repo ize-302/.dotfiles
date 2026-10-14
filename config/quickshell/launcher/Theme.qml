@@ -137,7 +137,7 @@ Singleton {
     // Marks what's in use or connected
     readonly property string checkIcon: "\uf00c"
 
-    // Volume popup: floats above the bar while the volume changes
+    // Popup: floats above the bar while the volume or brightness changes
     readonly property int osdWidth: 320
     readonly property int osdMargin: 24
     readonly property int osdTimeout: 1500

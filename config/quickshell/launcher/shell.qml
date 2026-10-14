@@ -11,7 +11,7 @@ import qs
 // daemon serves the power menu (PowerMenu.qml), the clipboard menu
 // (ClipboardMenu.qml), the scratchpad menu (ScratchpadMenu.qml), the key
 // bindings menu (KeybindMenu.qml), the control panel (ControlPanel.qml) and the
-// volume popup (VolumeOsd.qml).
+// volume and brightness popup (Osd.qml).
 ShellRoot {
     id: root
 
@@ -116,7 +116,7 @@ ShellRoot {
             root.closeOthers(controlPanel)
     }
 
-    VolumeOsd {
+    Osd {
         suppressed: controlPanel.open
     }
 
