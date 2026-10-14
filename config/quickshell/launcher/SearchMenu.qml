@@ -33,6 +33,9 @@ PanelWindow { // qmllint disable uncreatable-type
     // Small drop shadow under the panel; floating panels always have one
     property bool shadow: floating
     property int cornerRadius: Theme.cornerRadius
+    property color panelColor: Theme.panelColor
+    // Space between the panel's edges and its content
+    property int panelPadding: Theme.panelPadding
     // Sheen over the panel background; off for a plain fill
     property bool sheen: true
     // Delegate for a strip of cards instead of rows: one row across the
@@ -75,6 +78,8 @@ PanelWindow { // qmllint disable uncreatable-type
         const current = view.currentIndex;
         // A page is the cards (or rows) that fit
         const page = window.strip ? Math.max(1, Math.floor(cards.width / window.cardWidth)) : Theme.maxRows;
+        // h and l move along a strip with no search field to type into
+        const vim = window.strip && !window.searchable && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier));
 
         if (event.key === Qt.Key_Escape) {
             window.open = false;
@@ -82,9 +87,9 @@ PanelWindow { // qmllint disable uncreatable-type
             window.accept(window.results[current]);
         } else if (count === 0) {
             return;
-        } else if (event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N) || (window.strip && event.key === Qt.Key_Right)) {
+        } else if (event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N) || (window.strip && event.key === Qt.Key_Right) || (vim && event.key === Qt.Key_L)) {
             view.currentIndex = (current + 1) % count;
-        } else if (event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P) || (window.strip && event.key === Qt.Key_Left)) {
+        } else if (event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P) || (window.strip && event.key === Qt.Key_Left) || (vim && event.key === Qt.Key_H)) {
             view.currentIndex = (current + count - 1) % count;
         } else if (event.key === Qt.Key_Down) {
             view.currentIndex = (current + 1) % count;
@@ -136,10 +141,11 @@ PanelWindow { // qmllint disable uncreatable-type
         cornerRadius: window.cornerRadius
         fullWidth: window.strip
         sheen: window.sheen
+        color: window.panelColor
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         width: parent.width
-        height: content.implicitHeight + Theme.panelPadding * 2
+        height: content.implicitHeight + window.panelPadding * 2
 
         Item {
             id: keys
@@ -152,7 +158,7 @@ PanelWindow { // qmllint disable uncreatable-type
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.margins: Theme.panelPadding
+            anchors.margins: window.panelPadding
             spacing: Theme.searchPadding
 
             Row {
@@ -264,11 +270,11 @@ PanelWindow { // qmllint disable uncreatable-type
                             orientation: Gradient.Horizontal
                             GradientStop {
                                 position: 0
-                                color: fade.atRight ? "transparent" : Theme.panelColor
+                                color: fade.atRight ? "transparent" : window.panelColor
                             }
                             GradientStop {
                                 position: 1
-                                color: fade.atRight ? Theme.panelColor : "transparent"
+                                color: fade.atRight ? window.panelColor : "transparent"
                             }
                         }
 

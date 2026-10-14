@@ -259,6 +259,9 @@ Scope {
 
         shadow: true
         sheen: false
+        panelColor: Theme.scratchpadPanelColor
+        // The cards keep cardSpacing around them too
+        panelPadding: Theme.cardSpacing
         card: windowCard
         searchable: false
         results: root.entries
@@ -306,28 +309,46 @@ Scope {
             required property var modelData
             required property int index
             readonly property bool selected: ListView.isCurrentItem
+            readonly property bool closing: closeMouse.containsMouse
             readonly property string iconSource: Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.appId)?.icon ?? modelData.appId, "application-x-executable")
 
             width: menu.cardWidth
             height: ListView.view.height
 
             Rectangle {
+                id: card
+
                 anchors.fill: parent
                 anchors.margins: Theme.cardSpacing
                 radius: Theme.cornerRadius
                 color: cell.selected ? Theme.selectedColor : Theme.keyColor
                 border.width: 1
-                border.color: cell.selected ? Theme.edgeColor : "transparent"
+                // Red while the close button is pointed at
+                border.color: cell.closing ? Theme.closeColor : cell.selected ? Theme.edgeColor : "transparent"
 
-                Item {
+                Behavior on border.color {
+                    ColorAnimation {
+                        duration: Theme.animationDuration
+                    }
+                }
+
+                // Runs to the card's edges, inside its border, with the
+                // card's rounded top corners
+                ClippingRectangle {
                     id: thumbnail
 
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: title.top
-                    anchors.margins: Theme.cardSpacing
-                    clip: true
+                    anchors.topMargin: card.border.width
+                    anchors.leftMargin: card.border.width
+                    anchors.rightMargin: card.border.width
+                    color: "transparent"
+                    topLeftRadius: card.radius - card.border.width
+                    topRightRadius: card.radius - card.border.width
+                    bottomLeftRadius: 0
+                    bottomRightRadius: 0
 
                     // Fills the whole thumbnail, cropping what doesn't fit;
                     // the window's top (title, tabs) is kept
@@ -352,6 +373,30 @@ Scope {
                         source: cell.iconSource
                         opacity: 0.5
                     }
+
+                    // Red wash over the window about to be closed
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Theme.closeColor
+                        opacity: cell.closing ? 0.18 : 0
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.animationDuration
+                            }
+                        }
+                    }
+                }
+
+                // Line between the preview and the title, inside the border
+                Rectangle {
+                    anchors.bottom: title.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: card.border.width
+                    anchors.rightMargin: card.border.width
+                    height: 1
+                    color: Theme.edgeColor
                 }
 
                 Row {
@@ -395,27 +440,77 @@ Scope {
                 onClicked: menu.accept(cell.modelData)
             }
 
-            // Close button in the top right corner of a hovered card, red
-            // like the bar's urgent workspace when pointed at
+            // Close button: a round glass button that pops onto the top
+            // right corner of a hovered card. Pointed at, it fills red like
+            // the bar's urgent workspace, its × turns a quarter, and the card
+            // blushes red to show what goes.
             Rectangle {
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.margins: Theme.cardSpacing * 2
+                id: closeButton
+
+                readonly property bool shown: cardMouse.containsMouse || closeMouse.containsMouse
+
+                // Hangs off the card's top right corner, out by the space
+                // around the card on both sides: as far as it goes before
+                // the strip clips it
+                anchors.top: card.top
+                anchors.right: card.right
+                anchors.margins: -Theme.cardSpacing
                 width: Theme.closeButtonSize
                 height: Theme.closeButtonSize
-                radius: Theme.cornerRadius
-                visible: cardMouse.containsMouse || closeMouse.containsMouse
-                color: closeMouse.containsMouse ? Theme.closeColor : Theme.panelColor
+                radius: width / 2
+                color: cell.closing ? Theme.closeColor : Theme.panelColor
                 border.width: 1
-                border.color: closeMouse.containsMouse ? Theme.closeColor : Theme.edgeColor
+                border.color: cell.closing ? Theme.closeColor : Theme.edgeColor
+                opacity: shown ? 1 : 0
+                visible: opacity > 0
+                scale: !shown ? 0.6 : closeMouse.pressed ? 0.85 : 1
 
-                Text {
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.animationDuration
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: Theme.animationDuration * 1.5
+                        easing.type: Easing.OutBack
+                    }
+                }
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animationDuration
+                    }
+                }
+
+                // The ×, two bars crossed, crisper than a glyph
+                Item {
                     anchors.centerIn: parent
-                    text: "×"
-                    color: closeMouse.containsMouse ? Theme.panelColor : Theme.textColor
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize
-                    font.weight: Theme.fontWeight
+                    width: parent.width * 0.42
+                    height: width
+                    rotation: cell.closing ? 90 : 0
+
+                    Behavior on rotation {
+                        NumberAnimation {
+                            duration: Theme.animationDuration * 2
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    Repeater {
+                        model: [45, -45]
+
+                        Rectangle {
+                            required property int modelData
+
+                            anchors.centerIn: parent
+                            width: parent.width * Math.SQRT2
+                            height: 2
+                            radius: 1
+                            rotation: modelData
+                            antialiasing: true
+                            color: cell.closing ? Theme.panelColor : Theme.textColor
+                        }
+                    }
                 }
 
                 MouseArea {

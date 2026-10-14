@@ -66,6 +66,8 @@ Singleton {
 
     // Scratchpad menu: a full width strip of window previews on the bar
     readonly property string scratchpadEmptyText: "No windows in the scratchpad"
+    // Panel colour, more see-through than the other menus
+    readonly property color scratchpadPanelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.8)
     // Card width as a fraction of the screen width
     readonly property real cardWidth: 0.15
     // Two lone Super taps within this many ms open the strip
