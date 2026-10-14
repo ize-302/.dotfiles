@@ -106,10 +106,10 @@ bindswitch --reload --locked lid:off output eDP-1 enable
 
 ### Idle configuration
 #
-# Lock after 5 minutes idle. The session is also locked before a manual
+# Lock after 15 minutes idle. The session is also locked before a manual
 # suspend (power menu).
 exec swayidle -w \
-         timeout 300 '~/.local/bin/lock-screen' \
+         timeout 900 '~/.local/bin/lock-screen' \
          before-sleep '~/.local/bin/lock-screen'
 
 # Don't go idle while something is fullscreen (video, presentations)
