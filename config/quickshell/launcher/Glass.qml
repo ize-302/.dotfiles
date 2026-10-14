@@ -12,6 +12,8 @@ Rectangle {
     property bool floating: false
     property int cornerRadius: Theme.cornerRadius
     property bool fullWidth: false
+    // Fading sheen over the top; off leaves a plain fill
+    property bool sheen: true
 
     color: Theme.panelColor
     radius: floating ? cornerRadius : 0
@@ -48,6 +50,7 @@ Rectangle {
     }
 
     Rectangle {
+        visible: glass.sheen
         anchors.fill: parent
         radius: glass.radius
         topRightRadius: glass.topRightRadius

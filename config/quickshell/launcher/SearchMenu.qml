@@ -33,6 +33,8 @@ PanelWindow { // qmllint disable uncreatable-type
     // Small drop shadow under the panel; floating panels always have one
     property bool shadow: floating
     property int cornerRadius: Theme.cornerRadius
+    // Sheen over the panel background; off for a plain fill
+    property bool sheen: true
     // Delegate for a strip of cards instead of rows: one row across the
     // whole screen, sitting on the bar and scrolling sideways. Its root gets
     // the ListView's `modelData` and `index`; ListView.isCurrentItem marks
@@ -133,6 +135,7 @@ PanelWindow { // qmllint disable uncreatable-type
         floating: window.floating
         cornerRadius: window.cornerRadius
         fullWidth: window.strip
+        sheen: window.sheen
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         width: parent.width

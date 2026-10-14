@@ -258,6 +258,7 @@ Scope {
         id: menu
 
         shadow: true
+        sheen: false
         card: windowCard
         searchable: false
         results: root.entries
@@ -326,12 +327,16 @@ Scope {
                     anchors.right: parent.right
                     anchors.bottom: title.top
                     anchors.margins: Theme.cardSpacing
+                    clip: true
 
+                    // Fills the whole thumbnail, cropping what doesn't fit;
+                    // the window's top (title, tabs) is kept
                     Image {
                         id: preview
                         anchors.fill: parent
                         source: root.previews[cell.modelData.id] ?? ""
-                        fillMode: Image.PreserveAspectFit
+                        fillMode: Image.PreserveAspectCrop
+                        verticalAlignment: Image.AlignTop
                         asynchronous: true
                         cache: false
                         smooth: true
