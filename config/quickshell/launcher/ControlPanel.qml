@@ -10,8 +10,8 @@ import Quickshell.Wayland
 import qs
 
 // Control panel: the glass panel of the other menus, floating just above the
-// bar by the right edge. The output and input volume, a volume per
-// app that's playing, Wi-Fi and bluetooth. Toggled by
+// bar by the right edge. The output and input volume, Wi-Fi and bluetooth.
+// Toggled by
 // ~/.local/bin/control-panel
 // (`qs -c launcher ipc call controlPanel toggleControlPanel`), Super+A or the
 // bar's button; `control-panel Network` opens it on that page. The
@@ -37,10 +37,6 @@ Scope {
 
     readonly property list<PwNode> sinks: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSink)
     readonly property list<PwNode> sources: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSource)
-    // Apps playing sound. Not the short sounds of the volume keys and
-    // notifications (paplay and the like), which would make the Apps
-    // section come and go
-    readonly property list<PwNode> streams: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioOutStream && !root.isSoundEffect(node))
 
     readonly property NetworkDevice wifiDevice: Networking.devices.values.find(device => device.type === DeviceType.Wifi) ?? null
     // Cables plugged in
@@ -76,7 +72,7 @@ Scope {
     }
 
     // One per row, with the section it's in: a volume
-    // ({ kind: "volume", node, app }), an audio device to make the default ({ kind: "device", node }), a cable
+    // ({ kind: "volume", node }), an audio device to make the default ({ kind: "device", node }), a cable
     // ({ kind: "wired", device }), the Wi-Fi switch ({ kind: "wifi" }), a
     // network ({ kind: "network", network }) and the password for it
     // ({ kind: "password", network }), the bluetooth switch
@@ -90,8 +86,7 @@ Scope {
                 rows.push({
                     section: section,
                     kind: "volume",
-                    node: fallback,
-                    app: false
+                    node: fallback
                 });
             for (const node of devices)
                 rows.push({
@@ -103,21 +98,6 @@ Scope {
         };
         add("Output", sinks, Pipewire.defaultAudioSink);
         add("Input", sources, Pipewire.defaultAudioSource);
-        // One slider per app, however many streams it plays: a browser
-        // opens one per tab
-        const apps = new Map();
-        for (const node of streams) {
-            const name = appName(node);
-            apps.set(name, (apps.get(name) ?? []).concat([node]));
-        }
-        for (const nodes of apps.values())
-            rows.push({
-                section: "Apps",
-                kind: "volume",
-                node: nodes[0],
-                nodes: nodes,
-                app: true
-            });
         for (const device of wiredDevices)
             rows.push({
                 section: "Network",
@@ -164,18 +144,8 @@ Scope {
         return rows.filter(row => page === "" ? !row.list : row.section === page && row.list);
     }
 
-    function isSoundEffect(node) {
-        const players = ["paplay", "pw-play", "pw-cat", "aplay", "canberra-gtk-play"];
-        const props = node.properties ?? {};
-        return players.includes(node.name) || players.includes(props["application.name"]) || ["event", "notification"].includes((props["media.role"] ?? "").toLowerCase());
-    }
-
     function isSlider(row) {
         return row.kind === "volume";
-    }
-
-    function appName(node) {
-        return node.properties["application.name"] ?? node.nickname ?? node.name;
     }
 
     // "HDMI / DisplayPort 3 Output" -> "HDMI / DisplayPort 3": the section
@@ -188,23 +158,14 @@ Scope {
         return node === Pipewire.defaultAudioSink || node === Pipewire.defaultAudioSource;
     }
 
-    // A volume row's nodes: an app's streams, or the one device
-    function nodesOf(row) {
-        return row.nodes ?? [row.node];
-    }
-
-    // Unmutes too; an app's streams all move together
+    // Unmutes too
     function setVolume(row, volume) {
-        for (const node of root.nodesOf(row)) {
-            node.audio.muted = false;
-            node.audio.volume = volume;
-        }
+        row.node.audio.muted = false;
+        row.node.audio.volume = volume;
     }
 
     function toggleMute(row) {
-        const muted = !row.node.audio.muted;
-        for (const node of root.nodesOf(row))
-            node.audio.muted = muted;
+        row.node.audio.muted = !row.node.audio.muted;
     }
 
     // One step up or down a volume, on the step grid. Never pushes past
@@ -406,11 +367,9 @@ Scope {
         }
     }
 
-    // Volumes, and the app names the streams are grouped by, are only
-    // there for nodes that are tracked. Not taken from the rows, which are
-    // built from those names.
+    // Volumes are only there for nodes that are tracked
     PwObjectTracker {
-        objects: root.open ? [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource].concat(root.streams) : []
+        objects: root.open ? [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource] : []
     }
 
     PanelWindow { // qmllint disable uncreatable-type

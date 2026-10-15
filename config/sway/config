@@ -86,7 +86,8 @@ exec wl-paste --type image --watch cliphist store
 # menu and control panel daemon, toggled by ~/.local/bin/app-menu ($menu),
 # ~/.local/bin/power-menu, ~/.local/bin/clipboard-menu,
 # ~/.local/bin/scratchpad-menu, ~/.local/bin/keybind-menu,
-# ~/.local/bin/control-panel and ~/.local/bin/notification-center. It also
+# ~/.local/bin/control-panel, ~/.local/bin/notification-center and
+# ~/.local/bin/media-panel. It also
 # shows the volume popup,
 # and the notifications (in place of dunst; flameshot only notifies if
 # something already shows notifications, and this is started first).

@@ -3,6 +3,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Wayland
 import qs
 
 // App launcher: a glass panel in the bottom left corner, on top of the status
@@ -11,20 +12,56 @@ import qs
 // daemon serves the power menu (PowerMenu.qml), the clipboard menu
 // (ClipboardMenu.qml), the scratchpad menu (ScratchpadMenu.qml), the key
 // bindings menu (KeybindMenu.qml), the control panel (ControlPanel.qml), the
-// notification centre (NotificationCenter.qml), the volume popup (Osd.qml)
-// and the notifications (Notifications.qml).
+// notification centre (NotificationCenter.qml), the music popup
+// (MediaPanel.qml), the volume popup (Osd.qml) and the notifications
+// (Notifications.qml).
 ShellRoot {
     id: root
 
     // Desktop entry id -> times launched. Most used apps are listed first.
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, mediaPanel]
+    readonly property bool anyOpen: menus.some(menu => menu.open)
 
     // The menus share the corner, so only one is open at a time
     function closeOthers(menu) {
         for (const other of menus) {
             if (other !== menu)
                 other.open = false;
+        }
+    }
+
+    // A click outside the open menu closes it: while one is open, a clear
+    // layer covers every screen, the bar too, under the menus (which are on
+    // the overlay layer). The click only closes; it doesn't reach the
+    // window under it.
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow { // qmllint disable uncreatable-type
+            required property var modelData
+
+            screen: modelData
+            visible: root.anyOpen
+            color: "transparent"
+            exclusionMode: ExclusionMode.Ignore
+
+            WlrLayershell.namespace: "launcher-catcher"
+            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.AllButtons
+                onPressed: root.closeOthers(null)
+            }
         }
     }
 
@@ -116,6 +153,12 @@ ShellRoot {
             root.closeOthers(controlPanel)
     }
 
+    MediaPanel {
+        id: mediaPanel
+        onOpenChanged: if (open)
+            root.closeOthers(mediaPanel)
+    }
+
     NotificationCenter {
         id: notificationCenter
         server: notifications
@@ -129,7 +172,7 @@ ShellRoot {
 
     Notifications {
         id: notifications
-        suppressed: controlPanel.open || notificationCenter.open
+        suppressed: controlPanel.open || notificationCenter.open || mediaPanel.open
     }
 
     IpcHandler {

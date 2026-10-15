@@ -199,6 +199,19 @@ window#waybar {
   color: rgba(192, 202, 245, 0.2);
 }
 
+/* The music note, in the selection blue; dimmed while paused. Beside the
+   bluetooth glyph and the bell, so no separator */
+#custom-media {
+  padding: 0 8px 0 2px;
+  color: #b0b0b2;
+}
+#custom-media.paused {
+  color: #565f89;
+}
+#custom-media:hover {
+  color: #c0caf5;
+}
+
 #clock {
   color: #b0b0b2;
   margin-right: 6px;
@@ -257,7 +270,7 @@ tooltip {
   background-color: #15161e;
   border: none;
   box-shadow: none;
-	border-radius: 1px;
+  border-radius: 1px;
 }
 tooltip label {
   color: #b1b1b1;

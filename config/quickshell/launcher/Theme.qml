@@ -167,6 +167,18 @@ Singleton {
     // Marks what's in use or connected
     readonly property string checkIcon: "\uf00c"
 
+    // The music popup
+    // (MediaPanel.qml, MediaRow.qml)
+    readonly property int mediaPanelWidth: 360
+    readonly property int mediaArtSize: 48
+    readonly property int mediaButtonSize: 26
+    readonly property int mediaPlaySize: 30
+    readonly property string musicIcon: String.fromCodePoint(0xf075a)
+    readonly property string previousIcon: String.fromCodePoint(0xf04ae)
+    readonly property string nextIcon: String.fromCodePoint(0xf04ad)
+    readonly property string playIcon: String.fromCodePoint(0xf040a)
+    readonly property string pauseIcon: String.fromCodePoint(0xf03e4)
+
     // Volume popup: floats above the bar while the volume changes
     readonly property int osdWidth: 320
     readonly property int osdMargin: 24

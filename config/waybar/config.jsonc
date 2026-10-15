@@ -18,6 +18,7 @@
 		"clock#time",
 		"tray",
 		"bluetooth",
+		"custom/media",
 		"custom/notifications",
 		"custom/control-panel"
 	],
@@ -175,6 +176,22 @@
 		"return-type": "json",
 		"interval": "once",
 		"format": " 🐧 "
+	},
+
+	// A note while a song plays, dimmed while paused, and nothing (so hidden)
+	// when there's none. Quickshell writes it
+	// (config/quickshell/launcher/MediaPanel.qml) and signals SIGRTMIN+9 on
+	// a change. Click opens the music popup; scroll skips tracks.
+	"custom/media": {
+		"exec": "cat \"$XDG_RUNTIME_DIR/media.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
+		"return-type": "json",
+		"interval": "once",
+		"signal": 9,
+		"escape": true,
+		"tooltip": false,
+		"on-click": "~/.local/bin/media-panel",
+		"on-scroll-up": "playerctl previous",
+		"on-scroll-down": "playerctl next"
 	},
 
 	// Date and time are separate modules so style.css can colour each

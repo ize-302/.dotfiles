@@ -31,7 +31,6 @@ Column {
     // Sliders, switches and the password are full size;
     // lists are a little smaller
     readonly property bool main: !modelData.list || kind === "password"
-    readonly property bool app: modelData.app ?? false
     readonly property bool muted: node?.audio?.muted ?? false
     readonly property real level: node?.audio?.volume ?? 0
     // Under the mouse or picked with the keys: there's
@@ -41,7 +40,7 @@ Column {
 
     // Glyph before a main row; lists are plain text
     readonly property string glyph: {
-        if (kind === "volume" && !app)
+        if (kind === "volume")
             return node.type === PwNodeType.AudioSink ? Theme.volumeIcon(level, muted) : muted ? Theme.micMutedIcon : Theme.micIcon;
         if (kind === "bluetooth")
             return !panel.bluetoothOn ? Theme.bluetoothOffIcon : panel.bluetoothDevices.some(device => device.connected) ? Theme.bluetoothConnectedIcon : Theme.bluetoothIcon;
@@ -61,8 +60,6 @@ Column {
     // A switch's row says what it's connected to
     readonly property bool on: kind === "wifi" ? Networking.wifiEnabled : kind === "bluetooth" ? panel.bluetoothOn : false
     readonly property string label: {
-        if (app)
-            return panel.appName(node);
         if (kind === "device")
             return panel.deviceName(node);
         if (kind === "bluetooth") {
@@ -245,13 +242,13 @@ Column {
                 }
             }
 
-            // A volume's slider only has a label for an app
+            // A volume's slider has no label; its header names the device
             Text {
                 id: label
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: (!entry.slider || entry.app) && entry.kind !== "password"
-                width: entry.slider ? parent.width * 0.3 : parent.width - (end.visible ? end.width + parent.spacing : 0) - (icon.visible ? icon.width + parent.spacing : 0) - (detail.visible ? detail.width + parent.spacing : 0) - (signal.visible ? signal.width + parent.spacing : 0)
+                visible: !entry.slider && entry.kind !== "password"
+                width: parent.width - (end.visible ? end.width + parent.spacing : 0) - (icon.visible ? icon.width + parent.spacing : 0) - (detail.visible ? detail.width + parent.spacing : 0) - (signal.visible ? signal.width + parent.spacing : 0)
                 text: entry.label
                 textFormat: Text.PlainText
                 elide: Text.ElideRight
