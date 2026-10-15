@@ -74,7 +74,7 @@ exec gsettings set org.blueman.general plugin-list "['!StatusIcon', '!ShowConnec
 
 # GTK theme. On Wayland GTK3/4 apps read these from gsettings and ignore
 # ~/.config/gtk-3.0/settings.ini, so set them here to keep apps dark.
-exec_always gsettings set org.gnome.desktop.interface gtk-theme 'Arc-Dark'
+exec_always gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
 exec_always gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 exec_always gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
 
