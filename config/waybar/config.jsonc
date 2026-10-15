@@ -13,7 +13,7 @@
 		"memory",
 		"battery",
 		"backlight",
-		"wireplumber",
+		"custom/volume",
 		"network",
 		"bluetooth",
 		"custom/notifications",
@@ -141,21 +141,22 @@
 		"tooltip": false
 	},
 
-	// Above 50% switches to the loud icon. Only the highest matching state
-	// applies, so high/over repeat the loud format; style.css colours them
-	// (mid only changes the colour, so it keeps the default format).
-	// Click opens the sound popup (what's playing, output and input, like
-	// Super+A), right click toggles mute, scrolling changes the volume.
-	"wireplumber": {
-		"states": { "mid": 31, "loud": 51, "high": 71, "over": 101 },
-		"format": " {volume}%",
-		"format-loud": "  {volume}%",
-		"format-high": "  {volume}%",
-		"format-over": "  {volume}%",
-		"format-muted": " {volume}%",
+	// The speaker glyph and the volume, or a music note while something
+	// plays. Quickshell writes it (config/quickshell/launcher/BarVolume.qml),
+	// with the level as the class for style.css's colours, and signals
+	// SIGRTMIN+10 on a change. Click opens the sound popup (what's playing,
+	// output and input, like Super+A), right click toggles mute, scrolling
+	// changes the volume like the volume keys.
+	"custom/volume": {
+		"exec": "cat \"$XDG_RUNTIME_DIR/volume.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
+		"return-type": "json",
+		"interval": "once",
+		"signal": 10,
+		"tooltip": false,
 		"on-click": "~/.local/bin/control-panel",
 		"on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-		"tooltip": false
+		"on-scroll-up": "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+",
+		"on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
 	},
 
 	// The penguin; hover shows the kernel version. The script has to send

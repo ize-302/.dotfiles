@@ -87,7 +87,7 @@ window#waybar {
 #memory,
 #battery,
 #backlight,
-#wireplumber,
+#custom-volume,
 #network,
 #bluetooth,
 #custom-notifications,
@@ -171,23 +171,23 @@ window#waybar {
 
 /* Volume: the clock's colour, more opaque the louder it gets, red when boosted past
    100%. Faintest when muted. */
-#wireplumber {
+#custom-volume {
   color: rgba(192, 202, 245, 0.35);
 }
-#wireplumber.mid {
+#custom-volume.mid {
   color: rgba(192, 202, 245, 0.55);
 }
-#wireplumber.loud {
+#custom-volume.loud {
   color: rgba(192, 202, 245, 0.75);
 }
-#wireplumber.high {
+#custom-volume.high {
   color: rgba(192, 202, 245, 1);
 }
-#wireplumber.over {
+#custom-volume.over {
   color: #f7768e;
 }
 /* Must come after the level states so muted wins */
-#wireplumber.muted {
+#custom-volume.muted {
   color: rgba(192, 202, 245, 0.2);
 }
 

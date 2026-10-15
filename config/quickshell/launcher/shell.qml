@@ -15,7 +15,7 @@ import qs
 // notification centre (NotificationCenter.qml), the volume popup (Osd.qml),
 // the notifications
 // (Notifications.qml), the bluetooth pairing prompts (BluetoothAgent.qml)
-// and the caps lock popup (CapsLock.qml).
+// the caps lock popup (CapsLock.qml) and the bar's volume (BarVolume.qml).
 ShellRoot {
     id: root
 
@@ -164,6 +164,8 @@ ShellRoot {
     BluetoothAgent {}
 
     CapsLock {}
+
+    BarVolume {}
 
     Osd {
         suppressed: controlPanel.open
