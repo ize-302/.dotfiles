@@ -806,7 +806,7 @@ Scope {
     // The pointer wasn't found: the right edge, rather than nothing
     Timer {
         running: root.open && !root.placed
-        interval: 250
+        interval: 500
         onTriggered: root.placeWaited = true
     }
 
@@ -932,7 +932,9 @@ Scope {
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
         implicitWidth: Math.round((screen?.width ?? 1920) * Theme.controlWidth)
-        implicitHeight: panel.height
+        // Room under the glass for the arrow pointing at the bar module
+        implicitHeight: panel.height + (pointing ? Theme.arrowHeight - 1 : 0)
+        readonly property bool pointing: root.atPointer && root.pointerX >= 0
 
         WlrLayershell.namespace: "launcher-shadow"
         WlrLayershell.layer: WlrLayer.Overlay
@@ -964,6 +966,12 @@ Scope {
             id: panel
 
             floating: true
+
+            // Points down at the module it was opened from
+            PopupArrow {
+                visible: window.pointing
+                tip: root.pointerX - ((window.screen?.width ?? 0) - window.margins.right - window.implicitWidth)
+            }
             width: parent.width
             height: list.height + Theme.panelPadding * 2
 

@@ -24,17 +24,36 @@ ShellRoot {
     readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter]
     readonly property bool anyOpen: menus.some(menu => menu.open)
     // Where the pointer was when a menu opened (x on its screen), from the
-    // click catcher below, which appears under it; -1 until it's known.
+    // click catcher below, which appears under it, moved to the middle of the
+    // bar module there (~/.local/bin/bar-anchor); -1 until it's known.
     // Popups opened from a bar module centre themselves on it.
     property real pointerX: -1
     property var pointerScreen: null
+    property bool pointerSeen: false
 
     // A surface appearing under a still pointer isn't told where it is, so
     // the pointer is nudged a pixel and back once the catcher is up
     onAnyOpenChanged: {
         pointerX = -1;
+        pointerSeen = false;
         if (anyOpen)
             nudge.restart();
+    }
+
+    // The middle of the module under the pointer; the pointer itself if
+    // that fails
+    Process {
+        id: anchor
+
+        property real screenX: 0
+        property real pointer: -1
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const x = parseFloat(text);
+                root.pointerX = isNaN(x) ? anchor.pointer : x - anchor.screenX;
+            }
+        }
     }
 
     Timer {
@@ -59,6 +78,8 @@ ShellRoot {
         model: Quickshell.screens
 
         PanelWindow { // qmllint disable uncreatable-type
+            id: catcherWindow
+
             required property var modelData
 
             screen: modelData
@@ -88,10 +109,15 @@ ShellRoot {
                 // The first place the pointer is seen once a menu opens:
                 // where it was clicked
                 function note(x) {
-                    if (root.pointerX >= 0)
+                    if (root.pointerSeen)
                         return;
-                    root.pointerScreen = parent.modelData;
-                    root.pointerX = x;
+                    const screen = catcherWindow.modelData;
+                    root.pointerSeen = true;
+                    root.pointerScreen = screen;
+                    anchor.screenX = screen.x;
+                    anchor.pointer = x;
+                    anchor.command = [Theme.barAnchor, String(screen.x + x), String(screen.y + screen.height - Theme.barHeight), String(Theme.barHeight)];
+                    anchor.running = true;
                 }
 
                 onPositionChanged: mouse => note(mouse.x)

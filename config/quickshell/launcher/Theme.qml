@@ -200,6 +200,15 @@ Singleton {
     readonly property color capsLockColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.55)
     readonly property color capsLockEdgeColor: Qt.rgba(1, 1, 1, 0.08)
 
+    // The bar's height ("height" in config/waybar/config.jsonc), where
+    // ~/.local/bin/bar-anchor looks for the module a popup was opened from
+    readonly property int barHeight: 38
+    readonly property string barAnchor: Quickshell.env("HOME") + "/.local/bin/bar-anchor"
+
+    // The arrow under a popup opened from the bar (PopupArrow.qml)
+    readonly property int arrowWidth: 18
+    readonly property int arrowHeight: 9
+
     // Volume popup: floats above the bar while the volume changes
     readonly property int osdWidth: 320
     readonly property int osdMargin: 24
