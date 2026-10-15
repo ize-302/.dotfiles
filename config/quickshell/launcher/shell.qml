@@ -23,6 +23,25 @@ ShellRoot {
     property var history: ({})
     readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter]
     readonly property bool anyOpen: menus.some(menu => menu.open)
+    // Where the pointer was when a menu opened (x on its screen), from the
+    // click catcher below, which appears under it; -1 until it's known.
+    // Popups opened from a bar module centre themselves on it.
+    property real pointerX: -1
+    property var pointerScreen: null
+
+    // A surface appearing under a still pointer isn't told where it is, so
+    // the pointer is nudged a pixel and back once the catcher is up
+    onAnyOpenChanged: {
+        pointerX = -1;
+        if (anyOpen)
+            nudge.restart();
+    }
+
+    Timer {
+        id: nudge
+        interval: 30
+        onTriggered: Quickshell.execDetached(["sh", "-c", "swaymsg -q -- seat - cursor move 1 0; swaymsg -q -- seat - cursor move -1 0"])
+    }
 
     // The menus share the corner, so only one is open at a time
     function closeOthers(menu) {
@@ -59,9 +78,23 @@ ShellRoot {
             }
 
             MouseArea {
+                id: catcher
+
                 anchors.fill: parent
                 acceptedButtons: Qt.AllButtons
+                hoverEnabled: true
                 onPressed: root.closeOthers(null)
+
+                // The first place the pointer is seen once a menu opens:
+                // where it was clicked
+                function note(x) {
+                    if (root.pointerX >= 0)
+                        return;
+                    root.pointerScreen = parent.modelData;
+                    root.pointerX = x;
+                }
+
+                onPositionChanged: mouse => note(mouse.x)
             }
         }
     }
@@ -150,12 +183,16 @@ ShellRoot {
 
     ControlPanel {
         id: controlPanel
+        pointerX: root.pointerX
+        pointerScreen: root.pointerScreen
         onOpenChanged: if (open)
             root.closeOthers(controlPanel)
     }
 
     NotificationCenter {
         id: notificationCenter
+        pointerX: root.pointerX
+        pointerScreen: root.pointerScreen
         server: notifications
         onOpenChanged: if (open)
             root.closeOthers(notificationCenter)

@@ -1,8 +1,13 @@
 #!/bin/bash
-# ~/.local/bin/notification-center
+# ~/.local/bin/notification-center [--pointer]
 # Toggles the Quickshell notification centre (~/.config/quickshell/launcher),
-# starting its daemon first if it isn't running.
-toggle=(qs -c launcher ipc call notificationCenter toggleNotificationCenter)
+# starting its daemon first if it isn't running. --pointer (from the bar's
+# bell) centres it over the bell, rather than at the right edge.
+if [ "$1" = "--pointer" ]; then
+	toggle=(qs -c launcher ipc call notificationCenter toggleNotificationCenterAtPointer)
+else
+	toggle=(qs -c launcher ipc call notificationCenter toggleNotificationCenter)
+fi
 
 "${toggle[@]}" >/dev/null 2>&1 && exit 0
 

@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.I3
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
@@ -20,11 +21,24 @@ import qs
 // Enter runs one's default action, Delete dismisses it, c clears them all,
 // d turns do not disturb on or off (h for an hour, m until morning), and
 // Escape closes it. Scrolls when there are more than fit.
+//
+// Opened from the bar's bell (`notification-center --pointer`), it's
+// centred over the bell, kept on the screen; from the keyboard, it's at the
+// right edge (like ControlPanel.qml).
 Scope {
     id: root
 
     property bool open: false
     property int current: 0
+
+    // Centred on the pointer, opened from the bar; where it is (shell.qml),
+    // -1 until known. Shown once it's placed, or after a moment at the
+    // right edge if the pointer can't be found.
+    property bool atPointer: false
+    property real pointerX: -1
+    property var pointerScreen: null
+    property bool placeWaited: false
+    readonly property bool placed: !atPointer || pointerX >= 0 || placeWaited
     // The notification server (Notifications.qml)
     property var server: null
     readonly property var notifications: server ? Array.from(server.notifications) : []
@@ -76,13 +90,33 @@ Scope {
     onRowsChanged: current = Math.max(0, Math.min(current, rows.length - 1))
 
     // Opening it reads them all
-    onOpenChanged: if (open && server)
-        server.markRead()
+    onOpenChanged: {
+        if (open && server)
+            server.markRead();
+        if (!open) {
+            atPointer = false;
+            placeWaited = false;
+        }
+    }
+
+    // The pointer wasn't found: the right edge, rather than nothing
+    Timer {
+        running: root.open && !root.placed
+        interval: 250
+        onTriggered: root.placeWaited = true
+    }
 
     IpcHandler {
         target: "notificationCenter"
 
         function toggleNotificationCenter(): void {
+            root.open = !root.open;
+        }
+
+        // The same, over the bar's bell under the pointer
+        function toggleNotificationCenterAtPointer(): void {
+            if (!root.open)
+                root.atPointer = true;
             root.open = !root.open;
         }
 
@@ -98,7 +132,8 @@ Scope {
     PanelWindow { // qmllint disable uncreatable-type
         id: window
 
-        visible: root.open
+        visible: root.open && root.placed
+        screen: (root.atPointer && root.pointerX >= 0 ? root.pointerScreen : null) ?? Quickshell.screens.find(screen => screen.name === I3.focusedMonitor?.name) ?? null
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
         implicitWidth: Theme.notificationCenterWidth
@@ -113,7 +148,13 @@ Scope {
             right: true
         }
         margins.bottom: Theme.floatingGap
-        margins.right: Theme.floatingGap
+        // Centred on the pointer, kept on the screen
+        margins.right: {
+            if (!root.atPointer || root.pointerX < 0 || !screen)
+                return Theme.floatingGap;
+            const right = screen.width - root.pointerX - implicitWidth / 2;
+            return Math.round(Math.max(Theme.floatingGap, Math.min(right, screen.width - implicitWidth - Theme.floatingGap)));
+        }
 
         onVisibleChanged: {
             if (!visible)

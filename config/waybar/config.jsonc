@@ -153,7 +153,7 @@
 		"interval": "once",
 		"signal": 10,
 		"tooltip": false,
-		"on-click": "~/.local/bin/control-panel",
+		"on-click": "~/.local/bin/control-panel --pointer",
 		"on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
 		"on-scroll-up": "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+",
 		"on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
@@ -185,7 +185,7 @@
 		"interval": "once",
 		"signal": 8,
 		"tooltip": false,
-		"on-click": "~/.local/bin/notification-center"
+		"on-click": "~/.local/bin/notification-center --pointer"
 	},
 
 	// Replaces nm-applet's tray icon: signal bars on Wi-Fi, filling in with
@@ -204,7 +204,7 @@
 		"tooltip-format-ethernet": "Ethernet\n{ipaddr}",
 		"tooltip-format-disconnected": "Not connected",
 		"tooltip-format-disabled": "Wi-Fi off",
-		"on-click": "~/.local/bin/control-panel Network"
+		"on-click": "~/.local/bin/control-panel --pointer Network"
 	},
 
 	// Replaces blueman-applet. Hover lists connected devices; click opens
@@ -222,7 +222,7 @@
 		"tooltip-format-connected": "{controller_alias}: {num_connections} connected\n{device_enumerate}",
 		"tooltip-format-enumerate-connected": "{device_alias}",
 		"tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%",
-		"on-click": "~/.local/bin/control-panel Bluetooth",
+		"on-click": "~/.local/bin/control-panel --pointer Bluetooth",
 		"on-click-right": "blueman-manager"
 	},
 

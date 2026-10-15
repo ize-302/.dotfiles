@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
+import Quickshell.I3
 import Quickshell.Io
 import Quickshell.Networking
 import Quickshell.Services.Mpris
@@ -19,6 +20,10 @@ import qs
 // `control-panel Bluetooth` (its bluetooth) open those pages on their own,
 // and going back from them closes the popup. The notifications have their
 // own panel (NotificationCenter.qml).
+//
+// Opened from the bar (`control-panel --pointer`), it's centred over the
+// module that was clicked, kept on the screen: where the pointer is (from
+// shell.qml). From the keyboard, it's at the right edge.
 //
 // Up and Down move between rows, Left and Right (or h and l) move the
 // selected slider or skip back and forward on what's playing, m mutes a
@@ -52,6 +57,15 @@ Scope {
     // The page it was opened on from the bar ("Network", "Bluetooth"), which
     // closes it on going back, or "" for the sound popup
     property string entryPage: ""
+
+    // Centred on the pointer, opened from a bar module; where it is
+    // (shell.qml), -1 until known. Shown once it's placed, or after a
+    // moment at the right edge if the pointer can't be found.
+    property bool atPointer: false
+    property real pointerX: -1
+    property var pointerScreen: null
+    property bool placeWaited: false
+    readonly property bool placed: !atPointer || pointerX >= 0 || placeWaited
 
     // The player to show: one that's playing, else one with a track,
     // paused
@@ -722,6 +736,8 @@ Scope {
             page = "";
         } else {
             entryPage = "";
+            atPointer = false;
+            placeWaited = false;
             passwordFor = null;
             detailsFor = null;
             deviceFor = null;
@@ -735,14 +751,12 @@ Scope {
 
         // The sound popup; again closes it. From another page, switches.
         function toggleControlPanel(): void {
-            if (root.open && root.page === "") {
-                root.open = false;
-                return;
-            }
-            root.entryPage = "";
-            root.page = "";
-            root.current = 0;
-            root.open = true;
+            root.toggleSound(false);
+        }
+
+        // The same, over the bar module under the pointer
+        function toggleControlPanelAtPointer(): void {
+            root.toggleSound(true);
         }
 
         // Opens it on the main view, whatever it showed before
@@ -755,14 +769,45 @@ Scope {
         // Opens the panel on a section's page ("Network", "Bluetooth", ...)
         // on its own. Again on the same page closes it.
         function openSection(section: string): void {
-            if (root.open && root.page === section) {
-                root.open = false;
-                return;
-            }
-            root.open = true;
-            root.entryPage = section;
-            root.openPage(section);
+            root.toggleSection(section, false);
         }
+
+        // The same, over the bar module under the pointer
+        function openSectionAtPointer(section: string): void {
+            root.toggleSection(section, true);
+        }
+    }
+
+    function toggleSound(atPointer) {
+        if (open && page === "") {
+            open = false;
+            return;
+        }
+        if (!open)
+            root.atPointer = atPointer;
+        entryPage = "";
+        page = "";
+        current = 0;
+        open = true;
+    }
+
+    function toggleSection(section, atPointer) {
+        if (open && page === section) {
+            open = false;
+            return;
+        }
+        if (!open)
+            root.atPointer = atPointer;
+        open = true;
+        entryPage = section;
+        root.openPage(section);
+    }
+
+    // The pointer wasn't found: the right edge, rather than nothing
+    Timer {
+        running: root.open && !root.placed
+        interval: 250
+        onTriggered: root.placeWaited = true
     }
 
     Process {
@@ -882,10 +927,11 @@ Scope {
     PanelWindow { // qmllint disable uncreatable-type
         id: window
 
-        visible: root.open
+        visible: root.open && root.placed
+        screen: (root.atPointer && root.pointerX >= 0 ? root.pointerScreen : null) ?? Quickshell.screens.find(screen => screen.name === I3.focusedMonitor?.name) ?? null
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
-        implicitWidth: Math.round(screen.width * Theme.controlWidth)
+        implicitWidth: Math.round((screen?.width ?? 1920) * Theme.controlWidth)
         implicitHeight: panel.height
 
         WlrLayershell.namespace: "launcher-shadow"
@@ -897,7 +943,13 @@ Scope {
             right: true
         }
         margins.bottom: Theme.floatingGap
-        margins.right: Theme.floatingGap
+        // Centred on the pointer, kept on the screen
+        margins.right: {
+            if (!root.atPointer || root.pointerX < 0 || !screen)
+                return Theme.floatingGap;
+            const right = screen.width - root.pointerX - implicitWidth / 2;
+            return Math.round(Math.max(Theme.floatingGap, Math.min(right, screen.width - implicitWidth - Theme.floatingGap)));
+        }
 
         onVisibleChanged: {
             if (!visible)
