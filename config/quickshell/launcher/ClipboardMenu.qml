@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Io
 import qs
 
-// Clipboard history (cliphist), floating in the middle of the screen.
+// Clipboard history (cliphist), floating centred just above the bar.
 // Toggled by ~/.local/bin/clipboard-menu
 // (`qs -c launcher ipc call clipboard toggleClipboardMenu`). Enter copies the entry again.
 Scope {
@@ -54,6 +54,7 @@ Scope {
         id: menu
 
         floating: true
+        aboveBar: true
         showCount: true
         panelWidth: Theme.clipboardWidth
         results: root.search(query, root.entries)

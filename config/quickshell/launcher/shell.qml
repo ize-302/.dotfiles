@@ -11,14 +11,14 @@ import qs
 // daemon serves the power menu (PowerMenu.qml), the clipboard menu
 // (ClipboardMenu.qml), the scratchpad menu (ScratchpadMenu.qml), the key
 // bindings menu (KeybindMenu.qml), the control panel (ControlPanel.qml), the
-// volume popup (Osd.qml) and the notifications
-// (Notifications.qml).
+// notification centre (NotificationCenter.qml), the volume popup (Osd.qml)
+// and the notifications (Notifications.qml).
 ShellRoot {
     id: root
 
     // Desktop entry id -> times launched. Most used apps are listed first.
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter]
 
     // The menus share the corner, so only one is open at a time
     function closeOthers(menu) {
@@ -76,7 +76,6 @@ ShellRoot {
         id: appMenu
 
         shadow: true
-        standing: true
         results: root.search(query, DesktopEntries.applications.values, root.history)
         label: app => app.name
         icon: app => Quickshell.iconPath(app.icon, "application-x-executable")
@@ -113,9 +112,15 @@ ShellRoot {
 
     ControlPanel {
         id: controlPanel
-        notifications: notifications
         onOpenChanged: if (open)
             root.closeOthers(controlPanel)
+    }
+
+    NotificationCenter {
+        id: notificationCenter
+        server: notifications
+        onOpenChanged: if (open)
+            root.closeOthers(notificationCenter)
     }
 
     Osd {
@@ -124,7 +129,7 @@ ShellRoot {
 
     Notifications {
         id: notifications
-        suppressed: controlPanel.open
+        suppressed: controlPanel.open || notificationCenter.open
     }
 
     IpcHandler {

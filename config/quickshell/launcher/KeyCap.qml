@@ -15,11 +15,15 @@ Rectangle {
     // The text's colour, and when lit
     property color textColor: Theme.keyTextColor
     property color litTextColor: Theme.textColor
+    // A thin outline and no tint, like a printed key
+    property bool outlined: false
 
     width: Math.max(minWidth, label.implicitWidth + Theme.keyPadding * 2)
     height: Theme.keyHeight
     radius: Theme.cornerRadius
-    color: lit ? Theme.selectedColor : Theme.keyColor
+    color: lit ? Theme.hoverColor : outlined ? "transparent" : Theme.keyColor
+    border.width: outlined ? 1 : 0
+    border.color: Theme.dividerColor
 
     Text {
         id: label

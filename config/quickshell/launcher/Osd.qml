@@ -126,7 +126,7 @@ Scope {
                     width: parent.width - Theme.iconSize - percent.width - parent.spacing * 2
                     interactive: false
                     value: root.level
-                    color: Theme.volumeColor(root.level, root.muted)
+                    color: Theme.sliderColor(root.level, root.muted)
                 }
 
                 // A key cap, as wide as "100%" so it doesn't jump

@@ -30,12 +30,15 @@ PanelWindow { // qmllint disable uncreatable-type
     property real panelWidth: Theme.panelWidth
     // Float in the middle of the screen instead of sitting in the corner
     property bool floating: false
+    // Floating, but low: centred just above the bar instead of in the
+    // middle of the screen
+    property bool aboveBar: false
     // Stand on the bar a little in from the left edge, instead of in the
     // corner
     property bool standing: false
     // Small drop shadow under the panel; floating panels always have one
     property bool shadow: floating
-    property int cornerRadius: Theme.cornerRadius
+    property int cornerRadius: Theme.panelRadius
     property color panelColor: Theme.glassPanelColor
     // Space between the panel's edges and its content
     property int panelPadding: Theme.panelPadding
@@ -122,11 +125,12 @@ PanelWindow { // qmllint disable uncreatable-type
     // With no edges anchored, the layer shell centres the window; the strip
     // spans the bottom edge, on top of the bar
     anchors {
-        bottom: !window.floating || window.strip
+        bottom: !window.floating || window.strip || window.aboveBar
         left: !window.floating || window.strip
         right: window.strip
     }
     margins.left: standing ? Theme.edgeMargin : 0
+    margins.bottom: window.floating && window.aboveBar ? Theme.floatingBarGap : 0
 
     onVisibleChanged: {
         if (!visible)
@@ -314,6 +318,7 @@ PanelWindow { // qmllint disable uncreatable-type
                         width: list.width
                         height: Theme.rowHeight
                         color: ListView.isCurrentItem ? Theme.selectedColor : "transparent"
+                        radius: Theme.cornerRadius
 
                         Row {
                             anchors.verticalCenter: parent.verticalCenter

@@ -320,10 +320,11 @@ Scope {
                 anchors.fill: parent
                 anchors.margins: Theme.cardSpacing
                 radius: Theme.cornerRadius
-                color: cell.selected ? Theme.selectedColor : Theme.keyColor
-                border.width: 1
-                // Red while the close button is pointed at
-                border.color: cell.closing ? Theme.closeColor : cell.selected ? Theme.edgeColor : "transparent"
+                color: cell.selected ? Theme.hoverColor : Theme.keyColor
+                border.width: cell.selected ? 2 : 1
+                // Red while the close button is pointed at, the selection blue
+                // around the selected one
+                border.color: cell.closing ? Theme.closeColor : cell.selected ? Theme.selectedColor : "transparent"
 
                 Behavior on border.color {
                     ColorAnimation {

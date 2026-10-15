@@ -11,7 +11,7 @@ Rectangle {
     id: glass
 
     property bool floating: false
-    property int cornerRadius: Theme.cornerRadius
+    property int cornerRadius: Theme.panelRadius
     property bool fullWidth: false
     // Sits on the bar away from the screen edges
     property bool standing: false

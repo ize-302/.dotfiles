@@ -11,22 +11,23 @@ import qs
 
 // Notification server, in place of dunst: shows each notification as a glass
 // card over the bar's right end, where dunst put them, and keeps them for the
-// notification centre in the control panel.
+// notification centre (NotificationCenter.qml).
 //
-// Cards stack up from the bar, the newest standing on it, at most maxPopups at
-// once. They go after the app's timeout (or notificationTimeout), which
+// Cards stack up from just above the bar, the newest lowest, at most
+// maxPopups at once; they float, clear of the bar and the screen edge. They go after the app's timeout (or notificationTimeout), which
 // pauses under the mouse; critical ones stay and have a red edge. A click
 // runs the notification's default action, a right click or the × dismisses
 // it, and its other actions are key caps.
 //
-// The bar's control panel button shows an orange dot while there are new
-// ones and a bell with a line through it during do not disturb: this writes
-// $XDG_RUNTIME_DIR/control-panel.json for waybar's custom/control-panel
+// The bar's bell shows a badge and an orange dot while there are new ones
+// and a line through it during do not disturb: this writes
+// $XDG_RUNTIME_DIR/notifications.json for waybar's custom/notifications
 // module and signals it (SIGRTMIN+8) to read it again.
 Scope {
     id: root
 
-    // No cards while the control panel is open; they're in there
+    // No cards while the notification centre (they're in there) or the
+    // control panel, in the same corner, is open
     property bool suppressed: false
     // Do not disturb: no cards, except critical ones
     property bool doNotDisturb: false
@@ -166,11 +167,11 @@ Scope {
     onUnreadChanged: root.writeStatus()
     Component.onCompleted: root.writeStatus()
 
-    // What the bar's button shows: { text, class } for waybar
+    // What the bar's bell shows: { text, class } for waybar
     function writeStatus() {
         const dot = unread > 0 ? `<span color='${Theme.accentColor}' size='small' rise='6pt'>●</span>` : "";
         status.setText(JSON.stringify({
-            text: (doNotDisturb ? Theme.doNotDisturbIcon : Theme.controlPanelIcon) + dot,
+            text: (doNotDisturb ? Theme.doNotDisturbIcon : unread > 0 ? Theme.bellUnreadIcon : Theme.bellIcon) + dot,
             class: doNotDisturb ? "dnd" : unread > 0 ? "unread" : ""
         }) + "\n");
     }
@@ -192,7 +193,7 @@ Scope {
     FileView {
         id: status
 
-        path: Quickshell.env("XDG_RUNTIME_DIR") + "/control-panel.json"
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/notifications.json"
         printErrors: false
         onSaved: Quickshell.execDetached(["pkill", "-RTMIN+8", "-x", "waybar"])
     }
@@ -238,7 +239,8 @@ Scope {
             bottom: true
             right: true
         }
-        margins.right: Theme.edgeMargin
+        margins.bottom: Theme.floatingBarGap
+        margins.right: Theme.floatingGap
 
         Column {
             id: cards
@@ -258,10 +260,7 @@ Scope {
                     readonly property bool critical: root.isCritical(modelData)
                     readonly property list<NotificationAction> actions: (modelData?.actions ?? []).filter(action => action.identifier !== "default")
 
-                    // The newest stands on the bar like the other panels;
-                    // the ones above it float
-                    floating: index < root.popups.length - 1
-                    standing: !floating
+                    floating: true
                     // A plain fill, no sheen
                     sheen: false
                     width: cards.width

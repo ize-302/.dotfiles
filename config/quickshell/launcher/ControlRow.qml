@@ -8,9 +8,8 @@ import Quickshell.Services.Pipewire
 import qs
 
 // One row of the control panel (ControlPanel.qml), its section's header over
-// the first: a slider (a volume), a switch (Wi-Fi, bluetooth), the
-// notifications' bell, a device, network or notification on a page, or a
-// password being typed. What kind it is, and what it shows, comes from the
+// the first: a slider (a volume), a switch (Wi-Fi, bluetooth), a device or
+// network on a page, or a password being typed. What kind it is, and what it shows, comes from the
 // row (`modelData`, one of the panel's `rows`); clicks and keys go to the
 // panel.
 Column {
@@ -42,8 +41,6 @@ Column {
 
     // Glyph before a main row; lists are plain text
     readonly property string glyph: {
-        if (kind === "bell")
-            return panel.notifications.doNotDisturb ? Theme.doNotDisturbIcon : panel.notifications.unread > 0 ? Theme.bellUnreadIcon : Theme.bellIcon;
         if (kind === "volume" && !app)
             return node.type === PwNodeType.AudioSink ? Theme.volumeIcon(level, muted) : muted ? Theme.micMutedIcon : Theme.micIcon;
         if (kind === "bluetooth")
@@ -52,20 +49,18 @@ Column {
             return Networking.wifiEnabled ? Theme.wifiIcon : Theme.wifiOffIcon;
         return "";
     }
+    // One colour for every glyph, like the key caps' text; dim when off or
+    // muted. Only a volume boosted past 100% stands out.
     readonly property color glyphColor: {
-        if (kind === "bell")
-            return panel.notifications.doNotDisturb ? Theme.bluetoothOffColor : panel.notifications.unread > 0 ? Theme.accentColor : Theme.bluetoothColor;
         if (toggle)
-            return on ? Theme.bluetoothColor : Theme.bluetoothOffColor;
-        return Theme.volumeColor(level, muted);
+            return on ? Theme.controlIconColor : Theme.controlIconOffColor;
+        if (muted)
+            return Theme.controlIconOffColor;
+        return level > 1.005 ? Theme.closeColor : Theme.controlIconColor;
     }
     // A switch's row says what it's connected to
     readonly property bool on: kind === "wifi" ? Networking.wifiEnabled : kind === "bluetooth" ? panel.bluetoothOn : false
     readonly property string label: {
-        if (kind === "bell")
-            return panel.bellLabel();
-        if (kind === "empty")
-            return "No notifications";
         if (app)
             return panel.appName(node);
         if (kind === "device")
@@ -130,8 +125,7 @@ Column {
             return network.connected;
         return false;
     }
-    readonly property bool bright: kind !== "empty" && (checked || active || (main && kind !== "bluetooth" && kind !== "wifi") || on)
-    readonly property var notification: modelData.notification ?? null
+    readonly property bool bright: checked || active || (main && kind !== "bluetooth" && kind !== "wifi") || on
 
     // A failed connection shows on the row; a missing
     // password asks for one
@@ -174,7 +168,7 @@ Column {
         width: parent.width
         visible: entry.first
         text: entry.modelData.section
-        // Just the name, like the notifications' app
+        // Just the name, like the notification centre's app
         // headers
         line: false
         opensPage: panel.page === "" && panel.hasPage(entry.modelData.section)
@@ -188,64 +182,36 @@ Column {
         // A slider has no label of its own, so the header
         // says which device it's for
         summary: !back && (entry.modelData.section === "Output" || entry.modelData.section === "Input") ? panel.summary(entry.modelData.section) : ""
-        // The bluetooth page searches from its title,
-        // the notifications page clears
+        // The bluetooth page searches from its title
         action: {
-            if (!back)
-                return "";
-            if (entry.modelData.section === "Bluetooth" && panel.bluetoothOn)
+            if (back && entry.modelData.section === "Bluetooth" && panel.bluetoothOn)
                 return panel.adapter.discovering ? "Searching…" : "Search";
-            if (entry.modelData.section === "Notifications" && panel.notificationList.length > 0)
-                return "Clear";
             return "";
         }
         actionActive: entry.modelData.section === "Bluetooth" && (panel.adapter?.discovering ?? false)
         onClicked: back ? panel.closePage() : panel.openPage(entry.modelData.section)
-        onActionClicked: entry.modelData.section === "Notifications" ? panel.notifications.clear() : panel.toggleSearch()
-    }
-
-    // The app over its notifications, just its name
-    SectionHeader {
-        width: parent.width
-        visible: entry.kind === "notification" && (entry.index === 0 || panel.rows[entry.index - 1].group !== entry.modelData.group)
-        text: entry.modelData.group ?? ""
-        inset: 0
-        line: false
+        onActionClicked: panel.toggleSearch()
     }
 
     Item {
         width: parent.width
-        height: entry.kind === "notification" ? notificationView.implicitHeight + Theme.rowSpacing * 2 : Theme.rowHeight
+        height: Theme.rowHeight
 
         MouseArea {
             id: rowMouse
 
             anchors.fill: parent
             hoverEnabled: true
-            cursorShape: entry.slider || entry.kind === "empty" ? Qt.ArrowCursor : Qt.PointingHandCursor
+            cursorShape: entry.slider ? Qt.ArrowCursor : Qt.PointingHandCursor
             onPositionChanged: panel.current = entry.index
             onClicked: if (!entry.slider)
                 panel.activate(entry.modelData)
-        }
-
-        // A notification: its icon, summary and age, the
-        // body under them, then its actions
-        NotificationRow {
-            id: notificationView
-
-            y: Theme.rowSpacing
-            width: parent.width
-            visible: entry.kind === "notification"
-            notification: entry.notification
-            server: entry.panel.notifications
-            active: entry.active
         }
 
         Row {
             id: content
 
             anchors.verticalCenter: parent.verticalCenter
-            visible: entry.kind !== "notification"
             // Flush with a page's title and divider, like
             // the title itself
             x: panel.page !== "" ? 0 : Theme.rowPadding
@@ -290,8 +256,8 @@ Column {
                 textFormat: Text.PlainText
                 elide: Text.ElideRight
                 // The device in use or what's connected is
-                // green all the way across, like its check
-                color: entry.checked ? Theme.accentColor : entry.bright ? Theme.textColor : Theme.keyTextColor
+                // selection blue all the way across, like its check
+                color: entry.checked ? Theme.selectedColor : entry.bright ? Theme.textColor : Theme.keyTextColor
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.controlFontSize
                 font.weight: Theme.fontWeight
@@ -355,7 +321,7 @@ Column {
                 width: parent.width - percent.width - parent.spacing - (icon.visible ? icon.width + parent.spacing : 0) - (label.visible ? label.width + parent.spacing : 0)
                 active: entry.active
                 value: entry.level
-                color: Theme.volumeColor(entry.level, entry.muted)
+                color: Theme.sliderColor(entry.level, entry.muted)
                 onMoved: value => {
                     panel.current = entry.index;
                     panel.setVolume(entry.modelData, value);
@@ -381,7 +347,7 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: text !== ""
                 text: entry.detail
-                color: entry.checked ? Theme.accentColor : Theme.dimColor
+                color: entry.checked ? Theme.selectedColor : Theme.dimColor
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.controlSmallFontSize
                 font.weight: Theme.fontWeight
@@ -395,26 +361,26 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: entry.kind === "network"
                 text: visible ? panel.networkIcon(entry.network) : ""
-                color: entry.checked ? Theme.accentColor : Theme.dimColor
+                color: entry.checked ? Theme.selectedColor : Theme.dimColor
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.controlFontSize
             }
 
             // A check on what's in use or connected, or
-            // the switch, or the do not disturb button
+            // the switch
             Item {
                 id: end
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: !entry.slider && entry.kind !== "password" && entry.kind !== "empty"
-                width: entry.toggle ? Theme.toggleWidth : entry.kind === "bell" ? doNotDisturb.width : Theme.iconSize
+                visible: !entry.slider && entry.kind !== "password"
+                width: entry.toggle ? Theme.toggleWidth : Theme.iconSize
                 height: Theme.iconSize
 
                 Text {
                     anchors.centerIn: parent
-                    visible: !entry.toggle && entry.kind !== "bell"
+                    visible: !entry.toggle
                     text: entry.checked ? Theme.checkIcon : ""
-                    color: Theme.accentColor
+                    color: Theme.selectedColor
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.sectionFontSize
                 }
@@ -423,30 +389,6 @@ Column {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: entry.toggle
                     checked: entry.on
-                }
-
-                // A key cap with the bell struck through,
-                // lit and orange while do not disturb is on
-                KeyCap {
-                    id: doNotDisturb
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: entry.kind === "bell"
-                    minWidth: height
-                    text: Theme.doNotDisturbIcon
-                    fontSize: Theme.controlFontSize
-                    lit: panel.notifications?.doNotDisturb ?? false
-                    textColor: doNotDisturbMouse.containsMouse ? Theme.textColor : Theme.keyTextColor
-                    litTextColor: Theme.accentColor
-
-                    MouseArea {
-                        id: doNotDisturbMouse
-                        anchors.fill: parent
-                        anchors.margins: -4
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: panel.notifications.doNotDisturb = !panel.notifications.doNotDisturb
-                    }
                 }
             }
         }

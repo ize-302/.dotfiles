@@ -1,8 +1,9 @@
 import QtQuick
 import qs
 
-// Thin track, filled up to `value` (0 to 1; more shows as full), tinted like
-// the key caps. Dragging, clicking or scrolling it emits `moved` with the
+// Thin track, filled up to `value` (0 to 1; more shows as full), in the
+// switch's colours (Toggle.qml): the tinted track, a fill, and a white knob.
+// Dragging, clicking or scrolling it emits `moved` with the
 // new value; the owner sets `value`.
 Item {
     id: slider
@@ -29,7 +30,7 @@ Item {
         width: parent.width
         height: Theme.sliderHeight
         radius: height / 2
-        color: Theme.keyColor
+        color: Theme.sliderTrackColor
 
         Rectangle {
             width: Math.max(track.height, track.width * Math.max(0, Math.min(slider.value, 1)))
@@ -55,7 +56,7 @@ Item {
         width: slider.active || mouse.pressed ? Theme.knobActiveSize : Theme.knobSize
         height: width
         radius: width / 2
-        color: Theme.textColor
+        color: Theme.sliderKnobColor
 
         Behavior on width {
             NumberAnimation {

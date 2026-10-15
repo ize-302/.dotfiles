@@ -7,7 +7,9 @@ import Quickshell
 // #15161e with a sheen fading down and a lit edge. sway's
 // `layer_effects "launcher"` blurs what's behind.
 Singleton {
-    readonly property string fontFamily: "JetBrainsMono NF"
+    // Proportional (Adwaita Sans is Inter); fontconfig fills in the Nerd Font
+    // glyphs
+    readonly property string fontFamily: "Adwaita Sans"
     readonly property int fontSize: 17
     readonly property int fontWeight: 500
 
@@ -20,10 +22,15 @@ Singleton {
     readonly property color sheenTop: Qt.rgba(1, 1, 1, 0.05)
     readonly property color sheenMiddle: Qt.rgba(1, 1, 1, 0.01)
     readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.16)
-    // Top right corner of the menus
+    // Top right corner of the menus, and the smaller things inside them
+    readonly property int panelRadius: 4
     readonly property int cornerRadius: 4
     // Gap between a standing panel and the screen edge
     readonly property int edgeMargin: 2
+    // Hairline space between a floating panel (the control panel,
+    // notification cards) and the screen's right edge, and the bar
+    readonly property int floatingGap: 3
+    readonly property int floatingBarGap: 3
 
     // Search row
     readonly property int searchFontSize: 15
@@ -41,8 +48,10 @@ Singleton {
     readonly property int rowPadding: 8
     readonly property int iconSize: 22
     readonly property int iconSpacing: 10
-    // Tint, like the bar's focused workspace button
-    readonly property color selectedColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.12)
+    // macOS's system blue (dark mode), like a macOS menu's highlighted item
+    readonly property color selectedColor: "#0a84ff"
+    // A lit key cap or button: a tint, like the bar's focused workspace button
+    readonly property color hoverColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.12)
 
     // Key caps, tinted like the bar's workspace buttons
     readonly property color keyColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.05)
@@ -63,9 +72,25 @@ Singleton {
     readonly property real clipboardWidth: 0.35
     readonly property string clipboardEmptyText: "Nothing found"
 
-    // Key bindings menu: wider, a description and its keys share the row
-    readonly property real keybindWidth: 0.35
-    readonly property int keybindRadius: cornerRadius
+    // Key bindings menu: a "Shortcuts" sheet in the middle of the screen, the
+    // groups in two columns with a line between, each row's keys lined up in
+    // outlined caps after the descriptions
+    readonly property string keybindTitle: "Shortcuts"
+    readonly property int keybindRadius: 8
+    readonly property int keybindPadding: 28
+    readonly property int keybindFontSize: 14
+    readonly property int keybindRowHeight: 28
+    // Between a group's last row and the next group's name
+    readonly property int keybindGroupGap: 18
+    // Between the descriptions and the keys, and on each side of the line
+    // between the columns
+    readonly property int keybindLabelGap: 24
+    readonly property int keybindColumnGap: 32
+    // Descriptions longer than this many characters are cut short
+    readonly property int keybindMaxLabel: 36
+    // Taller than this fraction of the screen and the columns scroll
+    readonly property real keybindMaxHeight: 0.65
+    readonly property int keybindScrollbarWidth: 6
     readonly property string keybindEmptyText: "No bindings found"
 
     // Scratchpad menu: a full width strip of window previews on the bar
@@ -97,6 +122,10 @@ Singleton {
     // Arrow keys and the mouse wheel move a slider this far
     readonly property real volumeStep: 0.05
     readonly property int sliderHeight: 6
+    // Like the switch: the track of a switch that's off, a white knob, and
+    // the fill from sliderColor()
+    readonly property color sliderTrackColor: keyColor
+    readonly property color sliderKnobColor: "white"
     readonly property int knobSize: 12
     readonly property int knobActiveSize: 16
     // The bar's volume glyphs (config/waybar/config.jsonc)
@@ -109,8 +138,10 @@ Singleton {
     readonly property string bluetoothIcon: String.fromCodePoint(0xf00af)
     readonly property string bluetoothConnectedIcon: String.fromCodePoint(0xf00b1)
     readonly property string bluetoothOffIcon: String.fromCodePoint(0xf00b2)
-    readonly property color bluetoothColor: "#b0b0b2"
-    readonly property color bluetoothOffColor: "#808080"
+    // The control panel's glyphs (volume, mic, Wi-Fi, bluetooth), and
+    // when off or muted
+    readonly property color controlIconColor: keyTextColor
+    readonly property color controlIconOffColor: dimColor
     // Wi-Fi: on, off, and signal bars (weak to strong), with a lock for
     // networks that need a password
     readonly property string wifiIcon: String.fromCodePoint(0xf05a9)
@@ -123,7 +154,8 @@ Singleton {
     // On/off switch
     readonly property int toggleWidth: 30
     readonly property int toggleHeight: 18
-    readonly property color toggleOnColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.35)
+    // A blue pill when on, like a macOS switch
+    readonly property color toggleOnColor: selectedColor
     // Opens a section's page, and goes back from it
     readonly property string pageIcon: String.fromCodePoint(0xf0142)
     readonly property string backIcon: String.fromCodePoint(0xf0141)
@@ -152,6 +184,14 @@ Singleton {
         return Qt.rgba(192 / 255, 202 / 255, 245 / 255, alpha);
     }
 
+    // A volume slider's fill: blue like a switch that's on, red past 100%,
+    // dim when muted like a switch's knob when off
+    function sliderColor(volume, muted) {
+        if (muted)
+            return dimColor;
+        return volume > 1.005 ? closeColor : toggleOnColor;
+    }
+
     // Louder icon above 50%, like the bar
     function volumeIcon(volume, muted) {
         return muted ? volumeMutedIcon : Math.round(volume * 100) > 50 ? volumeHighIcon : volumeLowIcon;
@@ -167,6 +207,12 @@ Singleton {
     // For notifications that don't say how long to stay; critical ones stay
     // until closed
     readonly property int notificationTimeout: 5000
+    // Notification centre (NotificationCenter.qml): as wide as the cards,
+    // scrolling past this fraction of the screen height
+    readonly property int notificationCenterWidth: 380
+    readonly property real notificationCenterMaxHeight: 0.7
+    readonly property string noNotificationsText: "No notifications"
+    readonly property string doNotDisturbText: "Do not disturb is on"
     // Kept for the notification centre, oldest dropped first
     readonly property int maxNotifications: 50
     readonly property int notificationBodyLines: 3
@@ -174,11 +220,12 @@ Singleton {
     // sound theme)
     readonly property string notificationSound: "/usr/share/sounds/freedesktop/stereo/message.oga"
     readonly property string closeIcon: String.fromCodePoint(0xf0156)
-    // The notification centre's bell, with a badge while there are new ones
+    // The bar's notification bell (config/waybar/config.jsonc), with a
+    // badge while there are new ones
     readonly property string bellIcon: String.fromCodePoint(0xf009a)
     readonly property string bellUnreadIcon: String.fromCodePoint(0xf116b)
     readonly property int notificationRowIconSize: 20
-    // Do not disturb, on the bell row and the bar's button
+    // Do not disturb, in the notification centre and on the bar's bell
     readonly property string doNotDisturbIcon: String.fromCodePoint(0xf009b)
     // The bar's control panel button (config/waybar/config.jsonc)
     readonly property string controlPanelIcon: String.fromCodePoint(0xf066a)

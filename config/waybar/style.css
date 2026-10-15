@@ -70,11 +70,11 @@ window#waybar {
 }
 
 /* Binding mode indicator (swaybar defaults) */
+/* The caps lock block's red */
 #mode {
   padding: 0 6px;
-  background-color: #900000;
-  color: #ffffff;
-  border: 1px solid #2f343a;
+  background-color: #ff5555;
+  color: #15161e;
 }
 
 /* Status blocks, separated by a thin line */
@@ -215,11 +215,20 @@ window#waybar {
   padding-left: 0;
 }
 
-/* Control panel button, before the tray icons, so no separator either */
+/* Notification bell and control panel button, after the bluetooth glyph,
+   so no separator either */
+#custom-notifications {
+  padding: 0 8px 0 2px;
+  color: #b0b0b2;
+}
+#custom-notifications.dnd {
+  color: #808080;
+}
 #custom-control-panel {
   padding: 0 8px 0 2px;
   color: #b0b0b2;
 }
+#custom-notifications:hover,
 #custom-control-panel:hover {
   color: #c0caf5;
 }

@@ -85,8 +85,9 @@ exec wl-paste --type image --watch cliphist store
 # App launcher, power menu, clipboard menu, scratchpad menu, key bindings
 # menu and control panel daemon, toggled by ~/.local/bin/app-menu ($menu),
 # ~/.local/bin/power-menu, ~/.local/bin/clipboard-menu,
-# ~/.local/bin/scratchpad-menu, ~/.local/bin/keybind-menu and
-# ~/.local/bin/control-panel. It also shows the volume popup,
+# ~/.local/bin/scratchpad-menu, ~/.local/bin/keybind-menu,
+# ~/.local/bin/control-panel and ~/.local/bin/notification-center. It also
+# shows the volume popup,
 # and the notifications (in place of dunst; flameshot only notifies if
 # something already shows notifications, and this is started first).
 exec qs -c launcher -d
@@ -176,13 +177,13 @@ bindsym $mod+space exec $menu
 bindsym $mod+c exec ~/.local/bin/clipboard-menu
 
 # Key bindings cheat sheet
-bindsym $mod+question exec ~/.local/bin/keybind-menu
+bindsym $mod+F1 exec ~/.local/bin/keybind-menu
 
-# Control panel: notifications, volumes, Wi-Fi and bluetooth
+# Control panel: volumes, Wi-Fi and bluetooth
 bindsym $mod+a exec ~/.local/bin/control-panel
 
 # Notifications
-bindsym $mod+Shift+n exec ~/.local/bin/control-panel Notifications
+bindsym $mod+Shift+n exec ~/.local/bin/notification-center
 
 # Network/Bluetooth GUIs (swayfx tray can't render dbusmenu popups from nm-applet)
 
@@ -307,9 +308,16 @@ mode "resize" {
     bindsym Up resize shrink height 10px
     bindsym Right resize grow width 10px
 
-    # Return to default mode
+    # Return to default mode. Each key has its own comment, which names it
+    # in the key bindings cheat sheet.
+
+    # Leave resize mode
     bindsym Return mode "default"
+
+    # Leave resize mode
     bindsym Escape mode "default"
+
+    # Leave resize mode
     bindsym $mod+r mode "default"
 }
 
@@ -318,21 +326,46 @@ bindsym $mod+r mode "resize"
 #
 # Utilities:
 #
-    # Special keys to adjust volume via PulseAudio
-    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5% && paplay /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
-    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%  && paplay /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+    # Special keys to adjust volume. Up stops at 100% (-l 1.0): past that
+    # PipeWire boosts the signal in software, which distorts. Each key has
+    # its own comment, a blank line apart, which names it in the key
+    # bindings cheat sheet.
+
+    # Volume up
+    bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1.0 \@DEFAULT_AUDIO_SINK@ 5%+ && paplay /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+
+    # Volume down
+    bindsym --locked XF86AudioLowerVolume exec wpctl set-volume \@DEFAULT_AUDIO_SINK@ 5%- && paplay /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+
+    # Mute
     bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
+
+    # Mute the microphone
     bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
 
     # Special keys to adjust brightness via brightnessctl
+
+    # Brightness down
     bindsym --locked XF86MonBrightnessDown exec brightnessctl --min-val=1 -q set 3%-
+
+    # Brightness up
     bindsym --locked XF86MonBrightnessUp exec brightnessctl -q set 3%+
 
     # Special keys to control media via playerctl
+
+    # Play or pause
     bindsym --locked XF86AudioPlay exec playerctl play-pause
+
+    # Play or pause
     bindsym --locked XF86AudioPause exec playerctl play-pause
+
+    # Previous track
     bindsym --locked XF86AudioPrev exec playerctl previous
+
+    # Next track
     bindsym --locked XF86AudioNext exec playerctl next
+
+    # Stop playback
     bindsym --locked XF86AudioStop exec playerctl stop
 
     # Screenshot of the whole screen

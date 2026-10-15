@@ -9,24 +9,22 @@ import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
 
-// Control panel: the glass panel of the other menus, standing on the bar a
-// little in from the right edge. Notifications (with do not disturb), the
-// output and input volume, a volume per app that's playing, Wi-Fi and
-// bluetooth. Toggled by ~/.local/bin/control-panel
+// Control panel: the glass panel of the other menus, floating just above the
+// bar by the right edge. The output and input volume, a volume per
+// app that's playing, Wi-Fi and bluetooth. Toggled by
+// ~/.local/bin/control-panel
 // (`qs -c launcher ipc call controlPanel toggleControlPanel`), Super+A or the
-// bar's button; `control-panel Notifications` (Super+Shift+N) opens it on
-// that page.
+// bar's button; `control-panel Network` opens it on that page. The
+// notifications have their own panel (NotificationCenter.qml).
 //
 // Up and Down move between rows, Left and Right (or h and l) move the
 // selected slider, m mutes a volume, Enter mutes a volume, makes a device
 // the default, turns Wi-Fi or bluetooth on or off, or connects to a network
-// or device (asking for a new network's password) or runs a notification's
-// action, Delete forgets a network or bluetooth device or dismisses a
-// notification, s searches for bluetooth devices, c clears the
-// notifications, and d turns do not disturb on or off.
+// or device (asking for a new network's password), Delete forgets a network
+// or bluetooth device, and s searches for bluetooth devices.
 //
 // The main view has a section per thing, split by lines, with just its
-// slider or switch. The lists (notifications, audio devices, networks,
+// slider or switch. The lists (audio devices, networks,
 // bluetooth devices) are on a page per section: a click on the section's
 // header, Space, or Right on a switch opens the selected row's page in place
 // of the main view, and Escape, Backspace, Left or a click on the page's
@@ -36,9 +34,6 @@ Scope {
 
     property bool open: false
     property int current: 0
-    // The notification server (Notifications.qml), for the centre
-    property var notifications: null
-    readonly property var notificationList: notifications ? Array.from(notifications.notifications) : []
 
     readonly property list<PwNode> sinks: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSink)
     readonly property list<PwNode> sources: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSource)
@@ -90,33 +85,6 @@ Scope {
     // section's page; the rest are on the main view.
     readonly property var rows: {
         const rows = [];
-        if (notifications) {
-            rows.push({
-                section: "Notifications",
-                kind: "bell"
-            });
-            // Grouped by app, the app with the newest first
-            const groups = new Map();
-            for (const notification of notificationList) {
-                const app = notification.appName || "Other";
-                groups.set(app, (groups.get(app) ?? []).concat([notification]));
-            }
-            for (const [app, list] of groups)
-                for (const notification of list)
-                    rows.push({
-                        section: "Notifications",
-                        kind: "notification",
-                        list: true,
-                        group: app,
-                        notification: notification
-                    });
-            if (notificationList.length === 0)
-                rows.push({
-                    section: "Notifications",
-                    kind: "empty",
-                    list: true
-                });
-        }
         const add = (section, devices, fallback) => {
             if (fallback)
                 rows.push({
@@ -323,10 +291,10 @@ Scope {
         list.forceActiveFocus();
     }
 
-    // Sections with a page: notifications, audio devices, and networks and
+    // Sections with a page: audio devices, and networks and
     // bluetooth devices while they're on
     function hasPage(section) {
-        if (section === "Output" || section === "Input" || section === "Notifications")
+        if (section === "Output" || section === "Input")
             return true;
         if (section === "Network")
             return Networking.wifiEnabled;
@@ -341,8 +309,6 @@ Scope {
             return;
         page = section;
         current = 0;
-        if (section === "Notifications")
-            notifications.markRead();
         pageSlide.direction = 1;
         pageSlide.restart();
     }
@@ -376,21 +342,8 @@ Scope {
             adapter.discovering = !adapter.discovering;
     }
 
-    // "3 new", "5 notifications", "No notifications"
-    function bellLabel() {
-        const unread = Math.min(notifications.unread, notificationList.length);
-        if (unread > 0)
-            return unread + " new";
-        const count = notificationList.length;
-        return count === 0 ? "No notifications" : count === 1 ? "1 notification" : count + " notifications";
-    }
-
     function activate(row) {
-        if (row.kind === "bell") {
-            root.openPage("Notifications");
-        } else if (row.kind === "notification") {
-            notifications.activate(row.notification);
-        } else if (row.kind === "device") {
+        if (row.kind === "device") {
             if (row.node.type === PwNodeType.AudioSink)
                 Pipewire.preferredDefaultAudioSink = row.node;
             else
@@ -477,7 +430,8 @@ Scope {
             bottom: true
             right: true
         }
-        margins.right: Theme.edgeMargin
+        margins.bottom: Theme.floatingBarGap
+        margins.right: Theme.floatingGap
 
         onVisibleChanged: {
             if (!visible)
@@ -491,7 +445,7 @@ Scope {
         Glass {
             id: panel
 
-            standing: true
+            floating: true
             width: parent.width
             height: list.height + Theme.panelPadding * 2
 
@@ -548,12 +502,6 @@ Scope {
                         root.activate(row);
                     } else if (event.key === Qt.Key_Space && root.page === "") {
                         root.openPage(row.section);
-                    } else if (event.key === Qt.Key_Delete && row.kind === "notification") {
-                        row.notification.dismiss();
-                    } else if (event.key === Qt.Key_D && notifications) {
-                        notifications.doNotDisturb = !notifications.doNotDisturb;
-                    } else if (event.key === Qt.Key_C && root.page === "Notifications") {
-                        notifications.clear();
                     } else if (event.key === Qt.Key_S && root.page === "Bluetooth") {
                         root.toggleSearch();
                     } else if (event.key === Qt.Key_M && row.kind === "volume") {

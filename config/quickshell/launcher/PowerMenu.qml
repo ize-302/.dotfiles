@@ -34,10 +34,12 @@ Scope {
         }
     }
 
-    // Measures the longest label (the font is monospace)
-    TextMetrics {
+    // Measures the widest label
+    FontMetrics {
         id: longest
-        text: root.entries.reduce((a, b) => b.length > a.length ? b : a)
+
+        readonly property real widest: Math.max(...root.entries.map(entry => longest.advanceWidth(entry)))
+
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSize
         font.weight: Theme.fontWeight
@@ -59,7 +61,6 @@ Scope {
             bottom: true
             left: true
         }
-        margins.left: Theme.edgeMargin
 
         onVisibleChanged: {
             if (!visible)
@@ -76,10 +77,8 @@ Scope {
             // Tighter than the right: the icons carry their own inset
             readonly property int leftPadding: Theme.panelPadding - 4
 
-            standing: true
-
-            // Fitted to the longest label
-            width: Math.ceil(longest.advanceWidth) + Theme.iconSize + Theme.iconSpacing + Theme.rowPadding * 2 + leftPadding + Theme.panelPadding
+            // Fitted to the widest label
+            width: Math.ceil(longest.widest) + Theme.iconSize + Theme.iconSpacing + Theme.rowPadding * 2 + leftPadding + Theme.panelPadding
             height: rows.height + Theme.panelPadding * 2
 
             Column {
@@ -120,6 +119,7 @@ Scope {
                         width: rows.width
                         height: Theme.rowHeight
                         color: root.current === index ? Theme.selectedColor : "transparent"
+                        radius: Theme.cornerRadius
 
                         Row {
                             anchors.verticalCenter: parent.verticalCenter

@@ -18,6 +18,7 @@
 		"clock#time",
 		"tray",
 		"bluetooth",
+		"custom/notifications",
 		"custom/control-panel"
 	],
 
@@ -189,15 +190,22 @@
 		"tooltip": false
 	},
 
-	// Opens the control panel, like Super+A. Quickshell writes what it shows
-	// (config/quickshell/launcher/Notifications.qml): its sliders glyph, an
-	// orange dot while there are new notifications, a bell with a line
-	// through it during do not disturb. It signals SIGRTMIN+8 on a change.
-	"custom/control-panel": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/control-panel.json\" 2>/dev/null || echo '{\"text\": \"\udb81\ude6a\"}'",
+	// Opens the notification centre, like Super+Shift+N. Quickshell writes
+	// what it shows (config/quickshell/launcher/Notifications.qml): a bell,
+	// with a badge and an orange dot while there are new notifications and a
+	// line through it during do not disturb. It signals SIGRTMIN+8 on a change.
+	"custom/notifications": {
+		"exec": "cat \"$XDG_RUNTIME_DIR/notifications.json\" 2>/dev/null || echo '{\"text\": \"\udb80\udc9a\"}'",
 		"return-type": "json",
 		"interval": "once",
 		"signal": 8,
+		"tooltip": false,
+		"on-click": "~/.local/bin/notification-center"
+	},
+
+	// Opens the control panel, like Super+A: its sliders glyph
+	"custom/control-panel": {
+		"format": "\udb81\ude6a",
 		"tooltip": false,
 		"on-click": "~/.local/bin/control-panel"
 	},
