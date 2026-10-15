@@ -5,7 +5,7 @@ import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import qs
 
-// What's playing, in the music popup (MediaPanel.qml): the artwork, the
+// What's playing, in the sound popup (ControlPanel.qml): the artwork, the
 // title and artist, previous, play or pause and next, then a progress bar
 // with the time gone and the length. The bar seeks when the player can.
 Column {

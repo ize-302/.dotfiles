@@ -8,8 +8,10 @@ import Quickshell.Services.Pipewire
 import qs
 
 // One row of the control panel (ControlPanel.qml), its section's header over
-// the first: a slider (a volume), a switch (Wi-Fi, bluetooth), a device or
-// network on a page, or a password being typed. What kind it is, and what it shows, comes from the
+// the first: what's playing, a slider (a volume), a switch (Wi-Fi,
+// bluetooth), a device or
+// network on a page, a password being typed, or a network's details and the
+// hidden network form. What kind it is, and what it shows, comes from the
 // row (`modelData`, one of the panel's `rows`); clicks and keys go to the
 // panel.
 Column {
@@ -26,8 +28,12 @@ Column {
     readonly property var device: modelData.device ?? null
     readonly property WifiNetwork network: modelData.network ?? null
     readonly property bool slider: panel.isSlider(modelData)
-    // Wi-Fi and bluetooth on or off
-    readonly property bool toggle: kind === "bluetooth" || kind === "wifi"
+    // Wi-Fi and bluetooth on or off, and a network joining by itself
+    readonly property bool toggle: kind === "bluetooth" || kind === "wifi" || kind === "autoconnect" || kind === "btTrust"
+    // Typed into: a new network's password, the hidden network form
+    readonly property bool input: kind === "password" || kind === "joinName" || kind === "joinPassword"
+    // Only shows something: a network's details, how joining went
+    readonly property bool passive: kind === "info" || kind === "joinStatus"
     // Sliders, switches and the password are full size;
     // lists are a little smaller
     readonly property bool main: !modelData.list || kind === "password"
@@ -45,7 +51,7 @@ Column {
         if (kind === "bluetooth")
             return !panel.bluetoothOn ? Theme.bluetoothOffIcon : panel.bluetoothDevices.some(device => device.connected) ? Theme.bluetoothConnectedIcon : Theme.bluetoothIcon;
         if (kind === "wifi")
-            return Networking.wifiEnabled ? Theme.wifiIcon : Theme.wifiOffIcon;
+            return panel.wifiGlyph();
         return "";
     }
     // One colour for every glyph, like the key caps' text; dim when off or
@@ -58,7 +64,17 @@ Column {
         return level > 1.005 ? Theme.closeColor : Theme.controlIconColor;
     }
     // A switch's row says what it's connected to
-    readonly property bool on: kind === "wifi" ? Networking.wifiEnabled : kind === "bluetooth" ? panel.bluetoothOn : false
+    readonly property bool on: {
+        if (kind === "wifi")
+            return Networking.wifiEnabled;
+        if (kind === "bluetooth")
+            return panel.bluetoothOn;
+        if (kind === "autoconnect")
+            return panel.details.autoconnect === true;
+        if (kind === "btTrust")
+            return device.trusted;
+        return false;
+    }
     readonly property string label: {
         if (kind === "device")
             return panel.deviceName(node);
@@ -70,6 +86,9 @@ Column {
                 return "Turning off…";
             if (state === BluetoothAdapterState.Blocked)
                 return "Off (blocked)";
+            // On its page, the switch just says what it is
+            if (modelData.list)
+                return "Bluetooth";
             return on ? panel.summary("Bluetooth") || "No devices" : "Off";
         }
         if (kind === "bluetoothDevice")
@@ -77,12 +96,35 @@ Column {
         if (kind === "wifi") {
             if (!Networking.wifiHardwareEnabled)
                 return "Off (hardware switch)";
+            // On its page, the switch just says what it is
+            if (modelData.list)
+                return "Wi-Fi";
             return on ? panel.summary("Network") || "Not connected" : "Off";
         }
         if (kind === "network")
             return network.name;
         if (kind === "wired")
             return "Ethernet";
+        if (kind === "info")
+            return modelData.label;
+        if (kind === "connect")
+            return network.connected ? "Disconnect" : "Connect";
+        if (kind === "autoconnect")
+            return "Connect automatically";
+        if (kind === "forget")
+            return "Forget this network";
+        if (kind === "btConnect")
+            return device.pairing ? "Cancel pairing" : device.connected ? "Disconnect" : device.paired ? "Connect" : "Pair";
+        if (kind === "btTrust")
+            return "Connect automatically";
+        if (kind === "btForget")
+            return "Forget this device";
+        if (kind === "profile")
+            return modelData.label;
+        if (kind === "join")
+            return "Join other network…";
+        if (kind === "joinStatus")
+            return panel.joinBusy ? "Joining " + panel.joinName + "…" : panel.joinError;
         return "";
     }
     // Dimmed text after the label
@@ -99,6 +141,10 @@ Column {
         }
         if (kind === "wired")
             return device.linkSpeed ? device.linkSpeed + " Mb/s" : "";
+        if (kind === "info")
+            return modelData.value;
+        if (kind === "profile")
+            return modelData.codec;
         if (kind !== "bluetoothDevice")
             return "";
         if (device.pairing)
@@ -120,22 +166,11 @@ Column {
             return device.connected;
         if (kind === "network")
             return network.connected;
+        if (kind === "profile")
+            return panel.audio.active === modelData.name;
         return false;
     }
     readonly property bool bright: checked || active || (main && kind !== "bluetooth" && kind !== "wifi") || on
-
-    // A failed connection shows on the row; a missing
-    // password asks for one
-    Connections {
-        target: entry.network
-        enabled: entry.kind === "network"
-
-        function onConnectionFailed(reason) {
-            panel.setFailure(entry.network, reason);
-            if (reason === ConnectionFailReason.NoSecrets && !entry.network.known)
-                panel.askPassword(entry.network);
-        }
-    }
 
     // Rows sit on the glass like the other menus' rows,
     // under a header per section
@@ -178,7 +213,10 @@ Column {
         inset: back ? 0 : Theme.rowPadding
         // A slider has no label of its own, so the header
         // says which device it's for
-        summary: !back && (entry.modelData.section === "Output" || entry.modelData.section === "Input") ? panel.summary(entry.modelData.section) : ""
+        summary: !back && ["Output", "Input", "Now playing"].includes(entry.modelData.section) ? panel.summary(entry.modelData.section) : ""
+        // A page opened from the bar closes rather than going back, so
+        // its title has no back chevron
+        arrow: panel.page !== panel.entryPage
         // The bluetooth page searches from its title
         action: {
             if (back && entry.modelData.section === "Bluetooth" && panel.bluetoothOn)
@@ -192,22 +230,42 @@ Column {
 
     Item {
         width: parent.width
-        height: Theme.rowHeight
+        height: entry.kind === "media" ? mediaView.implicitHeight + Theme.rowSpacing * 2 : Theme.rowHeight
 
         MouseArea {
             id: rowMouse
 
             anchors.fill: parent
             hoverEnabled: true
-            cursorShape: entry.slider ? Qt.ArrowCursor : Qt.PointingHandCursor
+            // What's playing has its own buttons
+            cursorShape: entry.slider || entry.passive || entry.kind === "media" ? Qt.ArrowCursor : entry.input ? Qt.IBeamCursor : Qt.PointingHandCursor
             onPositionChanged: panel.current = entry.index
-            onClicked: if (!entry.slider)
-                panel.activate(entry.modelData)
+            onClicked: {
+                if (entry.input)
+                    panel.focusRow(entry.index);
+                else if (!entry.slider && !entry.passive && entry.kind !== "media")
+                    panel.activate(entry.modelData);
+            }
+        }
+
+        Loader {
+            id: mediaView
+
+            x: Theme.rowPadding
+            y: Theme.rowSpacing
+            width: parent.width - x * 2
+            active: entry.kind === "media"
+
+            sourceComponent: MediaRow {
+                player: entry.modelData.player
+                active: entry.active
+            }
         }
 
         Row {
             id: content
 
+            visible: entry.kind !== "media"
             anchors.verticalCenter: parent.verticalCenter
             // Flush with a page's title and divider, like
             // the title itself
@@ -247,14 +305,21 @@ Column {
                 id: label
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: !entry.slider && entry.kind !== "password"
-                width: parent.width - (end.visible ? end.width + parent.spacing : 0) - (icon.visible ? icon.width + parent.spacing : 0) - (detail.visible ? detail.width + parent.spacing : 0) - (signal.visible ? signal.width + parent.spacing : 0)
+                visible: !entry.slider && !entry.input
+                width: parent.width - (end.visible ? end.width + parent.spacing : 0) - (icon.visible ? icon.width + parent.spacing : 0) - (detail.visible ? detail.width + parent.spacing : 0) - (signal.visible ? signal.width + parent.spacing : 0) - (more.visible ? more.width + parent.spacing : 0)
                 text: entry.label
                 textFormat: Text.PlainText
                 elide: Text.ElideRight
                 // The device in use or what's connected is
-                // selection blue all the way across, like its check
-                color: entry.checked ? Theme.selectedColor : entry.bright ? Theme.textColor : Theme.keyTextColor
+                // selection blue all the way across, like its check.
+                // Forget and a failed join are red; a detail's name dim.
+                color: {
+                    if (entry.kind === "forget" || entry.kind === "btForget" || (entry.kind === "joinStatus" && entry.modelData.error))
+                        return Theme.closeColor;
+                    if (entry.passive)
+                        return Theme.dimColor;
+                    return entry.checked ? Theme.selectedColor : entry.bright ? Theme.textColor : Theme.keyTextColor;
+                }
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.controlFontSize
                 font.weight: Theme.fontWeight
@@ -266,15 +331,18 @@ Column {
                 }
             }
 
-            // A new network's password, underlined like a
-            // field: Enter connects, Escape gives up
+            // A new network's password, or the hidden network's name or
+            // password, underlined like a field. A password: Enter
+            // connects, Escape gives up. The form: Enter (or Tab, or Down)
+            // on the name goes to the password, Up back; Enter on the
+            // password joins, Escape goes back.
             TextInput {
                 id: password
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: entry.kind === "password"
+                visible: entry.input
                 width: parent.width
-                echoMode: TextInput.Password
+                echoMode: entry.kind === "joinName" ? TextInput.Normal : TextInput.Password
                 color: Theme.textColor
                 selectionColor: Theme.dividerColor
                 selectedTextColor: Theme.textColor
@@ -283,22 +351,42 @@ Column {
                 font.weight: Theme.fontWeight
                 clip: true
 
-                Component.onCompleted: if (visible)
+                Component.onCompleted: if (entry.kind === "password" || entry.kind === "joinName")
                     forceActiveFocus()
 
+                onTextChanged: {
+                    if (entry.kind === "joinName")
+                        panel.joinName = text;
+                    else if (entry.kind === "joinPassword")
+                        panel.joinPassword = text;
+                }
+
                 Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
-                        panel.submitPassword(text);
-                    else if (event.key === Qt.Key_Escape)
-                        panel.cancelPassword();
-                    else
+                    const enter = event.key === Qt.Key_Return || event.key === Qt.Key_Enter;
+                    if (entry.kind === "password") {
+                        if (enter)
+                            panel.submitPassword(text);
+                        else if (event.key === Qt.Key_Escape)
+                            panel.cancelPassword();
+                        else
+                            return;
+                    } else if (event.key === Qt.Key_Escape) {
+                        panel.closePage();
+                    } else if (entry.kind === "joinName" && (enter || event.key === Qt.Key_Tab || event.key === Qt.Key_Down)) {
+                        panel.focusRow(entry.index + 1);
+                    } else if (entry.kind === "joinPassword" && enter) {
+                        panel.join();
+                    } else if (entry.kind === "joinPassword" && (event.key === Qt.Key_Backtab || event.key === Qt.Key_Up)) {
+                        panel.focusRow(entry.index - 1);
+                    } else {
                         return;
+                    }
                     event.accepted = true;
                 }
 
                 Text {
                     visible: password.text.length === 0
-                    text: Theme.passwordPlaceholder
+                    text: entry.kind === "joinName" ? "Network name" : entry.kind === "joinPassword" ? "Password (none if it's open)" : Theme.passwordPlaceholder
                     color: Theme.dimColor
                     font: password.font
                 }
@@ -344,23 +432,60 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: text !== ""
                 text: entry.detail
-                color: entry.checked ? Theme.selectedColor : Theme.dimColor
+                // A detail's value reads like the label elsewhere
+                color: entry.kind === "info" ? Theme.textColor : entry.checked ? Theme.selectedColor : Theme.dimColor
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.controlSmallFontSize
                 font.weight: Theme.fontWeight
             }
 
-            // A network's signal bars, dimmed, with a lock
-            // when it needs a password
-            Text {
+            // A network's signal bars, dimmed, with a small lock
+            // before them when it needs a password
+            Row {
                 id: signal
 
                 anchors.verticalCenter: parent.verticalCenter
                 visible: entry.kind === "network"
-                text: visible ? panel.networkIcon(entry.network) : ""
-                color: entry.checked ? Theme.selectedColor : Theme.dimColor
+                spacing: 3
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: signal.visible && panel.isSecured(entry.network)
+                    text: Theme.lockIcon
+                    color: entry.checked ? Theme.selectedColor : Theme.dimColor
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.controlSmallFontSize - 1
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: signal.visible ? panel.networkIcon(entry.network) : ""
+                    color: entry.checked ? Theme.selectedColor : Theme.dimColor
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.controlFontSize
+                }
+            }
+
+            // Opens the network's or device's details
+            Text {
+                id: more
+
+                anchors.verticalCenter: parent.verticalCenter
+                visible: entry.kind === "network" || entry.kind === "bluetoothDevice"
+                text: Theme.pageIcon
+                color: moreMouse.containsMouse || entry.active ? Theme.textColor : Theme.dimColor
                 font.family: Theme.fontFamily
-                font.pixelSize: Theme.controlFontSize
+                font.pixelSize: Theme.sectionFontSize
+
+                MouseArea {
+                    id: moreMouse
+
+                    anchors.fill: parent
+                    anchors.margins: -6
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: entry.kind === "network" ? panel.openDetails(entry.network) : panel.openDevice(entry.device)
+                }
             }
 
             // A check on what's in use or connected, or
@@ -369,7 +494,7 @@ Column {
                 id: end
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: !entry.slider && entry.kind !== "password"
+                visible: !entry.slider && !entry.input
                 width: entry.toggle ? Theme.toggleWidth : Theme.iconSize
                 height: Theme.iconSize
 
@@ -389,6 +514,11 @@ Column {
                 }
             }
         }
+    }
+
+    // Keys to this row's field, for the join form
+    function focusField() {
+        password.forceActiveFocus();
     }
 
     // The widest volume, so the sliders line up

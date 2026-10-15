@@ -2,11 +2,11 @@
 	// Glyphs are written as \u escapes so editors can't mangle Nerd Font codepoints.
 	"layer": "top",
 	"position": "bottom",
+	"height": 32,
 	"spacing": 0,
 	"modules-left": ["sway/workspaces", "sway/scratchpad", "sway/mode"],
 	"modules-right": [
-		"keyboard-state",
-		"custom/kernel",
+		"tray",
 		"temperature",
 		"disk",
 		"cpu",
@@ -14,13 +14,11 @@
 		"battery",
 		"backlight",
 		"wireplumber",
-		"clock#date",
-		"clock#time",
-		"tray",
+		"network",
 		"bluetooth",
-		"custom/media",
 		"custom/notifications",
-		"custom/control-panel"
+		"clock"
+		// "custom/kernel"
 	],
 
 	// {windows} adds one icon per open window, picked by app id below
@@ -57,17 +55,6 @@
 		"on-click": "~/.local/bin/scratchpad-menu"
 	},
 
-	// Caps lock only, and only while it's on: the unlocked label is empty and
-	// style.css draws the block on the locked one.
-	// Needs read access to /dev/input (input group).
-	"keyboard-state": {
-		"capslock": true,
-		"format": "{icon}",
-		"format-icons": {
-			"locked": " \uf023 ON ",
-			"unlocked": ""
-		}
-	},
 
 	// temperature has no `states`, so the colour lives in the icon.
 	// Icon index = temp / (critical-threshold / 20) = temp / 5:
@@ -76,7 +63,7 @@
 		"thermal-zone": 0,
 		"critical-threshold": 100,
 		"interval": 1,
-		"format": " {icon} {temperatureC}ºC </span>",
+		"format": "{icon} {temperatureC}ºC</span>",
 		"format-icons": [
 			"<span color='#00FF00'>", "<span color='#00FF00'>",
 			"<span color='#00FF00'>", "<span color='#00FF00'>",
@@ -101,7 +88,7 @@
 		"path": "/",
 		"interval": 30,
 		"unit": "GiB",
-		"format": "  {percentage_used}% ",
+		"format": " {percentage_used}%",
 		"states": { "d0": 0, "d50": 50, "d65": 65, "d75": 75, "d85": 85, "d92": 92 },
 		"tooltip-format": "Used  {specific_used:0.0f}G\nFree  {specific_free:0.0f}G\nTotal {specific_total:0.0f}G"
 	},
@@ -110,7 +97,7 @@
 	// Click opens btop on its own workspace; click again there to close it.
 	"cpu": {
 		"interval": 1,
-		"format": "  {usage}% ",
+		"format": " {usage}%",
 		"states": { "c0": 0, "c10": 10, "c25": 25, "c50": 50, "c60": 60, "c70": 70 },
 		"on-click": "~/.local/bin/btop-toggle",
 		"tooltip": false
@@ -119,7 +106,7 @@
 	// Hover shows the actual amounts, in GiB.
 	"memory": {
 		"interval": 1,
-		"format": "  {percentage}% ",
+		"format": " {percentage}%",
 		"states": { "c0": 0, "c10": 10, "c25": 25, "c50": 50, "c60": 60, "c70": 70 },
 		"on-click": "~/.local/bin/btop-toggle",
 		"tooltip-format": "RAM  {used:0.1f} / {total:0.1f} GiB\nFree {avail:0.1f} GiB\nSwap {swapUsed:0.1f} / {swapTotal:0.1f} GiB"
@@ -130,7 +117,7 @@
 	"battery": {
 		"interval": 1,
 		"states": { "lt10": 9, "lt30": 29, "lt50": 49, "lt80": 79, "lt100": 99 },
-		"format": " {icon} {capacity}% ",
+		"format": "{icon} {capacity}%",
 		"format-time": "{H}h{M}m",
 		"format-icons": {
 			"charging": "󰂄",
@@ -150,61 +137,41 @@
 
 	"backlight": {
 		"device": "intel_backlight",
-		"format": " ☀️{percent}% ",
+		"format": "☀️{percent}%",
 		"tooltip": false
 	},
 
 	// Above 50% switches to the loud icon. Only the highest matching state
 	// applies, so high/over repeat the loud format; style.css colours them
 	// (mid only changes the colour, so it keeps the default format).
-	// Click toggles mute.
+	// Click opens the sound popup (what's playing, output and input, like
+	// Super+A), right click toggles mute, scrolling changes the volume.
 	"wireplumber": {
 		"states": { "mid": 31, "loud": 51, "high": 71, "over": 101 },
-		"format": "  {volume}% ",
-		"format-loud": "   {volume}% ",
-		"format-high": "   {volume}% ",
-		"format-over": "   {volume}% ",
-		"format-muted": "  {volume}% ",
-		"on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+		"format": " {volume}%",
+		"format-loud": "  {volume}%",
+		"format-high": "  {volume}%",
+		"format-over": "  {volume}%",
+		"format-muted": " {volume}%",
+		"on-click": "~/.local/bin/control-panel",
+		"on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
 		"tooltip": false
 	},
 
-	// The script prints the penguin.
-	// Hover shows the kernel version 
+	// The penguin; hover shows the kernel version. The script has to send
+	// some text, or waybar hides the module; the format replaces it.
 	"custom/kernel": {
- 		"exec": "printf '{\"tooltip\": \"Linux Kernel %s\"}\\n' \"$(uname -r)\"",
+		"exec": "printf '{\"text\": \"linux\", \"tooltip\": \"Linux Kernel %s\"}\\n' \"$(uname -r)\"",
 		"return-type": "json",
 		"interval": "once",
-		"format": " 🐧 "
+		"format": "🐧"
 	},
 
-	// A note while a song plays, dimmed while paused, and nothing (so hidden)
-	// when there's none. Quickshell writes it
-	// (config/quickshell/launcher/MediaPanel.qml) and signals SIGRTMIN+9 on
-	// a change. Click opens the music popup; scroll skips tracks.
-	"custom/media": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/media.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 9,
-		"escape": true,
-		"tooltip": false,
-		"on-click": "~/.local/bin/media-panel",
-		"on-scroll-up": "playerctl previous",
-		"on-scroll-down": "playerctl next"
-	},
-
-	// Date and time are separate modules so style.css can colour each
-	"clock#date": {
-		"format": " {:%a %d %b} ·",
-		"interval": 60,
-		"tooltip": false
-	},
-
-	"clock#time": {
-		"format": " {:%H:%M} ",
+	// Just the time, last on the bar; hover shows the date
+	"clock": {
+		"format": "{:%H:%M}",
 		"interval": 10,
-		"tooltip": false
+		"tooltip-format": "{:%A, %d %B %Y}"
 	},
 
 	// Opens the notification centre, like Super+Shift+N. Quickshell writes
@@ -220,16 +187,28 @@
 		"on-click": "~/.local/bin/notification-center"
 	},
 
-	// Opens the control panel, like Super+A: its sliders glyph
-	"custom/control-panel": {
-		"format": "\udb81\ude6a",
-		"tooltip": false,
-		"on-click": "~/.local/bin/control-panel"
+	// Replaces nm-applet's tray icon: signal bars on Wi-Fi, filling in with
+	// the strength (0-24, 25-49, 50-74, 75-100%), a cable on ethernet, and
+	// the bars struck through when off or disconnected. Hover
+	// shows the network; click opens the control panel's Network page.
+	"network": {
+		"interval": 5,
+		"format-wifi": "{icon}",
+		"format-icons": ["\udb82\udcbf", "\udb82\udcbc", "\udb82\udcbd", "\udb82\udcbe"],
+		"format-ethernet": "\udb80\ude00",
+		"format-linked": "\udb81\udf83",
+		"format-disconnected": "\udb81\udf83",
+		"format-disabled": "\udb81\udf83",
+		"tooltip-format-wifi": "{essid}  {signalStrength}%\n{ipaddr}",
+		"tooltip-format-ethernet": "Ethernet\n{ipaddr}",
+		"tooltip-format-disconnected": "Not connected",
+		"tooltip-format-disabled": "Wi-Fi off",
+		"on-click": "~/.local/bin/control-panel Network"
 	},
 
-	// Replaces blueman-applet. Hover lists connected devices;
-	// click toggles power (unblocking rfkill if needed), right click opens
-	// the manager for pairing.
+	// Replaces blueman-applet. Hover lists connected devices; click opens
+	// the control panel's Bluetooth page (its switch turns it on or off,
+	// unblocking rfkill if needed), right click opens blueman's manager.
 	"bluetooth": {
 		"format": "󰂯",
 		"format-connected": "󰂱",
@@ -242,12 +221,12 @@
 		"tooltip-format-connected": "{controller_alias}: {num_connections} connected\n{device_enumerate}",
 		"tooltip-format-enumerate-connected": "{device_alias}",
 		"tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%",
-		"on-click": "if rfkill list bluetooth | grep -q 'Soft blocked: yes'; then rfkill unblock bluetooth; sleep 1; bluetoothctl power on; elif bluetoothctl show | grep -q 'Powered: yes'; then bluetoothctl power off; else bluetoothctl power on; fi",
+		"on-click": "~/.local/bin/control-panel Bluetooth",
 		"on-click-right": "blueman-manager"
 	},
 
 	"tray": {
 		"icon-size": 21,
-		"spacing": 4
+		"spacing": 12
 	}
 }

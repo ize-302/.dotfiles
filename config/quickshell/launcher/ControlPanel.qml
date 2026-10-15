@@ -5,23 +5,38 @@ import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Io
 import Quickshell.Networking
+import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
 
-// Control panel: the glass panel of the other menus, floating just above the
-// bar by the right edge. The output and input volume, Wi-Fi and bluetooth.
-// Toggled by
-// ~/.local/bin/control-panel
-// (`qs -c launcher ipc call controlPanel toggleControlPanel`), Super+A or the
-// bar's button; `control-panel Network` opens it on that page. The
-// notifications have their own panel (NotificationCenter.qml).
+// The bar's popups for sound, Wi-Fi and bluetooth: the glass panel of the
+// other menus, floating just above the bar by the right edge. Its main view
+// is the sound popup: what's playing (MediaRow.qml), and the output and input
+// volume. Toggled by ~/.local/bin/control-panel
+// (`qs -c launcher ipc call controlPanel toggleControlPanel`), Super+A or a
+// click on the bar's volume; `control-panel Network` (the bar's Wi-Fi) and
+// `control-panel Bluetooth` (its bluetooth) open those pages on their own,
+// and going back from them closes the popup. The notifications have their
+// own panel (NotificationCenter.qml).
 //
 // Up and Down move between rows, Left and Right (or h and l) move the
-// selected slider, m mutes a volume, Enter mutes a volume, makes a device
+// selected slider or skip back and forward on what's playing, m mutes a
+// volume, Enter plays or pauses, mutes a volume, makes a device
 // the default, turns Wi-Fi or bluetooth on or off, or connects to a network
 // or device (asking for a new network's password), Delete forgets a network
 // or bluetooth device, and s searches for bluetooth devices.
+//
+// On the Network page, Right (or l, or the › on a row) opens a network's
+// details: its addresses, signal and security
+// (~/.local/bin/network-info), whether it connects by itself, and Connect or
+// Disconnect and Forget. "Join other network…" asks for the name and
+// password of a hidden one.
+//
+// On the Bluetooth page, the same opens a device's details: its type,
+// battery and address, Connect or Disconnect (or Pair), whether it
+// reconnects by itself, its audio profile for headphones and speakers
+// (~/.local/bin/bluetooth-audio), and Forget.
 //
 // The main view has a section per thing, split by lines, with just its
 // slider or switch. The lists (audio devices, networks,
@@ -34,6 +49,16 @@ Scope {
 
     property bool open: false
     property int current: 0
+    // The page it was opened on from the bar ("Network", "Bluetooth"), which
+    // closes it on going back, or "" for the sound popup
+    property string entryPage: ""
+
+    // The player to show: one that's playing, else one with a track,
+    // paused
+    readonly property MprisPlayer player: {
+        const players = Mpris.players.values.filter(player => player.trackTitle || player.isPlaying);
+        return players.find(player => player.isPlaying) ?? players[0] ?? null;
+    }
 
     readonly property list<PwNode> sinks: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSink)
     readonly property list<PwNode> sources: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSource)
@@ -49,14 +74,31 @@ Scope {
         const networks = wifiDevice.networks.values.filter(network => network.name);
         return networks.sort((a, b) => rank(a) - rank(b) || b.signalStrength - a.signalStrength).slice(0, Theme.maxNetworks);
     }
-    // The new network a password is being typed for, and why recent
-    // attempts failed (name -> ConnectionFailReason)
+    // The network a password is being typed for, and why recent attempts
+    // failed (name -> ConnectionFailReason)
     property WifiNetwork passwordFor: null
     property var failures: ({})
+    // A saved network's new password, for network-info's stdin
+    property string newPassword: ""
 
     // The section whose page is open, or "" for the main view; the main view
-    // each time the panel opens
+    // each time the panel opens. Also "Details" (a network's) and "Join" (a
+    // hidden network), which open from the Network page.
     property string page: ""
+
+    // The network whose details are open, and what network-info said
+    // about it
+    property WifiNetwork detailsFor: null
+    property var details: ({})
+    // The bluetooth device whose details are open, and its audio profiles
+    // from bluetooth-audio
+    property BluetoothDevice deviceFor: null
+    property var audio: ({})
+    // Joining a hidden network: the name typed, and what happened
+    property string joinName: ""
+    property string joinPassword: ""
+    property bool joinBusy: false
+    property string joinError: ""
 
     readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter
     readonly property bool bluetoothOn: adapter?.enabled ?? false
@@ -96,8 +138,23 @@ Scope {
                     node: node
                 });
         };
+        if (player)
+            rows.push({
+                section: "Now playing",
+                kind: "media",
+                player: player
+            });
         add("Output", sinks, Pipewire.defaultAudioSink);
         add("Input", sources, Pipewire.defaultAudioSource);
+        if (wifiDevice) {
+            // At the top of the page, which opens even while Wi-Fi is off
+            rows.push({
+                section: "Network",
+                kind: "wifi",
+                list: true
+            });
+        }
+        // Cables plugged in, under the switch
         for (const device of wiredDevices)
             rows.push({
                 section: "Network",
@@ -106,10 +163,6 @@ Scope {
                 device: device
             });
         if (wifiDevice) {
-            rows.push({
-                section: "Network",
-                kind: "wifi"
-            });
             for (const network of networks) {
                 rows.push({
                     section: "Network",
@@ -125,11 +178,20 @@ Scope {
                         network: network
                     });
             }
+            if (Networking.wifiEnabled)
+                rows.push({
+                    section: "Network",
+                    kind: "join",
+                    list: true
+                });
         }
         if (adapter) {
+            // At the top of the page, which opens even while bluetooth is
+            // off
             rows.push({
                 section: "Bluetooth",
-                kind: "bluetooth"
+                kind: "bluetooth",
+                list: true
             });
             for (const device of bluetoothDevices)
                 rows.push({
@@ -139,9 +201,250 @@ Scope {
                     device: device
                 });
         }
+        if (page === "Details")
+            return detailsRows();
+        if (page === "Device")
+            return deviceRows();
+        if (page === "Join")
+            return joinRows();
         // Sliders and switches are only on the main view; a page is just the
         // section's list
         return rows.filter(row => page === "" ? !row.list : row.section === page && row.list);
+    }
+
+    // A network's details page: what's known about it ({ kind: "info",
+    // label, value }), then Connect or Disconnect, the switch for joining it
+    // by itself, and Forget
+    function detailsRows() {
+        const network = detailsFor;
+        if (!network)
+            return [];
+        const section = network.name;
+        const rows = [];
+        const info = (label, value) => {
+            if (value)
+                rows.push({
+                    section: section,
+                    kind: "info",
+                    list: true,
+                    label: label,
+                    value: String(value)
+                });
+        };
+        info("Status", network.connected ? "Connected" : network.known ? "Saved" : "Not saved");
+        info("Signal", details.signal !== undefined ? details.signal + "%" : "");
+        info("Band", root.band(details.frequency));
+        info("Link speed", details.rate);
+        info("Security", details.security);
+        info("IP address", details.ip);
+        info("Gateway", details.gateway);
+        info("DNS", (details.dns ?? []).join(", "));
+        info("MAC address", details.mac);
+        rows.push({
+            section: section,
+            kind: "connect",
+            list: true,
+            network: network
+        });
+        if (details.uuid)
+            rows.push({
+                section: section,
+                kind: "autoconnect",
+                list: true
+            });
+        if (network.known)
+            rows.push({
+                section: section,
+                kind: "forget",
+                list: true,
+                network: network
+            });
+        return rows;
+    }
+
+    // A bluetooth device's page: what it is, then Connect, Disconnect or
+    // Pair, the switch for reconnecting by itself, its audio profiles
+    // ({ kind: "profile", name, label, codec }), and Forget
+    function deviceRows() {
+        const device = deviceFor;
+        if (!device)
+            return [];
+        const section = device.name || device.address;
+        const rows = [];
+        const info = (label, value) => {
+            if (value)
+                rows.push({
+                    section: section,
+                    kind: "info",
+                    list: true,
+                    label: label,
+                    value: String(value)
+                });
+        };
+        info("Type", root.deviceType(device.icon));
+        info("Status", device.connected ? "Connected" : device.paired ? "Paired" : "Not paired");
+        info("Battery", device.batteryAvailable ? Math.round(device.battery * 100) + "%" : "");
+        info("Address", device.address);
+        rows.push({
+            section: section,
+            kind: "btConnect",
+            list: true,
+            device: device
+        });
+        if (device.paired)
+            rows.push({
+                section: section,
+                kind: "btTrust",
+                list: true,
+                device: device
+            });
+        if (device.connected)
+            for (const profile of audio.profiles ?? [])
+                rows.push({
+                    section: section,
+                    kind: "profile",
+                    list: true,
+                    device: device,
+                    name: profile.name,
+                    label: profile.label,
+                    codec: profile.codec
+                });
+        if (device.paired)
+            rows.push({
+                section: section,
+                kind: "btForget",
+                list: true,
+                device: device
+            });
+        return rows;
+    }
+
+    // "audio-headset" -> "Headphones"
+    function deviceType(icon) {
+        const types = {
+            "audio-headset": "Headphones",
+            "audio-headphones": "Headphones",
+            "audio-card": "Speaker",
+            "input-keyboard": "Keyboard",
+            "input-mouse": "Mouse",
+            "input-tablet": "Tablet",
+            "input-gaming": "Game controller",
+            "phone": "Phone",
+            "computer": "Computer",
+            "camera-video": "Camera",
+            "printer": "Printer"
+        };
+        return types[icon] ?? "";
+    }
+
+    function openDevice(device) {
+        deviceFor = device;
+        audio = {};
+        page = "Device";
+        current = 0;
+        root.loadAudio();
+        pageSlide.direction = 1;
+        pageSlide.restart();
+    }
+
+    function loadAudio() {
+        if (!deviceFor?.connected)
+            return;
+        audioProcess.command = [Theme.bluetoothAudio, "show", deviceFor.address];
+        audioProcess.running = true;
+    }
+
+    function setProfile(name) {
+        audio = Object.assign({}, audio, {
+            active: name
+        });
+        Quickshell.execDetached([Theme.bluetoothAudio, "set", deviceFor.address, name]);
+    }
+
+    // The hidden network form: its name, its password, and how it went
+    function joinRows() {
+        const section = "Join other network";
+        const rows = [
+            {
+                section: section,
+                kind: "joinName",
+                list: true
+            },
+            {
+                section: section,
+                kind: "joinPassword",
+                list: true
+            }
+        ];
+        if (joinBusy || joinError)
+            rows.push({
+                section: section,
+                kind: "joinStatus",
+                list: true,
+                error: !joinBusy
+            });
+        return rows;
+    }
+
+    // "5280 MHz" -> "5 GHz"
+    function band(frequency) {
+        const mhz = parseInt(frequency ?? "");
+        if (!mhz)
+            return "";
+        return mhz >= 5925 ? "6 GHz" : mhz >= 4900 ? "5 GHz" : "2.4 GHz";
+    }
+
+    // Slides in from the right, like a section's page
+    function openDetails(network) {
+        detailsFor = network;
+        details = {};
+        page = "Details";
+        current = 0;
+        root.loadDetails();
+        pageSlide.direction = 1;
+        pageSlide.restart();
+    }
+
+    function loadDetails() {
+        if (!detailsFor)
+            return;
+        detailsProcess.command = [Theme.networkInfo, "show", detailsFor.name];
+        detailsProcess.running = true;
+    }
+
+    function setAutoconnect(on) {
+        if (!details.uuid)
+            return;
+        details = Object.assign({}, details, {
+            autoconnect: on
+        });
+        Quickshell.execDetached([Theme.networkInfo, "autoconnect", details.uuid, on ? "yes" : "no"]);
+    }
+
+    function openJoin() {
+        joinName = "";
+        joinPassword = "";
+        joinError = "";
+        page = "Join";
+        current = 0;
+        pageSlide.direction = 1;
+        pageSlide.restart();
+    }
+
+    // Puts the keys in the row's field, for the join form
+    function focusRow(index) {
+        current = index;
+        Qt.callLater(() => rowRepeater.itemAt(index)?.focusField());
+    }
+
+    // The password goes to network-info on its stdin, once it's running
+    function join() {
+        if (!joinName || joinBusy)
+            return;
+        joinBusy = true;
+        joinError = "";
+        joinProcess.command = [Theme.networkInfo, "join", joinName];
+        joinProcess.running = true;
     }
 
     function isSlider(row) {
@@ -200,11 +503,21 @@ Scope {
         }
     }
 
-    // Signal bars for a network, with a lock when it needs a password
+    // Signal bars for a network: an outline below 25%, then one to three
+    // filled, like the bar's
     function networkIcon(network) {
         const strength = network.signalStrength > 1 ? network.signalStrength / 100 : network.signalStrength;
         const bars = Math.max(0, Math.min(3, Math.floor(strength * 4)));
-        return (root.isSecured(network) ? Theme.wifiStrengthLockIcons : Theme.wifiStrengthIcons)[bars];
+        return Theme.wifiStrengthIcons[bars];
+    }
+
+    // The Wi-Fi switch's glyph: the connected network's bars, an outline
+    // when on but not connected, struck through when off
+    function wifiGlyph() {
+        if (!Networking.wifiEnabled)
+            return Theme.wifiOffIcon;
+        const connected = wifiDevice?.networks.values.find(network => network.connected);
+        return connected ? root.networkIcon(connected) : Theme.wifiStrengthIcons[0];
     }
 
     function isSecured(network) {
@@ -239,12 +552,36 @@ Scope {
         Qt.callLater(() => root.current = root.rows.findIndex(row => row.kind === "password"));
     }
 
+    // A new network connects with it; a saved one (its password was wrong,
+    // or has changed) gets it saved by network-info, then connects
     function submitPassword(password) {
         const network = passwordFor;
         passwordFor = null;
         list.forceActiveFocus();
-        if (network && password)
+        if (!network || !password)
+            return;
+        root.setFailure(network);
+        if (network.known) {
+            newPassword = password;
+            passwordProcess.command = [Theme.networkInfo, "password", network.name];
+            passwordProcess.running = true;
+        } else {
             network.connectWithPsk(password);
+        }
+    }
+
+    // A connection failed: shown on its row. One that wants a password
+    // (none saved, or the saved one is wrong) asks for it on the Network
+    // page, opening the panel if it's closed, as nm-applet's dialog did.
+    function connectionFailed(network, reason) {
+        root.setFailure(network, reason);
+        if (reason !== ConnectionFailReason.NoSecrets && reason !== ConnectionFailReason.WifiAuthTimeout)
+            return;
+        if (!open)
+            open = true;
+        if (page !== "Network")
+            root.openPage("Network");
+        root.askPassword(network);
     }
 
     function cancelPassword() {
@@ -252,15 +589,15 @@ Scope {
         list.forceActiveFocus();
     }
 
-    // Sections with a page: audio devices, and networks and
-    // bluetooth devices while they're on
+    // Sections with a page: audio devices, and Wi-Fi and bluetooth (their
+    // pages have their switches)
     function hasPage(section) {
         if (section === "Output" || section === "Input")
             return true;
         if (section === "Network")
-            return Networking.wifiEnabled;
+            return wifiDevice !== null || wiredDevices.length > 0;
         if (section === "Bluetooth")
-            return bluetoothOn;
+            return adapter !== null;
         return false;
     }
 
@@ -274,11 +611,31 @@ Scope {
         pageSlide.restart();
     }
 
-    // Back to the main view, on the section's row
+    // Back to the main view, on the section's row; from a network's details
+    // or the join form, back to the Network page, and from a device's,
+    // the Bluetooth page
     function closePage() {
         const section = page;
-        page = "";
-        current = Math.max(0, rows.findIndex(row => row.section === section));
+        // Opened on this page from the bar: nothing to go back to
+        if (section === entryPage) {
+            open = false;
+            return;
+        }
+        if (section === "Device") {
+            const device = deviceFor;
+            page = "Bluetooth";
+            deviceFor = null;
+            current = Math.max(0, rows.findIndex(row => row.device === device));
+        } else if (section === "Details" || section === "Join") {
+            const network = detailsFor;
+            page = "Network";
+            detailsFor = null;
+            current = Math.max(0, rows.findIndex(row => section === "Join" ? row.kind === "join" : row.network === network));
+            list.forceActiveFocus();
+        } else {
+            page = "";
+            current = Math.max(0, rows.findIndex(row => row.section === section));
+        }
         pageSlide.direction = -1;
         pageSlide.restart();
     }
@@ -294,6 +651,11 @@ Scope {
             return wiredDevices.some(device => device.connected) ? "Ethernet" : wifiDevice?.networks.values.find(network => network.connected)?.name ?? "";
         if (section === "Bluetooth")
             return bluetoothDevices.filter(device => device.connected).map(device => device.name).join(", ");
+        if (section === "Now playing") {
+            // "Mozilla zen" -> "Zen"
+            const name = (player?.identity ?? "").replace(/^Mozilla /, "");
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
         return "";
     }
 
@@ -304,7 +666,9 @@ Scope {
     }
 
     function activate(row) {
-        if (row.kind === "device") {
+        if (row.kind === "media") {
+            row.player.togglePlaying();
+        } else if (row.kind === "device") {
             if (row.node.type === PwNodeType.AudioSink)
                 Pipewire.preferredDefaultAudioSink = row.node;
             else
@@ -324,6 +688,28 @@ Scope {
                 row.device.disconnect();
             else
                 row.device.network?.connect();
+        } else if (row.kind === "join") {
+            root.openJoin();
+        } else if (row.kind === "connect") {
+            root.toggleNetwork(row.network);
+            if (row.network.connected || row.network.known || !root.isSecured(row.network))
+                return;
+            // A new secured network asks for its password on the Network page
+            root.closePage();
+        } else if (row.kind === "autoconnect") {
+            root.setAutoconnect(!details.autoconnect);
+        } else if (row.kind === "forget") {
+            row.network.forget();
+            root.closePage();
+        } else if (row.kind === "btConnect") {
+            root.toggleDevice(row.device);
+        } else if (row.kind === "btTrust") {
+            row.device.trusted = !row.device.trusted;
+        } else if (row.kind === "profile") {
+            root.setProfile(row.name);
+        } else if (row.kind === "btForget") {
+            row.device.forget();
+            root.closePage();
         }
     }
 
@@ -335,7 +721,10 @@ Scope {
         if (open) {
             page = "";
         } else {
+            entryPage = "";
             passwordFor = null;
+            detailsFor = null;
+            deviceFor = null;
             if (adapter?.discovering)
                 adapter.discovering = false;
         }
@@ -344,26 +733,144 @@ Scope {
     IpcHandler {
         target: "controlPanel"
 
+        // The sound popup; again closes it. From another page, switches.
         function toggleControlPanel(): void {
-            root.open = !root.open;
+            if (root.open && root.page === "") {
+                root.open = false;
+                return;
+            }
+            root.entryPage = "";
+            root.page = "";
+            root.current = 0;
+            root.open = true;
         }
 
         // Opens it on the main view, whatever it showed before
         function showControlPanel(): void {
-            if (root.page !== "")
-                root.closePage();
+            root.entryPage = "";
+            root.page = "";
             root.open = true;
         }
 
-        // Opens the panel on a section's page ("Output", "Network", ...)
-        // Again on the same page closes it
+        // Opens the panel on a section's page ("Network", "Bluetooth", ...)
+        // on its own. Again on the same page closes it.
         function openSection(section: string): void {
             if (root.open && root.page === section) {
                 root.open = false;
                 return;
             }
             root.open = true;
+            root.entryPage = section;
             root.openPage(section);
+        }
+    }
+
+    Process {
+        id: detailsProcess
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.details = JSON.parse(text);
+                } catch (error) {}
+            }
+        }
+    }
+
+    // Again while the details are open: signal, and addresses once it
+    // connects
+    Timer {
+        running: root.open && root.page === "Details"
+        repeat: true
+        interval: 4000
+        onTriggered: if (!detailsProcess.running)
+            root.loadDetails()
+    }
+
+    Process {
+        id: audioProcess
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.audio = JSON.parse(text);
+                } catch (error) {}
+            }
+        }
+    }
+
+    // A device that connects (or switches profile) while its page is open
+    Connections {
+        target: root.deviceFor
+
+        function onConnectedChanged() {
+            root.loadAudio();
+        }
+    }
+
+    Timer {
+        running: root.open && root.page === "Device" && (root.deviceFor?.connected ?? false)
+        repeat: true
+        interval: 4000
+        onTriggered: if (!audioProcess.running)
+            root.loadAudio()
+    }
+
+    // Every network nearby, not just the ones listed, so a saved network
+    // failing on its own (its password changed) asks too
+    Instantiator {
+        model: root.wifiDevice ? root.wifiDevice.networks.values : []
+
+        delegate: Connections {
+            required property WifiNetwork modelData
+
+            target: modelData
+
+            function onConnectionFailed(reason) {
+                root.connectionFailed(modelData, reason);
+            }
+        }
+    }
+
+    Process {
+        id: passwordProcess
+
+        stdinEnabled: true
+
+        onStarted: {
+            write(root.newPassword + "\n");
+            root.newPassword = "";
+        }
+    }
+
+    Process {
+        id: joinProcess
+
+        stdinEnabled: true
+
+        onStarted: {
+            write(root.joinPassword + "\n");
+            root.joinPassword = "";
+        }
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.joinBusy = false;
+                let result = {};
+                try {
+                    result = JSON.parse(text);
+                } catch (error) {
+                    result = {
+                        error: "Couldn't join"
+                    };
+                }
+                if (result.ok) {
+                    if (root.page === "Join")
+                        root.closePage();
+                } else {
+                    root.joinError = result.error || "Couldn't join";
+                }
+            }
         }
     }
 
@@ -463,6 +970,10 @@ Scope {
                         root.openPage(row.section);
                     } else if (event.key === Qt.Key_S && root.page === "Bluetooth") {
                         root.toggleSearch();
+                    } else if (row.kind === "media" && (event.key === Qt.Key_Right || event.key === Qt.Key_L)) {
+                        row.player.next();
+                    } else if (row.kind === "media" && (event.key === Qt.Key_Left || event.key === Qt.Key_H)) {
+                        row.player.previous();
                     } else if (event.key === Qt.Key_M && row.kind === "volume") {
                         root.toggleMute(row);
                     } else if (event.key === Qt.Key_Delete && row.kind === "bluetoothDevice" && row.device.paired) {
@@ -473,6 +984,10 @@ Scope {
                         root.current = (root.current + 1) % count;
                     } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Backtab || event.key === Qt.Key_K || (ctrl && event.key === Qt.Key_P)) {
                         root.current = (root.current + count - 1) % count;
+                    } else if (root.page === "Network" && row.kind === "network" && (event.key === Qt.Key_Right || event.key === Qt.Key_L)) {
+                        root.openDetails(row.network);
+                    } else if (root.page === "Bluetooth" && row.kind === "bluetoothDevice" && (event.key === Qt.Key_Right || event.key === Qt.Key_L)) {
+                        root.openDevice(row.device);
                     } else if (!root.isSlider(row) && root.page === "" && (event.key === Qt.Key_Right || event.key === Qt.Key_L)) {
                         root.openPage(row.section);
                     } else if (!root.isSlider(row) && root.page !== "" && (event.key === Qt.Key_Left || event.key === Qt.Key_H)) {
@@ -488,6 +1003,8 @@ Scope {
                 }
 
                 Repeater {
+                    id: rowRepeater
+
                     model: root.rows
 
                     ControlRow {

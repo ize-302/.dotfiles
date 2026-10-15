@@ -70,16 +70,17 @@ window#waybar {
 }
 
 /* Binding mode indicator (swaybar defaults) */
-/* The caps lock block's red */
+/* Bright red, so resize mode stands out */
 #mode {
   padding: 0 6px;
   background-color: #ff5555;
   color: #15161e;
 }
 
-/* Status blocks, separated by a thin line */
-#custom-kernel,
-#keyboard-state label.locked,
+/* Every module on the right the same distance apart, with no separators:
+   12px each side (formats have no spaces at their ends). The tray's icons
+   are closer, 12px apart (config.jsonc), as one group. */
+#tray,
 #temperature,
 #disk,
 #cpu,
@@ -87,21 +88,12 @@ window#waybar {
 #battery,
 #backlight,
 #wireplumber,
-#clock {
-  padding: 0 4px;
-  margin: 4px 0;
-  border-right: 1px solid #414868;
-}
-
-/* Only drawn while caps lock is on */
-#keyboard-state label.locked {
-  color: #ff5555;
-}
-
-/* Kernel icon is a colour emoji, so no text colour applies. The emoji has
-   its own side spacing, so the block padding is dropped to keep gaps even. */
+#network,
+#bluetooth,
+#custom-notifications,
+#clock,
 #custom-kernel {
-  padding: 0;
+  padding: 0 12px;
 }
 
 /* CPU / memory usage colours (states: value >= threshold) */
@@ -199,69 +191,46 @@ window#waybar {
   color: rgba(192, 202, 245, 0.2);
 }
 
-/* The music note, in the selection blue; dimmed while paused. Beside the
-   bluetooth glyph and the bell, so no separator */
-#custom-media {
-  padding: 0 8px 0 2px;
-  color: #b0b0b2;
-}
-#custom-media.paused {
-  color: #565f89;
-}
-#custom-media:hover {
-  color: #c0caf5;
-}
-
+/* The time, after the bell */
 #clock {
-  color: #b0b0b2;
-  margin-right: 6px;
-}
-/* Date and time read as one block: no separator or gap between them */
-#clock.date {
   color: #c0caf5;
-  padding-right: 0;
-  margin-right: 0;
-  border-right: none;
-}
-#clock.time {
-  color: #c0caf5;
-  padding-left: 0;
 }
 
-/* Notification bell and control panel button, after the bluetooth glyph,
-   so no separator either */
+/* Wi-Fi, bluetooth and the notification bell, in the time's colour; grey
+   when off, disconnected or in do not disturb */
 #custom-notifications {
-  padding: 0 8px 0 2px;
-  color: #b0b0b2;
+  color: #c0caf5;
 }
 #custom-notifications.dnd {
   color: #808080;
 }
-#custom-control-panel {
-  padding: 0 8px 0 2px;
-  color: #b0b0b2;
-}
-#custom-notifications:hover,
-#custom-control-panel:hover {
-  color: #c0caf5;
+#custom-notifications:hover {
+  color: #ffffff;
 }
 
-/* Bluetooth sits beside the tray icons, so no separator */
 #bluetooth {
-  padding: 0 10px 0 0px;
-  color: #b0b0b2;
+  color: #c0caf5;
+}
+#network {
+  color: #c0caf5;
+}
+#network.disconnected,
+#network.linked,
+#network.disabled {
+  color: #808080;
+}
+#network:hover,
+#bluetooth:hover {
+  color: #ffffff;
 }
 #bluetooth.off,
 #bluetooth.disabled {
   color: #808080;
 }
 
-#tray {
-  padding: 0 6px 0 0px;
-}
 /* Tray icons are images, so CSS can't recolour them; dim to match #a9b1d6 */
-#tray image {
-  opacity: 0.77;
+#tray {
+  background-color: rgba(192, 202, 245, 0.06);
 }
 
 /* Hover popups: flat panel, no border. The GTK theme would otherwise add its
@@ -277,8 +246,4 @@ tooltip label {
   font-size: 11pt;
   font-weight: 400;
   padding: 4px;
-}
-
-.modules-right {
-  background-color: rgba(192, 202, 245, 0.03);
 }

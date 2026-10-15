@@ -16,6 +16,12 @@ if ! pacman -Q adw-gtk-theme >/dev/null 2>&1; then
   sudo pacman -S --needed adw-gtk-theme
 fi
 
+# The launcher's bluetooth pairing agent (home/.local/bin/bluetooth-agent)
+if ! pacman -Q python-dbus python-gobject >/dev/null 2>&1; then
+  echo "[+] Installing python-dbus and python-gobject..."
+  sudo pacman -S --needed python-dbus python-gobject
+fi
+
 mkdir -p "$HOME/.config"
 stow --adopt -v -t "$HOME/.config" config
 stow --adopt -v -t "$HOME" home

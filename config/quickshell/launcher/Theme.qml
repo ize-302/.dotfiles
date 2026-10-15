@@ -142,15 +142,19 @@ Singleton {
     // when off or muted
     readonly property color controlIconColor: keyTextColor
     readonly property color controlIconOffColor: dimColor
-    // Wi-Fi: on, off, and signal bars (weak to strong), with a lock for
-    // networks that need a password
-    readonly property string wifiIcon: String.fromCodePoint(0xf05a9)
-    readonly property string wifiOffIcon: String.fromCodePoint(0xf05aa)
-    readonly property list<string> wifiStrengthIcons: [0xf091f, 0xf0922, 0xf0925, 0xf0928].map(code => String.fromCodePoint(code))
-    readonly property list<string> wifiStrengthLockIcons: [0xf0921, 0xf0924, 0xf0927, 0xf092a].map(code => String.fromCodePoint(code))
+    // Wi-Fi: signal bars (an outline, then one to three filled), like the
+    // bar's network module (config/waybar/config.jsonc); struck through
+    // when off. A lock beside them for networks that need a password.
+    readonly property list<string> wifiStrengthIcons: [0xf08bf, 0xf08bc, 0xf08bd, 0xf08be].map(code => String.fromCodePoint(code))
+    readonly property string wifiOffIcon: String.fromCodePoint(0xf0783)
+    readonly property string lockIcon: String.fromCodePoint(0xf033e)
     // Networks listed at most; the rest are further away
     readonly property int maxNetworks: 6
     readonly property string passwordPlaceholder: "Password"
+    // Network details and joining hidden networks, with nmcli
+    readonly property string networkInfo: Quickshell.env("HOME") + "/.local/bin/network-info"
+    // A bluetooth device's audio profiles, with pactl
+    readonly property string bluetoothAudio: Quickshell.env("HOME") + "/.local/bin/bluetooth-audio"
     // On/off switch
     readonly property int toggleWidth: 30
     readonly property int toggleHeight: 18
@@ -167,9 +171,14 @@ Singleton {
     // Marks what's in use or connected
     readonly property string checkIcon: "\uf00c"
 
-    // The music popup
-    // (MediaPanel.qml, MediaRow.qml)
-    readonly property int mediaPanelWidth: 360
+    // Bluetooth pairing prompt (BluetoothAgent.qml): the code's digits as
+    // key caps, and the buttons
+    readonly property int pairingWidth: 400
+    readonly property int pairingCodeSize: 20
+    readonly property int pairingButtonWidth: 80
+    readonly property int pairingButtonHeight: 30
+
+    // The sound popup's Now playing (ControlPanel.qml, MediaRow.qml)
     readonly property int mediaArtSize: 48
     readonly property int mediaButtonSize: 26
     readonly property int mediaPlaySize: 30
@@ -178,6 +187,18 @@ Singleton {
     readonly property string nextIcon: String.fromCodePoint(0xf04ad)
     readonly property string playIcon: String.fromCodePoint(0xf040a)
     readonly property string pauseIcon: String.fromCodePoint(0xf03e4)
+
+    // Caps lock popup (CapsLock.qml): a square in the middle of the screen,
+    // with macOS's ⇪, for a moment after each switch. How often the
+    // keyboards' lights are read, in ms.
+    readonly property int capsLockSize: 110
+    readonly property int capsLockRadius: 12
+    readonly property int capsLockTimeout: 1200
+    readonly property int capsLockPoll: 150
+    readonly property string capsLockIcon: String.fromCodePoint(0xf0632)
+    // Fainter than the menus' glass, and its edge
+    readonly property color capsLockColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.55)
+    readonly property color capsLockEdgeColor: Qt.rgba(1, 1, 1, 0.08)
 
     // Volume popup: floats above the bar while the volume changes
     readonly property int osdWidth: 320
@@ -241,8 +262,6 @@ Singleton {
     readonly property string doNotDisturbIcon: String.fromCodePoint(0xf009b)
     // Do not disturb "until morning" ends at this hour
     readonly property int doNotDisturbMorning: 8
-    // The bar's control panel button (config/waybar/config.jsonc)
-    readonly property string controlPanelIcon: String.fromCodePoint(0xf066a)
 
     readonly property int animationDuration: 120
 

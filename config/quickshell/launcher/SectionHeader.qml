@@ -16,6 +16,8 @@ Item {
     property bool opensPage: false
     property bool line: true
     property bool back: false
+    // A page's title with its back chevron; off for one that closes
+    property bool arrow: true
     // Space from the edges to the text
     property int inset: Theme.rowPadding
     // Size of a page's title
@@ -34,7 +36,7 @@ Item {
         id: backIcon
         x: header.inset
         anchors.verticalCenter: label.verticalCenter
-        visible: header.back
+        visible: header.back && header.arrow
         text: Theme.backIcon
         color: mouse.containsMouse ? Theme.textColor : Theme.dimColor
         font.family: Theme.fontFamily
@@ -45,7 +47,7 @@ Item {
     // sits low, by the row under it
     Text {
         id: label
-        x: header.back ? backIcon.x + backIcon.width + Theme.iconSpacing : header.inset
+        x: header.back && header.arrow ? backIcon.x + backIcon.width + Theme.iconSpacing : header.inset
         y: header.back ? (header.height - Theme.searchPadding - height) / 2 : header.height - height - Theme.rowSpacing
         text: header.back ? header.text : header.text.toUpperCase()
         color: header.back ? Theme.textColor : Theme.dimColor

@@ -12,15 +12,16 @@ import qs
 // daemon serves the power menu (PowerMenu.qml), the clipboard menu
 // (ClipboardMenu.qml), the scratchpad menu (ScratchpadMenu.qml), the key
 // bindings menu (KeybindMenu.qml), the control panel (ControlPanel.qml), the
-// notification centre (NotificationCenter.qml), the music popup
-// (MediaPanel.qml), the volume popup (Osd.qml) and the notifications
-// (Notifications.qml).
+// notification centre (NotificationCenter.qml), the volume popup (Osd.qml),
+// the notifications
+// (Notifications.qml), the bluetooth pairing prompts (BluetoothAgent.qml)
+// and the caps lock popup (CapsLock.qml).
 ShellRoot {
     id: root
 
     // Desktop entry id -> times launched. Most used apps are listed first.
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, mediaPanel]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter]
     readonly property bool anyOpen: menus.some(menu => menu.open)
 
     // The menus share the corner, so only one is open at a time
@@ -153,12 +154,6 @@ ShellRoot {
             root.closeOthers(controlPanel)
     }
 
-    MediaPanel {
-        id: mediaPanel
-        onOpenChanged: if (open)
-            root.closeOthers(mediaPanel)
-    }
-
     NotificationCenter {
         id: notificationCenter
         server: notifications
@@ -166,13 +161,17 @@ ShellRoot {
             root.closeOthers(notificationCenter)
     }
 
+    BluetoothAgent {}
+
+    CapsLock {}
+
     Osd {
         suppressed: controlPanel.open
     }
 
     Notifications {
         id: notifications
-        suppressed: controlPanel.open || notificationCenter.open || mediaPanel.open
+        suppressed: controlPanel.open || notificationCenter.open
     }
 
     IpcHandler {
