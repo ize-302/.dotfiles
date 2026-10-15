@@ -31,6 +31,10 @@ Scope {
     property bool suppressed: false
     // Do not disturb: no cards, except critical ones
     property bool doNotDisturb: false
+    // How long for: "hour", "morning" (until doNotDisturbMorning o'clock),
+    // or "" until it's turned off; and when it ends (ms, 0 for never)
+    property string doNotDisturbFor: ""
+    property real doNotDisturbUntil: 0
     // Cards on screen, newest first
     property list<Notification> popups: []
 
@@ -42,6 +46,29 @@ Scope {
     // for "5m ago"
     property var receivedAt: ({})
     property real now: Date.now()
+
+    // Turns do not disturb on for an hour, until morning, or ("") until
+    // it's turned off
+    function setDoNotDisturb(duration) {
+        const end = new Date();
+        if (duration === "hour") {
+            end.setTime(end.getTime() + 3600000);
+        } else if (duration === "morning") {
+            if (end.getHours() >= Theme.doNotDisturbMorning)
+                end.setDate(end.getDate() + 1);
+            end.setHours(Theme.doNotDisturbMorning, 0, 0, 0);
+        }
+        doNotDisturb = true;
+        doNotDisturbFor = duration;
+        doNotDisturbUntil = duration ? end.getTime() : 0;
+    }
+
+    // "17:20", "08:00", or "" when it doesn't end
+    function doNotDisturbEnd() {
+        if (!doNotDisturb || doNotDisturbUntil === 0)
+            return "";
+        return Qt.formatTime(new Date(doNotDisturbUntil), "HH:mm");
+    }
 
     // The centre's been looked at
     function markRead() {
@@ -160,8 +187,12 @@ Scope {
 
     // Cards already up go too, except critical ones
     onDoNotDisturbChanged: {
-        if (doNotDisturb)
+        if (doNotDisturb) {
             popups = popups.filter(popup => root.isCritical(popup));
+        } else {
+            doNotDisturbFor = "";
+            doNotDisturbUntil = 0;
+        }
         root.writeStatus();
     }
     onUnreadChanged: root.writeStatus()
@@ -185,6 +216,11 @@ Scope {
             root.doNotDisturb = !root.doNotDisturb;
         }
 
+        // "hour", "morning", or "" for until it's turned off
+        function doNotDisturbFor(duration: string): void {
+            root.setDoNotDisturb(duration);
+        }
+
         function clear(): void {
             root.clear();
         }
@@ -203,6 +239,16 @@ Scope {
         repeat: true
         interval: 30000
         onTriggered: root.now = Date.now()
+    }
+
+    // Ends a timed do not disturb. Checks the clock rather than waiting out
+    // the time, which a suspend would stretch.
+    Timer {
+        running: root.doNotDisturbUntil > 0
+        repeat: true
+        interval: 15000
+        onTriggered: if (Date.now() >= root.doNotDisturbUntil)
+            root.doNotDisturb = false
     }
 
     NotificationServer {
@@ -239,7 +285,7 @@ Scope {
             bottom: true
             right: true
         }
-        margins.bottom: Theme.floatingBarGap
+        margins.bottom: Theme.floatingGap
         margins.right: Theme.floatingGap
 
         Column {

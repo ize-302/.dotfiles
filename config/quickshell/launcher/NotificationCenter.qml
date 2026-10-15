@@ -14,9 +14,11 @@ import qs
 // (`qs -c launcher ipc call notificationCenter toggleNotificationCenter`),
 // Super+Shift+N or the bar's bell.
 //
-// The title has a do not disturb key cap and Clear. Up and Down (or j and
-// k) move between notifications, Enter runs one's default action, Delete
-// dismisses it, c clears them all, d turns do not disturb on or off, and
+// The title has a do not disturb key cap and Clear; while do not disturb is
+// on, a row under it says how long for: an hour, until morning, or until
+// it's turned off. Up and Down (or j and k) move between notifications,
+// Enter runs one's default action, Delete dismisses it, c clears them all,
+// d turns do not disturb on or off (h for an hour, m until morning), and
 // Escape closes it. Scrolls when there are more than fit.
 Scope {
     id: root
@@ -110,7 +112,7 @@ Scope {
             bottom: true
             right: true
         }
-        margins.bottom: Theme.floatingBarGap
+        margins.bottom: Theme.floatingGap
         margins.right: Theme.floatingGap
 
         onVisibleChanged: {
@@ -147,6 +149,10 @@ Scope {
                         root.open = false;
                     } else if (event.key === Qt.Key_D && root.server) {
                         root.toggleDoNotDisturb();
+                    } else if (event.key === Qt.Key_H && root.server) {
+                        root.server.setDoNotDisturb("hour");
+                    } else if (event.key === Qt.Key_M && root.server) {
+                        root.server.setDoNotDisturb("morning");
                     } else if (count === 0) {
                         return;
                     } else if (event.key === Qt.Key_C) {
@@ -240,6 +246,66 @@ Scope {
                         width: parent.width
                         height: 1
                         color: Theme.dividerColor
+                    }
+                }
+
+                // How long do not disturb lasts, while it's on: the choice
+                // lit blue like the bell's cap, and when it ends
+                Item {
+                    visible: root.server?.doNotDisturb ?? false
+                    width: parent.width
+                    height: Theme.rowHeight
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: (root.server?.doNotDisturbEnd() ?? "") ? "Ends " + root.server.doNotDisturbEnd() : "Do not disturb"
+                        color: Theme.dimColor
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.controlSmallFontSize
+                        font.weight: Theme.fontWeight
+                    }
+
+                    Row {
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.keySpacing
+
+                        Repeater {
+                            model: [
+                                {
+                                    duration: "hour",
+                                    text: "1 hour"
+                                },
+                                {
+                                    duration: "morning",
+                                    text: "Until morning"
+                                },
+                                {
+                                    duration: "",
+                                    text: "Until off"
+                                }
+                            ]
+
+                            KeyCap {
+                                id: durationCap
+
+                                required property var modelData
+
+                                text: modelData.text
+                                fontSize: Theme.controlSmallFontSize
+                                lit: (root.server?.doNotDisturbFor ?? "") === modelData.duration || durationMouse.containsMouse
+                                litTextColor: (root.server?.doNotDisturbFor ?? "") === modelData.duration ? Theme.selectedColor : Theme.textColor
+
+                                MouseArea {
+                                    id: durationMouse
+                                    anchors.fill: parent
+                                    anchors.margins: -2
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: root.server.setDoNotDisturb(durationCap.modelData.duration)
+                                }
+                            }
+                        }
                     }
                 }
 

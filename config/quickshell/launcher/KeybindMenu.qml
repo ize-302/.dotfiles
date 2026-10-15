@@ -10,15 +10,21 @@ import qs
 // just above the bar, the groups in two columns, scrolling when
 // they don't fit. Toggled by
 // ~/.local/bin/keybind-menu (`qs -c launcher ipc call keybinds toggleKeybindMenu`).
-// Read only: Escape or Enter closes it.
+//
+// Typing searches: only the rows whose description, group or keys have
+// every word typed stay (a group's name keeps all its rows). Up, Down,
+// Page Up, Page Down, Ctrl+J and Ctrl+K scroll. Escape clears the search,
+// or closes the sheet when there's none; Enter closes it.
 Scope {
     id: root
 
     property bool open: false
     // One per group: { name, rows: [{ label, keys: [{ text, cap }] }] }
     property var groups: []
-    // The groups split in two, left and right
-    readonly property var columns: root.split(root.groups)
+    property string query: ""
+    // The groups split in two, left and right, then searched; a column left
+    // with nothing goes
+    readonly property var columns: root.split(root.groups).map(column => root.search(column, root.query)).filter(column => column.length > 0)
 
     readonly property var keyNames: ({
             "Mod4": "Super",
@@ -172,6 +178,18 @@ Scope {
         return row.modifiers.map(cap).concat(ends);
     }
 
+    // The groups with only their rows that match every word of the query
+    function search(groups, query) {
+        const words = query.toLowerCase().split(/\s+/).filter(word => word);
+        if (words.length === 0)
+            return groups;
+        const matches = text => words.every(word => text.toLowerCase().includes(word));
+        return groups.map(group => ({
+                    name: group.name,
+                    rows: matches(group.name) ? group.rows : group.rows.filter(row => matches([group.name, row.label].concat(row.keys.map(key => key.text)).join(" ")))
+                })).filter(group => group.rows.length > 0);
+    }
+
     // Two columns about as tall as each other, the groups kept whole and in
     // order; the sheet scrolls when they don't fit
     function split(groups) {
@@ -238,7 +256,7 @@ Scope {
         // With the drop shadow (`layer_effects "launcher-shadow"` in sway).
         // Only the bottom anchored: the layer shell centres it across.
         anchors.bottom: true
-        margins.bottom: Theme.floatingBarGap
+        margins.bottom: Theme.floatingGap
 
         WlrLayershell.namespace: "launcher-shadow"
         WlrLayershell.layer: WlrLayer.Overlay
@@ -248,6 +266,7 @@ Scope {
             if (!visible)
                 return;
 
+            input.text = "";
             scroller.contentY = 0;
             input.forceActiveFocus();
             panel.appear();
@@ -256,35 +275,36 @@ Scope {
         Glass {
             id: panel
 
+            // As wide and tall as the whole sheet, kept while searching so
+            // the panel doesn't shrink under the typing
+            property real lockedWidth: 0
+            property real lockedHeight: 0
+
             floating: true
             cornerRadius: Theme.keybindRadius
-            width: Math.max(sheet.width, title.implicitWidth) + Theme.keybindPadding * 2
+            width: Math.max(sheet.width, title.implicitWidth, lockedWidth) + Theme.keybindPadding * 2
             height: bar.height + scroller.height + Theme.keybindPadding
 
-            Item {
-                id: input
+            Connections {
+                target: sheet
 
-                Keys.onPressed: event => {
-                    const step = Theme.keybindRowHeight * 3;
-                    const end = Math.max(0, scroller.contentHeight - scroller.height);
-
-                    if (event.key === Qt.Key_Escape || event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Q)
-                        root.open = false;
-                    else if (event.key === Qt.Key_Down || event.key === Qt.Key_J)
-                        scroller.contentY = Math.min(scroller.contentY + step, end);
-                    else if (event.key === Qt.Key_Up || event.key === Qt.Key_K)
-                        scroller.contentY = Math.max(scroller.contentY - step, 0);
-                    else if (event.key === Qt.Key_PageDown)
-                        scroller.contentY = Math.min(scroller.contentY + scroller.height, end);
-                    else if (event.key === Qt.Key_PageUp)
-                        scroller.contentY = Math.max(scroller.contentY - scroller.height, 0);
-                    else
-                        return;
-                    event.accepted = true;
+                function onWidthChanged() {
+                    if (root.query === "")
+                        panel.lockedWidth = sheet.width;
                 }
             }
 
-            // Title bar: the title in the middle
+            Connections {
+                target: scroller
+
+                function onFittedHeightChanged() {
+                    if (root.query === "")
+                        panel.lockedHeight = scroller.fittedHeight;
+                }
+            }
+
+            // Title bar: the title in the middle, the search field in the
+            // top right corner
             Item {
                 id: bar
 
@@ -300,6 +320,84 @@ Scope {
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.searchFontSize
                     font.weight: Font.Bold
+                }
+
+                // A small field, tinted like the key caps, outlined while
+                // there's a search
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.keybindPadding
+                    anchors.verticalCenter: title.verticalCenter
+                    width: Theme.keybindSearchWidth
+                    height: Theme.keyHeight + 6
+                    radius: Theme.cornerRadius
+                    color: Theme.keyColor
+                    border.width: 1
+                    border.color: input.text !== "" ? Theme.keyTextColor : Theme.dividerColor
+
+                    Row {
+                        anchors.fill: parent
+                        anchors.leftMargin: Theme.keyPadding
+                        anchors.rightMargin: Theme.keyPadding
+                        spacing: Theme.keySpacing * 2
+
+                        Text {
+                            id: searchIcon
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: Theme.searchIcon
+                            color: Theme.dimColor
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.keybindFontSize - 1
+                        }
+
+                        TextInput {
+                            id: input
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - searchIcon.width - parent.spacing
+                            color: Theme.textColor
+                            selectionColor: Theme.dividerColor
+                            selectedTextColor: Theme.textColor
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.keybindFontSize - 1
+                            font.weight: Theme.fontWeight
+                            clip: true
+
+                            onTextChanged: {
+                                root.query = text;
+                                scroller.contentY = 0;
+                            }
+
+                            Keys.onPressed: event => {
+                                const ctrl = event.modifiers & Qt.ControlModifier;
+                                const step = Theme.keybindRowHeight * 3;
+                                const end = Math.max(0, scroller.contentHeight - scroller.height);
+
+                                if (event.key === Qt.Key_Escape && text !== "")
+                                    text = "";
+                                else if (event.key === Qt.Key_Escape || event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                                    root.open = false;
+                                else if (event.key === Qt.Key_Down || (ctrl && event.key === Qt.Key_J))
+                                    scroller.contentY = Math.min(scroller.contentY + step, end);
+                                else if (event.key === Qt.Key_Up || (ctrl && event.key === Qt.Key_K))
+                                    scroller.contentY = Math.max(scroller.contentY - step, 0);
+                                else if (event.key === Qt.Key_PageDown)
+                                    scroller.contentY = Math.min(scroller.contentY + scroller.height, end);
+                                else if (event.key === Qt.Key_PageUp)
+                                    scroller.contentY = Math.max(scroller.contentY - scroller.height, 0);
+                                else
+                                    return;
+                                event.accepted = true;
+                            }
+
+                            Text {
+                                visible: input.text.length === 0
+                                text: Theme.placeholder
+                                color: Theme.dimColor
+                                font: input.font
+                            }
+                        }
+                    }
                 }
             }
 
@@ -361,7 +459,11 @@ Scope {
                 anchors.top: bar.bottom
                 x: Theme.keybindPadding
                 width: sheet.width
-                height: Math.min(contentHeight, window.screen.height * Theme.keybindMaxHeight - bar.height - Theme.keybindPadding)
+                // The sheet, up to keybindMaxHeight of the screen; while
+                // searching, the height it had without a search
+                readonly property real fittedHeight: Math.min(contentHeight, window.screen.height * Theme.keybindMaxHeight - bar.height - Theme.keybindPadding)
+
+                height: root.query === "" ? fittedHeight : Math.max(fittedHeight, panel.lockedHeight)
                 contentWidth: sheet.width
                 contentHeight: Math.max(sheet.height, empty.visible ? Theme.keybindRowHeight * 3 : 0)
                 clip: true
@@ -371,7 +473,7 @@ Scope {
                     id: empty
 
                     anchors.centerIn: parent
-                    visible: root.groups.length === 0
+                    visible: root.columns.length === 0
                     text: Theme.keybindEmptyText
                     color: Theme.dimColor
                     font.family: Theme.fontFamily

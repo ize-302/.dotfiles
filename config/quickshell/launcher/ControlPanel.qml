@@ -430,7 +430,7 @@ Scope {
             bottom: true
             right: true
         }
-        margins.bottom: Theme.floatingBarGap
+        margins.bottom: Theme.floatingGap
         margins.right: Theme.floatingGap
 
         onVisibleChanged: {

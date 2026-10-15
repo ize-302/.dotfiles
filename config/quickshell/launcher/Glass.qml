@@ -4,17 +4,14 @@ import qs
 // Panel background shared by the menus: translucent, with a sheen fading down
 // from the top and a lit top and right edge. Left and bottom touch the screen
 // edge and the bar, unless the panel is floating: then every corner is
-// rounded and every edge lit. A standing panel only touches the bar: both
-// top corners rounded, both sides lit. A full width panel, like the bar,
-// only has its top edge lit and no rounded corner.
+// rounded and every edge lit. A full width panel, like the bar, only has its
+// top edge lit and no rounded corner.
 Rectangle {
     id: glass
 
     property bool floating: false
     property int cornerRadius: Theme.panelRadius
     property bool fullWidth: false
-    // Sits on the bar away from the screen edges
-    property bool standing: false
     // Fading sheen over the top; off leaves a plain fill
     property bool sheen: true
     // The lit edge's colour; red for a critical notification
@@ -23,7 +20,6 @@ Rectangle {
     color: Theme.glassPanelColor
     radius: floating ? cornerRadius : 0
     // The one corner that touches neither the screen edge nor the bar
-    topLeftRadius: standing ? cornerRadius : radius
     topRightRadius: fullWidth ? radius : cornerRadius
 
     // Rises out of the bar
@@ -85,7 +81,7 @@ Rectangle {
 
         Rectangle {
             anchors.fill: parent
-            anchors.leftMargin: glass.floating || glass.standing ? 0 : -border.width
+            anchors.leftMargin: glass.floating ? 0 : -border.width
             anchors.bottomMargin: glass.floating ? 0 : -border.width
             anchors.rightMargin: glass.fullWidth ? -border.width : 0
             color: "transparent"

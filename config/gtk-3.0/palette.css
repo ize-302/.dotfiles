@@ -7,8 +7,9 @@
 @define-color raised  #1f2335;
 @define-color text    #c0caf5;
 @define-color divider #414868;
-/* Orange like the focused window's border (client.focused in config/sway/config) */
-@define-color accent  #ff7518;
+/* Blue like the launcher's selected row (selectedColor in Theme.qml) */
+@define-color accent  #0a84ff;
+@define-color on_accent #ffffff;
 @define-color danger  #f7768e;
 @define-color success #9ece6a;
 @define-color warning #e0af68;
@@ -37,9 +38,9 @@
 @define-color thumbnail_bg_color @raised;
 @define-color thumbnail_fg_color @text;
 
-/* Dark text on the orange, like tmux's current window */
+/* White text on the blue, like the launcher's selected row */
 @define-color accent_bg_color @accent;
-@define-color accent_fg_color @panel;
+@define-color accent_fg_color @on_accent;
 @define-color accent_color @accent;
 @define-color destructive_bg_color @danger;
 @define-color destructive_fg_color @panel;
@@ -58,8 +59,9 @@
 @define-color unfocused_borders @divider;
 
 /* Some apps paint selections from these names, not CSS (Thunar's icon
- * view): the same tint as the selected rows in gtk.css */
-@define-color theme_selected_bg_color alpha(@text, 0.12);
-@define-color theme_selected_fg_color @text;
-@define-color theme_unfocused_selected_bg_color alpha(@text, 0.08);
+ * view): the same blue as the selected rows in gtk.css, fainter in a
+ * window that isn't focused */
+@define-color theme_selected_bg_color @accent;
+@define-color theme_selected_fg_color @on_accent;
+@define-color theme_unfocused_selected_bg_color alpha(@accent, 0.4);
 @define-color theme_unfocused_selected_fg_color @text;

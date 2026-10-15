@@ -33,9 +33,6 @@ PanelWindow { // qmllint disable uncreatable-type
     // Floating, but low: centred just above the bar instead of in the
     // middle of the screen
     property bool aboveBar: false
-    // Stand on the bar a little in from the left edge, instead of in the
-    // corner
-    property bool standing: false
     // Small drop shadow under the panel; floating panels always have one
     property bool shadow: floating
     property int cornerRadius: Theme.panelRadius
@@ -129,8 +126,7 @@ PanelWindow { // qmllint disable uncreatable-type
         left: !window.floating || window.strip
         right: window.strip
     }
-    margins.left: standing ? Theme.edgeMargin : 0
-    margins.bottom: window.floating && window.aboveBar ? Theme.floatingBarGap : 0
+    margins.bottom: window.floating && window.aboveBar ? Theme.floatingGap : 0
 
     onVisibleChanged: {
         if (!visible)
@@ -146,7 +142,6 @@ PanelWindow { // qmllint disable uncreatable-type
         id: panel
 
         floating: window.floating
-        standing: window.standing
         cornerRadius: window.cornerRadius
         fullWidth: window.strip
         sheen: window.sheen

@@ -10,7 +10,7 @@ Singleton {
     // Proportional (Adwaita Sans is Inter); fontconfig fills in the Nerd Font
     // glyphs
     readonly property string fontFamily: "Adwaita Sans"
-    readonly property int fontSize: 17
+    readonly property int fontSize: 15
     readonly property int fontWeight: 500
 
     // Fraction of the screen width
@@ -25,15 +25,13 @@ Singleton {
     // Top right corner of the menus, and the smaller things inside them
     readonly property int panelRadius: 4
     readonly property int cornerRadius: 4
-    // Gap between a standing panel and the screen edge
-    readonly property int edgeMargin: 2
     // Hairline space between a floating panel (the control panel,
-    // notification cards) and the screen's right edge, and the bar
+    // notification cards, the clipboard menu, ...) and the bar, and the
+    // screen's right edge
     readonly property int floatingGap: 3
-    readonly property int floatingBarGap: 3
 
     // Search row
-    readonly property int searchFontSize: 15
+    readonly property int searchFontSize: 14
     readonly property string searchIcon: ""
     readonly property string placeholder: "Search…"
     readonly property color textColor: "#c0caf5"
@@ -91,6 +89,8 @@ Singleton {
     // Taller than this fraction of the screen and the columns scroll
     readonly property real keybindMaxHeight: 0.65
     readonly property int keybindScrollbarWidth: 6
+    // The search field in the title bar's top right corner
+    readonly property int keybindSearchWidth: 200
     readonly property string keybindEmptyText: "No bindings found"
 
     // Scratchpad menu: a full width strip of window previews on the bar
@@ -227,6 +227,8 @@ Singleton {
     readonly property int notificationRowIconSize: 20
     // Do not disturb, in the notification centre and on the bar's bell
     readonly property string doNotDisturbIcon: String.fromCodePoint(0xf009b)
+    // Do not disturb "until morning" ends at this hour
+    readonly property int doNotDisturbMorning: 8
     // The bar's control panel button (config/waybar/config.jsonc)
     readonly property string controlPanelIcon: String.fromCodePoint(0xf066a)
 
