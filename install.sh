@@ -10,6 +10,12 @@ for dir in config/quickshell/*/; do
   [ -e "$dir.qmlls.ini" ] || [ -L "$dir.qmlls.ini" ] || touch "$dir.qmlls.ini"
 done
 
+# GTK theme the palette in config/gtk-3.0 is built on (set in config/sway/config)
+if ! pacman -Q adw-gtk-theme >/dev/null 2>&1; then
+  echo "[+] Installing adw-gtk-theme..."
+  sudo pacman -S --needed adw-gtk-theme
+fi
+
 mkdir -p "$HOME/.config"
 stow --adopt -v -t "$HOME/.config" config
 stow --adopt -v -t "$HOME" home
