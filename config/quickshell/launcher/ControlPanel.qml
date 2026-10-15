@@ -42,8 +42,10 @@ Scope {
 
     readonly property list<PwNode> sinks: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSink)
     readonly property list<PwNode> sources: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioSource)
-    // Apps playing sound
-    readonly property list<PwNode> streams: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioOutStream)
+    // Apps playing sound. Not the short sounds of the volume keys and
+    // notifications (paplay and the like), which would make the Apps
+    // section come and go
+    readonly property list<PwNode> streams: Pipewire.nodes.values.filter(node => node.type === PwNodeType.AudioOutStream && !root.isSoundEffect(node))
 
     readonly property NetworkDevice wifiDevice: Networking.devices.values.find(device => device.type === DeviceType.Wifi) ?? null
     // Cables plugged in
@@ -192,6 +194,12 @@ Scope {
         // Sliders and switches are only on the main view; a page is just the
         // section's list
         return rows.filter(row => page === "" ? !row.list : row.section === page && row.list);
+    }
+
+    function isSoundEffect(node) {
+        const players = ["paplay", "pw-play", "pw-cat", "aplay", "canberra-gtk-play"];
+        const props = node.properties ?? {};
+        return players.includes(node.name) || players.includes(props["application.name"]) || ["event", "notification"].includes((props["media.role"] ?? "").toLowerCase());
     }
 
     function isSlider(row) {
@@ -424,6 +432,13 @@ Scope {
 
         function toggleControlPanel(): void {
             root.open = !root.open;
+        }
+
+        // Opens it on the main view, whatever it showed before
+        function showControlPanel(): void {
+            if (root.page !== "")
+                root.closePage();
+            root.open = true;
         }
 
         // Opens the panel on a section's page ("Output", "Network", ...)
