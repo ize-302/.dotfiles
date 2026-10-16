@@ -5,7 +5,12 @@
 # instance per sway session and stops once that session is gone. Sway drops
 # the wallpaper on every reload, so starting it again while it is running puts
 # the current image back without restarting the timer.
+#
+# Each image is also copied to /var/lib/sddm-wallpaper/current, which
+# install.sh creates for this user, so the login screen (config/sddm/themes/
+# custom) can show it: SDDM can't read $HOME.
 dir=~/Pictures/wallpapers
+share=/var/lib/sddm-wallpaper
 interval=${1:-1800}
 state="${XDG_RUNTIME_DIR:-/tmp}/wallpaper-rotate.${SWAYSOCK##*/}"
 
@@ -13,9 +18,17 @@ set_bg() {
 	swaymsg -q "output * bg \"$1\" fill"
 }
 
+# Renamed into place, so the greeter never reads half an image
+share_bg() {
+	[ -w "$share" ] || return 0
+	cp -f -- "$1" "$share/.current.tmp" && mv -f "$share/.current.tmp" "$share/current"
+}
+
 exec 9>"$state.lock"
 if ! flock -n 9; then
 	set_bg "$(<"$state.current")"
+	# And for the login screen, in case it was made since that image was set
+	share_bg "$(<"$state.current")"
 	exit
 fi
 
@@ -26,6 +39,7 @@ while :; do
 		grep -vxF -- "$last" | shuf -n1)
 	if [ -n "$img" ]; then
 		set_bg "$img" || exit
+		share_bg "$img"
 		echo "$img" >"$state.current"
 		last=$img
 	fi

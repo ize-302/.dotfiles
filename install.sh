@@ -35,6 +35,9 @@ if [ -d /usr/share/sddm/themes ]; then
   sudo install -Dm644 etc/sddm.conf.d/custom-theme.conf /etc/sddm.conf.d/custom-theme.conf
   # Arranges the outputs for the greeter, needs xorg-xrandr
   sudo install -Dm755 etc/sddm/Xsetup /etc/sddm/Xsetup
+  # Somewhere outside $HOME that SDDM can read, for ~/.local/bin/wallpaper-rotate
+  # to copy the current wallpaper to
+  sudo install -d -m755 -o "$USER" -g "$(id -gn)" /var/lib/sddm-wallpaper
 fi
 
 # Reload shell once installed
