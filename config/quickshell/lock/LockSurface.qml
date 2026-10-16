@@ -74,7 +74,7 @@ Rectangle {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: clock.date.toLocaleString(Qt.locale(Theme.dateLocale), Theme.dateFormat)
-            color: Theme.softTextColor
+            color: Theme.overlayColor
             font.pixelSize: Theme.dateFontSize
             font.weight: Theme.dateFontWeight
             font.family: Theme.fontFamily
@@ -83,7 +83,7 @@ Rectangle {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: Qt.formatDateTime(clock.date, Theme.clockFormat)
-            color: Theme.textColor
+            color: Theme.clockColor
             font.pixelSize: Theme.clockFontSize
             font.weight: Theme.clockFontWeight
             font.family: Theme.fontFamily
@@ -107,9 +107,7 @@ Rectangle {
             width: Theme.avatarSize
             height: Theme.avatarSize
             radius: Theme.avatarRadius
-            color: Theme.glassColor
-            border.width: 1
-            border.color: Theme.edgeColor
+            color: "transparent"
 
             // The user's picture where SDDM looks for it, falling back to the penguin
             readonly property list<url> sources: [
@@ -123,7 +121,6 @@ Rectangle {
             Image {
                 id: avatarImage
                 anchors.fill: parent
-                anchors.margins: 1
                 source: avatar.sources[avatar.sourceIndex]
                 sourceSize: Qt.size(width, height)
                 fillMode: Image.PreserveAspectCrop
@@ -146,7 +143,7 @@ Rectangle {
             Rectangle {
                 id: avatarMask
                 anchors.fill: avatarImage
-                radius: avatar.radius - 1
+                radius: avatar.radius
                 visible: false
                 layer.enabled: true
             }
@@ -162,7 +159,7 @@ Rectangle {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: Quickshell.env("USER")
-            color: Theme.textColor
+            color: Theme.clockColor
             font.pixelSize: Theme.usernameFontSize
             font.weight: Theme.usernameFontWeight
             font.family: Theme.fontFamily
@@ -248,13 +245,14 @@ Rectangle {
 
                 anchors.fill: parent
                 radius: Theme.inputRadius
-                edgeColor: root.context.messageIsError && root.context.message !== "" ? Theme.errorColor : Theme.edgeColor
+                color: Theme.inputColor
+                edgeColor: root.context.messageIsError && root.context.message !== "" ? Theme.errorColor : Theme.inputEdgeColor
 
                 Text {
                     anchors.fill: password
                     visible: password.text.length === 0
                     text: Theme.placeholder
-                    color: Theme.dimColor
+                    color: Theme.inputDimColor
                     font.pixelSize: Theme.inputFontSize
                     font.family: Theme.fontFamily
                     verticalAlignment: Text.AlignVCenter
@@ -277,7 +275,7 @@ Rectangle {
                     echoMode: TextInput.Password
                     passwordCharacter: Theme.maskCharacter
                     inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
-                    color: Theme.textColor
+                    color: Theme.inputTextColor
                     selectionColor: Theme.selectedColor
                     verticalAlignment: TextInput.AlignVCenter
                     font.pixelSize: Theme.inputFontSize
@@ -312,7 +310,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.context.capsLock
                     text: Theme.capsLockIcon
-                    color: Theme.softTextColor
+                    color: Theme.inputDimColor
                     font.pixelSize: Theme.iconSize
                     font.family: Theme.fontFamily
                 }
@@ -328,7 +326,7 @@ Rectangle {
                     width: Theme.buttonSize
                     height: Theme.buttonSize
                     radius: Theme.buttonRadius
-                    color: root.context.unlockInProgress ? "transparent" : password.text.length > 0 ? Theme.selectedColor : buttonArea.containsMouse ? Theme.hoverColor : "transparent"
+                    color: root.context.unlockInProgress ? "transparent" : password.text.length > 0 ? Theme.selectedColor : buttonArea.containsMouse ? Theme.inputHoverColor : "transparent"
 
                     Behavior on color {
                         ColorAnimation {
@@ -340,13 +338,14 @@ Rectangle {
                         anchors.centerIn: parent
                         visible: !root.context.unlockInProgress
                         text: Theme.submitIcon
-                        color: password.text.length > 0 ? "white" : Theme.dimColor
+                        color: password.text.length > 0 ? "white" : Theme.inputDimColor
                         font.pixelSize: Theme.iconSize
                         font.family: Theme.fontFamily
                     }
 
                     Spinner {
                         anchors.centerIn: parent
+                        color: Theme.inputTextColor
                         width: Theme.iconSize
                         height: Theme.iconSize
                         visible: root.context.unlockInProgress
@@ -378,7 +377,7 @@ Rectangle {
                     return root.context.message;
                 return root.context.showPrompt ? " " : Theme.hintText;
             }
-            color: root.context.messageIsError && root.context.message !== "" && !root.context.unlockInProgress ? Theme.errorColor : Theme.softTextColor
+            color: root.context.messageIsError && root.context.message !== "" && !root.context.unlockInProgress ? Theme.errorColor : Theme.overlayColor
             font.pixelSize: Theme.messageFontSize
             font.family: Theme.fontFamily
         }
@@ -396,7 +395,7 @@ Rectangle {
         }
         visible: battery.isLaptopBattery
         text: (UPower.onBattery ? Theme.batteryIcon(percent) : Theme.chargingIcon) + "  " + percent + "%"
-        color: Theme.softTextColor
+        color: Theme.overlayColor
         font.pixelSize: Theme.statusFontSize
         font.family: Theme.fontFamily
     }

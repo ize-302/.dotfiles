@@ -21,6 +21,10 @@ Singleton {
     readonly property color textColor: "#c0caf5"
     readonly property color dimColor: "#565f89"
     readonly property color softTextColor: "#a9b1d6"
+    // Over the wallpaper: white, like macOS's lock screen, the clock and
+    // name solid, the date, hint and battery a little softer
+    readonly property color clockColor: "white"
+    readonly property color overlayColor: Qt.rgba(1, 1, 1, 0.85)
     // macOS's system blue, the launcher's selection and switches
     readonly property color selectedColor: "#0a84ff"
     // The bar's urgent workspace and a critical notification's edge
@@ -59,9 +63,15 @@ Singleton {
     readonly property real promptBottom: 0.16
     readonly property int promptSpacing: 12
 
-    // Password field: a floating glass panel with the menus' corners, the
-    // submit button and caps lock inside it
+    // Password field: white, with the menus' corners, the submit button and
+    // caps lock inside it, and the background's colour for its text
     readonly property int inputWidth: 260
+    readonly property color inputColor: "white"
+    readonly property color inputTextColor: "#1a1b26"
+    readonly property color inputDimColor: Qt.rgba(26 / 255, 27 / 255, 38 / 255, 0.45)
+    readonly property color inputHoverColor: Qt.rgba(26 / 255, 27 / 255, 38 / 255, 0.08)
+    // Faint against the wallpaper, as the glass's lit edge would be
+    readonly property color inputEdgeColor: Qt.rgba(1, 1, 1, 0.3)
     readonly property int inputHeight: 36
     readonly property int inputRadius: 8
     readonly property int inputPadding: 12
