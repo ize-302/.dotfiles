@@ -205,10 +205,6 @@ Singleton {
     readonly property int barHeight: 38
     readonly property string barAnchor: Quickshell.env("HOME") + "/.local/bin/bar-anchor"
 
-    // The arrow under a popup opened from the bar (PopupArrow.qml)
-    readonly property int arrowWidth: 18
-    readonly property int arrowHeight: 9
-
     // Volume popup: floats above the bar while the volume changes
     readonly property int osdWidth: 320
     readonly property int osdMargin: 24

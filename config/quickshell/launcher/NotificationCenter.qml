@@ -197,9 +197,7 @@ Scope {
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
         implicitWidth: Theme.notificationCenterWidth
-        // Room under the glass for the arrow pointing at the bar module
-        implicitHeight: panel.height + (pointing ? Theme.arrowHeight - 1 : 0)
-        readonly property bool pointing: root.atPointer && root.pointerX >= 0
+        implicitHeight: panel.height
 
         WlrLayershell.namespace: "launcher-shadow"
         WlrLayershell.layer: WlrLayer.Overlay
@@ -233,11 +231,6 @@ Scope {
 
             floating: true
 
-            // Points down at the module it was opened from
-            PopupArrow {
-                visible: window.pointing
-                tip: root.pointerX - ((window.screen?.width ?? 0) - window.margins.right - window.implicitWidth)
-            }
             width: parent.width
             height: content.height + Theme.panelPadding * 2
 
