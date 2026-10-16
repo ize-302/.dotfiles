@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Pam
 import qs
 
@@ -9,6 +10,8 @@ Scope {
     id: root
 
     signal unlocked
+    // A wrong password, or PAM refused: the field shakes
+    signal failed
 
     property string currentText: ""
     property bool showPrompt: false
@@ -18,6 +21,7 @@ Scope {
     // Last thing PAM said during the current attempt, e.g. pam_faillock's
     // "The account is locked due to 3 failed logins"
     property string pamInfo: ""
+    property bool capsLock: false
 
     onCurrentTextChanged: {
         if (currentText !== "")
@@ -47,6 +51,7 @@ Scope {
         message = text;
         messageIsError = true;
         unlockInProgress = false;
+        failed();
     }
 
     Timer {
@@ -88,5 +93,34 @@ Scope {
         }
 
         onError: error => root.fail("Authentication error: " + PamError.toString(error))
+    }
+
+    // Reads the keyboards' caps lock lights, as the launcher's caps lock
+    // popup does (config/quickshell/launcher/CapsLock.qml), for the
+    // field's ⇪
+    Process {
+        id: capsWatcher
+
+        command: ["python3", "-c", `
+import glob, time
+last = None
+while True:
+    lit = False
+    for path in glob.glob("/sys/class/leds/*::capslock/brightness"):
+        try:
+            with open(path) as file:
+                lit = lit or file.read().strip() not in ("", "0")
+        except OSError:
+            pass
+    if lit != last:
+        print(int(lit), flush=True)
+        last = lit
+    time.sleep(${Theme.capsLockPoll / 1000})
+`]
+        running: true
+
+        stdout: SplitParser {
+            onRead: line => root.capsLock = line.trim() === "1"
+        }
     }
 }

@@ -1,19 +1,62 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
+import Quickshell.Io
+import Quickshell.Services.UPower
 import qs
 
-// What one monitor shows while locked: the clock, then the unlock prompt once
-// a key is pressed. Mirrors LockScreen.qml and LoginScreen.qml of the SDDM theme.
+// What one monitor shows while locked: the blurred wallpaper with the date
+// and time near the top, and low in the middle who's locked in. Typing or a
+// click brings up the password field under the name, on the monitor with
+// keyboard focus; it goes away again after Theme.promptTimeout seconds
+// without input.
 Rectangle {
     id: root
 
     required property LockContext context
+
+    // The monitor typing goes to; the others show just the time
+    readonly property bool active: Window.active
 
     color: Theme.background
 
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
+    }
+
+    FileView {
+        id: wallpaperState
+        path: Theme.wallpaperState
+    }
+
+    Image {
+        id: wallpaper
+        anchors.fill: parent
+        visible: false
+        source: wallpaperState.loaded ? "file://" + wallpaperState.text().trim() : ""
+        sourceSize: Qt.size(width * Theme.wallpaperScale, height * Theme.wallpaperScale)
+        fillMode: Image.PreserveAspectCrop
+        smooth: true
+        asynchronous: true
+    }
+
+    MultiEffect {
+        anchors.fill: parent
+        source: wallpaper
+        visible: wallpaper.status === Image.Ready
+        autoPaddingEnabled: false
+        blurEnabled: true
+        blur: Theme.wallpaperBlur
+        blurMax: Theme.wallpaperBlurMax
+        blurMultiplier: Theme.wallpaperBlurMultiplier
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        visible: wallpaper.status === Image.Ready
+        color: Theme.background
+        opacity: Theme.wallpaperTint
     }
 
     MouseArea {
@@ -24,259 +67,337 @@ Rectangle {
         }
     }
 
-    Item {
-        id: clockScreen
-        anchors.fill: parent
-        opacity: root.context.showPrompt ? 0.0 : 1.0
+    Column {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: Math.round(root.height * Theme.clockTop)
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 150
-            }
-        }
-
-        Column {
-            anchors.centerIn: parent
-            spacing: Theme.dateMarginTop
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: Qt.formatDateTime(clock.date, Theme.clockFormat)
-                color: Theme.clockColor
-                font.pixelSize: Theme.clockFontSize
-                font.weight: Theme.clockFontWeight
-                font.family: Theme.fontFamily
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: clock.date.toLocaleString(Qt.locale(Theme.dateLocale), Theme.dateFormat)
-                color: Theme.dateColor
-                font.pixelSize: Theme.dateFontSize
-                font.weight: Theme.dateFontWeight
-                font.family: Theme.fontFamily
-            }
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: clock.date.toLocaleString(Qt.locale(Theme.dateLocale), Theme.dateFormat)
+            color: Theme.softTextColor
+            font.pixelSize: Theme.dateFontSize
+            font.weight: Theme.dateFontWeight
+            font.family: Theme.fontFamily
         }
 
         Text {
-            anchors {
-                bottom: parent.bottom
-                bottomMargin: Theme.hintMarginBottom
-                horizontalCenter: parent.horizontalCenter
-            }
-            text: Theme.hintText
-            color: Theme.hintColor
-            font.pixelSize: Theme.hintFontSize
-            font.weight: Theme.hintFontWeight
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: Qt.formatDateTime(clock.date, Theme.clockFormat)
+            color: Theme.textColor
+            font.pixelSize: Theme.clockFontSize
+            font.weight: Theme.clockFontWeight
             font.family: Theme.fontFamily
         }
     }
 
-    // Hidden with opacity rather than `visible`, so the password input keeps
-    // keyboard focus and can catch the key press that opens the prompt.
-    Item {
-        id: promptScreen
-        anchors.fill: parent
-        opacity: root.context.showPrompt ? 1.0 : 0.0
+    Column {
+        id: prompt
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 150
-            }
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            bottom: parent.bottom
+            bottomMargin: Math.round(root.height * Theme.promptBottom)
         }
+        spacing: Theme.promptSpacing
+        visible: root.active
 
-        Column {
-            id: promptContainer
-            anchors.centerIn: parent
-            scale: root.context.showPrompt ? 1.0 : 0.5
+        Rectangle {
+            id: avatar
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Theme.avatarSize
+            height: Theme.avatarSize
+            radius: Theme.avatarRadius
+            color: Theme.glassColor
+            border.width: 1
+            border.color: Theme.edgeColor
 
-            Behavior on scale {
-                NumberAnimation {
-                    duration: 200
+            // The user's picture where SDDM looks for it, falling back to the penguin
+            readonly property list<url> sources: [
+                "file:///usr/share/sddm/faces/" + Quickshell.env("USER") + ".face.icon",
+                "file://" + Quickshell.env("HOME") + "/.face.icon",
+                "file://" + Quickshell.env("HOME") + "/.face",
+                Qt.resolvedUrl("icons/avatar.svg")
+            ]
+            property int sourceIndex: 0
+
+            Image {
+                id: avatarImage
+                anchors.fill: parent
+                anchors.margins: 1
+                source: avatar.sources[avatar.sourceIndex]
+                sourceSize: Qt.size(width, height)
+                fillMode: Image.PreserveAspectCrop
+                mipmap: true
+                visible: false
+
+                onStatusChanged: {
+                    // Deferred: changing the source from its own status handler is a binding loop
+                    // and the next one after the source that failed, as a
+                    // missing file can report its error twice
+                    if (status === Image.Error) {
+                        const next = avatar.sources.indexOf(source) + 1;
+                        if (next > 0 && next < avatar.sources.length)
+                            Qt.callLater(() => avatar.sourceIndex = Math.max(avatar.sourceIndex, next));
+                    }
                 }
             }
 
+            // Cut to the rounded square
             Rectangle {
-                id: avatar
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: Theme.avatarSize
-                height: Theme.avatarSize
-                color: Theme.inputBackgroundColor
-
-                // The user's picture where SDDM looks for it, falling back to the penguin
-                readonly property list<url> sources: [
-                    "file:///usr/share/sddm/faces/" + Quickshell.env("USER") + ".face.icon",
-                    "file://" + Quickshell.env("HOME") + "/.face.icon",
-                    "file://" + Quickshell.env("HOME") + "/.face",
-                    Qt.resolvedUrl("icons/avatar.svg")
-                ]
-                property int sourceIndex: 0
-
-                Image {
-                    anchors.fill: parent
-                    source: avatar.sources[avatar.sourceIndex]
-                    sourceSize: Qt.size(width, height)
-                    fillMode: Image.PreserveAspectCrop
-                    mipmap: true
-
-                    onStatusChanged: {
-                        // Deferred: changing the source from its own status handler is a binding loop
-                        if (status === Image.Error && avatar.sourceIndex < avatar.sources.length - 1)
-                            Qt.callLater(() => avatar.sourceIndex++);
-                    }
-                }
+                id: avatarMask
+                anchors.fill: avatarImage
+                radius: avatar.radius - 1
+                visible: false
+                layer.enabled: true
             }
 
-            Item {
-                width: 1
-                height: Theme.usernameMargin
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: Quickshell.env("USER")
-                color: Theme.usernameColor
-                font.pixelSize: Theme.usernameFontSize
-                font.weight: Theme.usernameFontWeight
-                font.family: Theme.fontFamily
-            }
-
-            Item {
-                width: 1
-                height: Theme.inputMarginTop
-            }
-
-            Item {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: Math.max(inputRow.width, spinner.width)
-                height: root.context.unlockInProgress ? spinner.height : inputRow.height
-
-                Row {
-                    id: inputRow
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    opacity: root.context.unlockInProgress ? 0.0 : 1.0
-
-                    Rectangle {
-                        width: Theme.inputWidth
-                        height: Theme.inputHeight
-                        color: Theme.inputBackgroundColor
-
-                        Image {
-                            id: passwordIcon
-                            x: (Theme.inputHeight - width) / 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: Theme.inputIconSize
-                            height: width
-                            sourceSize: Qt.size(width, height)
-                            source: "icons/password.svg"
-                        }
-
-                        Text {
-                            anchors.fill: password
-                            visible: password.text.length === 0
-                            text: "Password"
-                            color: Theme.inputContentColor
-                            font.pixelSize: Theme.inputFontSize
-                            font.family: Theme.fontFamily
-                            verticalAlignment: Text.AlignVCenter
-                        }
-
-                        TextInput {
-                            id: password
-                            anchors {
-                                fill: parent
-                                leftMargin: Theme.inputHeight + 2
-                                rightMargin: 10
-                            }
-                            focus: true
-                            clip: true
-                            readOnly: root.context.unlockInProgress
-                            echoMode: TextInput.Password
-                            passwordCharacter: Theme.maskCharacter
-                            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
-                            color: Theme.inputContentColor
-                            verticalAlignment: TextInput.AlignVCenter
-                            font.pixelSize: Theme.inputFontSize
-                            font.family: Theme.fontFamily
-                            font.letterSpacing: Theme.maskCharacterSpacing
-
-                            Component.onCompleted: forceActiveFocus()
-
-                            onTextChanged: root.context.currentText = text
-                            onAccepted: root.context.tryUnlock()
-
-                            // Typing on one monitor shows up on all of them
-                            Connections {
-                                target: root.context
-                                function onCurrentTextChanged() {
-                                    password.text = root.context.currentText;
-                                }
-                            }
-
-                            Keys.onPressed: event => {
-                                if (!root.context.showPrompt) {
-                                    // The key that opens the prompt isn't typed into it
-                                    if (event.key !== Qt.Key_Escape)
-                                        root.context.showPrompt = true;
-                                    event.accepted = true;
-                                } else if (event.key === Qt.Key_Escape) {
-                                    if (!root.context.unlockInProgress)
-                                        root.context.showPrompt = false;
-                                    event.accepted = true;
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        width: Theme.inputHeight
-                        height: Theme.inputHeight
-                        color: unlockButton.containsMouse ? Theme.buttonActiveBackgroundColor : Theme.buttonBackgroundColor
-
-                        Image {
-                            anchors.centerIn: parent
-                            width: Theme.buttonIconSize
-                            height: width
-                            sourceSize: Qt.size(width, height)
-                            source: "icons/arrow-right.svg"
-                        }
-
-                        MouseArea {
-                            id: unlockButton
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                password.forceActiveFocus();
-                                if (root.context.showPrompt)
-                                    root.context.tryUnlock();
-                                else
-                                    root.context.showPrompt = true;
-                            }
-                        }
-                    }
-                }
-
-                Spinner {
-                    id: spinner
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: root.context.unlockInProgress
-                }
-            }
-
-            Item {
-                width: 1
-                height: Theme.messageMarginTop
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                // Keeps its height when empty so the prompt doesn't jump
-                text: root.context.unlockInProgress ? " " : (root.context.message || " ")
-                color: root.context.messageIsError ? Theme.messageErrorColor : Theme.messageNormalColor
-                font.pixelSize: Theme.messageFontSize
-                font.weight: Theme.messageFontWeight
-                font.family: Theme.fontFamily
+            MultiEffect {
+                anchors.fill: avatarImage
+                source: avatarImage
+                maskEnabled: true
+                maskSource: avatarMask
             }
         }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: Quickshell.env("USER")
+            color: Theme.textColor
+            font.pixelSize: Theme.usernameFontSize
+            font.weight: Theme.usernameFontWeight
+            font.family: Theme.fontFamily
+        }
+
+        // Hidden with opacity rather than `visible`, so the password input
+        // keeps keyboard focus and catches the key press that brings it up
+        Item {
+            id: field
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Theme.inputWidth
+            height: Theme.inputHeight
+            opacity: root.context.showPrompt ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Theme.animationDuration
+                }
+            }
+
+            transform: Translate {
+                id: shake
+            }
+
+            SequentialAnimation {
+                id: shakeAnimation
+
+                NumberAnimation {
+                    target: shake
+                    property: "x"
+                    to: -Theme.shakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: shake
+                    property: "x"
+                    to: Theme.shakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: shake
+                    property: "x"
+                    to: -Theme.shakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: shake
+                    property: "x"
+                    to: Theme.shakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: shake
+                    property: "x"
+                    to: 0
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.OutQuad
+                }
+            }
+
+            Connections {
+                target: root.context
+                function onShowPromptChanged() {
+                    if (root.context.showPrompt)
+                        glass.appear();
+                }
+                function onFailed() {
+                    shakeAnimation.restart();
+                }
+                // Typing on one monitor shows up on all of them
+                function onCurrentTextChanged() {
+                    password.text = root.context.currentText;
+                }
+            }
+
+            Glass {
+                id: glass
+
+                anchors.fill: parent
+                radius: Theme.inputRadius
+                edgeColor: root.context.messageIsError && root.context.message !== "" ? Theme.errorColor : Theme.edgeColor
+
+                Text {
+                    anchors.fill: password
+                    visible: password.text.length === 0
+                    text: Theme.placeholder
+                    color: Theme.dimColor
+                    font.pixelSize: Theme.inputFontSize
+                    font.family: Theme.fontFamily
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                TextInput {
+                    id: password
+
+                    anchors {
+                        left: parent.left
+                        right: capsLock.visible ? capsLock.left : button.left
+                        top: parent.top
+                        bottom: parent.bottom
+                        leftMargin: Theme.inputPadding
+                        rightMargin: Theme.inputPadding / 2
+                    }
+                    focus: true
+                    clip: true
+                    readOnly: root.context.unlockInProgress
+                    echoMode: TextInput.Password
+                    passwordCharacter: Theme.maskCharacter
+                    inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                    color: Theme.textColor
+                    selectionColor: Theme.selectedColor
+                    verticalAlignment: TextInput.AlignVCenter
+                    font.pixelSize: Theme.inputFontSize
+                    font.family: Theme.fontFamily
+                    font.letterSpacing: Theme.maskSpacing
+
+                    Component.onCompleted: forceActiveFocus()
+
+                    onTextChanged: root.context.currentText = text
+                    onAccepted: root.context.tryUnlock()
+
+                    Keys.onPressed: event => {
+                        if (!root.context.showPrompt) {
+                            // The key that brings up the field isn't typed into it
+                            if (event.key !== Qt.Key_Escape)
+                                root.context.showPrompt = true;
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Escape) {
+                            if (!root.context.unlockInProgress)
+                                root.context.showPrompt = false;
+                            event.accepted = true;
+                        }
+                    }
+                }
+
+                // macOS's ⇪, while caps lock is on
+                Text {
+                    id: capsLock
+
+                    anchors.right: button.left
+                    anchors.rightMargin: Theme.inputPadding / 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.context.capsLock
+                    text: Theme.capsLockIcon
+                    color: Theme.softTextColor
+                    font.pixelSize: Theme.iconSize
+                    font.family: Theme.fontFamily
+                }
+
+                // Blue once there's something to submit; the spinner while
+                // PAM checks it
+                Rectangle {
+                    id: button
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: (Theme.inputHeight - height) / 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.buttonSize
+                    height: Theme.buttonSize
+                    radius: Theme.buttonRadius
+                    color: root.context.unlockInProgress ? "transparent" : password.text.length > 0 ? Theme.selectedColor : buttonArea.containsMouse ? Theme.hoverColor : "transparent"
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.animationDuration
+                        }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        visible: !root.context.unlockInProgress
+                        text: Theme.submitIcon
+                        color: password.text.length > 0 ? "white" : Theme.dimColor
+                        font.pixelSize: Theme.iconSize
+                        font.family: Theme.fontFamily
+                    }
+
+                    Spinner {
+                        anchors.centerIn: parent
+                        width: Theme.iconSize
+                        height: Theme.iconSize
+                        visible: root.context.unlockInProgress
+                    }
+
+                    MouseArea {
+                        id: buttonArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            password.forceActiveFocus();
+                            if (root.context.showPrompt)
+                                root.context.tryUnlock();
+                            else
+                                root.context.showPrompt = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            // Keeps its height when empty so nothing jumps
+            text: {
+                if (root.context.unlockInProgress)
+                    return Theme.spinnerText;
+                if (root.context.message !== "")
+                    return root.context.message;
+                return root.context.showPrompt ? " " : Theme.hintText;
+            }
+            color: root.context.messageIsError && root.context.message !== "" && !root.context.unlockInProgress ? Theme.errorColor : Theme.softTextColor
+            font.pixelSize: Theme.messageFontSize
+            font.family: Theme.fontFamily
+        }
+    }
+
+    // Bottom right: the battery, as on the bar
+    Text {
+        readonly property var battery: UPower.displayDevice
+        readonly property int percent: Math.round(battery.percentage * 100)
+
+        anchors {
+            right: parent.right
+            bottom: parent.bottom
+            margins: Theme.statusMargin
+        }
+        visible: battery.isLaptopBattery
+        text: (UPower.onBattery ? Theme.batteryIcon(percent) : Theme.chargingIcon) + "  " + percent + "%"
+        color: Theme.softTextColor
+        font.pixelSize: Theme.statusFontSize
+        font.family: Theme.fontFamily
     }
 }
