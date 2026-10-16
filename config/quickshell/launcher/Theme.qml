@@ -249,6 +249,22 @@ Singleton {
     // For notifications that don't say how long to stay; critical ones stay
     // until closed
     readonly property int notificationTimeout: 5000
+    // The notification centre's cards (NotificationCard.qml), like
+    // macOS's: rounded, a little lighter than the glass, with the app's icon
+    // in a rounded square. A collapsed stack's cards peek out underneath.
+    readonly property int noteCardRadius: 14
+    readonly property int noteCardPadding: 12
+    readonly property int noteCardIconSize: 34
+    readonly property int noteCardSpacing: 8
+    readonly property color noteCardColor: Qt.rgba(1, 1, 1, 0.06)
+    readonly property color noteCardHoverColor: Qt.rgba(1, 1, 1, 0.1)
+    readonly property color noteCardEdgeColor: Qt.rgba(1, 1, 1, 0.08)
+    readonly property int noteCardStackPeek: 6
+    readonly property int noteCardStackInset: 10
+    readonly property int noteCardCloseSize: 20
+    // The round and pill buttons: do not disturb, Clear All, Show less
+    readonly property int noteCardButtonHeight: 26
+
     // Notification centre (NotificationCenter.qml): as wide as the cards,
     // scrolling past this fraction of the screen height
     readonly property int notificationCenterWidth: 380
@@ -262,12 +278,12 @@ Singleton {
     // sound theme)
     readonly property string notificationSound: "/usr/share/sounds/freedesktop/stereo/message.oga"
     readonly property string closeIcon: String.fromCodePoint(0xf0156)
-    // The bar's notification bell (config/waybar/config.jsonc), with a
-    // badge while there are new ones
+    // A bell, with a badge while there are new notifications
     readonly property string bellIcon: String.fromCodePoint(0xf009a)
     readonly property string bellUnreadIcon: String.fromCodePoint(0xf116b)
     readonly property int notificationRowIconSize: 20
-    // Do not disturb, in the notification centre and on the bar's bell
+    // Do not disturb, in the notification centre (and on the bar's clock,
+    // ~/.local/bin/clock-status)
     readonly property string doNotDisturbIcon: String.fromCodePoint(0xf009b)
     // Do not disturb "until morning" ends at this hour
     readonly property int doNotDisturbMorning: 8

@@ -13,7 +13,7 @@ import qs
 // edge, like the control panel. Toggled by
 // ~/.local/bin/notification-center
 // (`qs -c launcher ipc call notificationCenter toggleNotificationCenter`),
-// Super+Shift+N or the bar's bell.
+// Super+Shift+N or a click on the bar's clock.
 //
 // The title has a do not disturb key cap and Clear; while do not disturb is
 // on, a row under it says how long for: an hour, until morning, or until
@@ -22,8 +22,8 @@ import qs
 // d turns do not disturb on or off (h for an hour, m until morning), and
 // Escape closes it. Scrolls when there are more than fit.
 //
-// Opened from the bar's bell (`notification-center --pointer`), it's
-// centred over the bell, kept on the screen; from the keyboard, it's at the
+// Opened from the bar's clock (`notification-center --pointer`), it's
+// centred over the clock, kept on the screen; from the keyboard, it's at the
 // right edge (like ControlPanel.qml).
 Scope {
     id: root
@@ -43,7 +43,13 @@ Scope {
     property var server: null
     readonly property var notifications: server ? Array.from(server.notifications) : []
 
-    // { notification, group }, grouped by app, the app with the newest first
+    // Apps whose stack is spread out (app -> true); stacks start collapsed
+    property var expanded: ({})
+
+    // Grouped by app, the app with the newest first. An app with more than
+    // one is a stack: collapsed, its newest card ({ kind: "card",
+    // notification, group, stack: how many }); spread out, a header
+    // ({ kind: "header", group, count }) over a card for each.
     readonly property var rows: {
         const groups = new Map();
         for (const notification of notifications) {
@@ -51,13 +57,66 @@ Scope {
             groups.set(app, (groups.get(app) ?? []).concat([notification]));
         }
         const rows = [];
-        for (const [app, list] of groups)
-            for (const notification of list)
+        for (const [app, list] of groups) {
+            if (list.length > 1 && expanded[app]) {
                 rows.push({
+                    kind: "header",
                     group: app,
-                    notification: notification
+                    count: list.length
                 });
+                for (const notification of list)
+                    rows.push({
+                        kind: "card",
+                        group: app,
+                        notification: notification,
+                        stack: 1
+                    });
+            } else {
+                rows.push({
+                    kind: "card",
+                    group: app,
+                    notification: list[0],
+                    stack: list.length
+                });
+            }
+        }
         return rows;
+    }
+
+    // Spreads a stack out, or collapses it again
+    function setExpanded(app, on) {
+        const expanded = Object.assign({}, root.expanded);
+        if (on)
+            expanded[app] = true;
+        else
+            delete expanded[app];
+        root.expanded = expanded;
+    }
+
+    // Every notification from an app, for clearing a stack
+    function dismissGroup(app) {
+        for (const notification of notifications.filter(notification => (notification.appName || "Other") === app))
+            notification.dismiss();
+        root.setExpanded(app, false);
+    }
+
+    // A click or Enter: a collapsed stack spreads out, a header collapses
+    // its stack, a card runs its default action
+    function activate(row) {
+        if (row.kind === "header")
+            root.setExpanded(row.group, false);
+        else if (row.stack > 1)
+            root.setExpanded(row.group, true);
+        else
+            server.activate(row.notification);
+    }
+
+    // The × or Delete: a stack (collapsed, or its header) goes whole
+    function dismiss(row) {
+        if (row.kind === "header" || row.stack > 1)
+            root.dismissGroup(row.group);
+        else
+            row.notification.dismiss();
     }
 
     // "3 new", "5 notifications"; nothing when there are none, the list
@@ -96,6 +155,7 @@ Scope {
         if (!open) {
             atPointer = false;
             placeWaited = false;
+            expanded = {};
         }
     }
 
@@ -113,7 +173,7 @@ Scope {
             root.open = !root.open;
         }
 
-        // The same, over the bar's bell under the pointer
+        // The same, over the bar's clock under the pointer
         function toggleNotificationCenterAtPointer(): void {
             if (!root.open)
                 root.atPointer = true;
@@ -207,9 +267,9 @@ Scope {
                     } else if (event.key === Qt.Key_C) {
                         root.server.clear();
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.server.activate(row.notification);
+                        root.activate(row);
                     } else if (event.key === Qt.Key_Delete || event.key === Qt.Key_X) {
-                        row.notification.dismiss();
+                        root.dismiss(row);
                     } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Tab || event.key === Qt.Key_J || (ctrl && event.key === Qt.Key_N)) {
                         root.current = (root.current + 1) % count;
                     } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Backtab || event.key === Qt.Key_K || (ctrl && event.key === Qt.Key_P)) {
@@ -220,20 +280,21 @@ Scope {
                     event.accepted = true;
                 }
 
-                // The title, how many there are, and the do not disturb and
-                // Clear key caps, over a divider like the search row's
+                // The title and how many there are, then a round do not
+                // disturb button (blue while it's on) and Clear All, like
+                // macOS's
                 Item {
                     width: parent.width
-                    height: Theme.controlFontSize * 2 + Theme.searchPadding
+                    height: Theme.noteCardCloseSize + Theme.panelPadding
 
                     Text {
                         id: title
-                        y: (parent.height - Theme.searchPadding - height) / 2
+                        anchors.verticalCenter: parent.verticalCenter
                         text: "Notifications"
                         color: Theme.textColor
                         font.family: Theme.fontFamily
-                        font.pixelSize: Theme.controlFontSize
-                        font.weight: Theme.fontWeight
+                        font.pixelSize: Theme.searchFontSize
+                        font.weight: Font.DemiBold
                     }
 
                     Text {
@@ -249,52 +310,65 @@ Scope {
 
                     Row {
                         anchors.right: parent.right
-                        anchors.verticalCenter: title.verticalCenter
-                        spacing: Theme.keySpacing
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.keySpacing * 2
 
-                        // The bell struck through, lit and blue while do not
-                        // disturb is on, like a switch
-                        KeyCap {
-                            minWidth: height
-                            text: Theme.doNotDisturbIcon
-                            fontSize: Theme.controlFontSize
-                            lit: root.server?.doNotDisturb ?? false
-                            textColor: doNotDisturbMouse.containsMouse ? Theme.textColor : Theme.keyTextColor
-                            litTextColor: Theme.selectedColor
+                        Rectangle {
+                            readonly property bool on: root.server?.doNotDisturb ?? false
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: Theme.noteCardButtonHeight
+                            height: width
+                            radius: width / 2
+                            color: on ? Theme.selectedColor : doNotDisturbMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
+                            border.width: on ? 0 : 1
+                            border.color: Theme.noteCardEdgeColor
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: Theme.doNotDisturbIcon
+                                color: parent.on ? "white" : Theme.keyTextColor
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.controlFontSize
+                            }
 
                             MouseArea {
                                 id: doNotDisturbMouse
                                 anchors.fill: parent
-                                anchors.margins: -4
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: root.toggleDoNotDisturb()
                             }
                         }
 
-                        KeyCap {
+                        Rectangle {
+                            anchors.verticalCenter: parent.verticalCenter
                             visible: root.rows.length > 0
-                            text: "Clear"
-                            fontSize: Theme.keyFontSize
-                            lit: clearMouse.containsMouse
+                            width: clearLabel.implicitWidth + Theme.noteCardPadding * 1.5
+                            height: Theme.noteCardButtonHeight
+                            radius: height / 2
+                            color: clearMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
+                            border.width: 1
+                            border.color: Theme.noteCardEdgeColor
+
+                            Text {
+                                id: clearLabel
+                                anchors.centerIn: parent
+                                text: "Clear All"
+                                color: Theme.textColor
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.controlSmallFontSize
+                                font.weight: Font.DemiBold
+                            }
 
                             MouseArea {
                                 id: clearMouse
                                 anchors.fill: parent
-                                anchors.margins: -4
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: root.server.clear()
                             }
                         }
-                    }
-
-                    Rectangle {
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: Theme.searchPadding / 2
-                        width: parent.width
-                        height: 1
-                        color: Theme.dividerColor
                     }
                 }
 
@@ -385,62 +459,117 @@ Scope {
                         id: list
 
                         width: flick.width
+                        spacing: Theme.noteCardSpacing
 
                         Repeater {
                             id: repeater
 
                             model: root.rows
 
-                            Column {
+                            Item {
                                 id: entry
 
                                 required property var modelData
                                 required property int index
-                                readonly property bool active: root.current === index
+                                readonly property bool header: modelData.kind === "header"
 
-                                width: list.width
+                                x: Theme.noteCardCloseSize / 3
+                                width: list.width - x
+                                // Room above a card for its ×, which hangs over its
+                                // corner
+                                height: header ? groupHeader.height : notificationCard.implicitHeight + notificationCard.y
 
-                                // The app over its notifications, just its
-                                // name
-                                SectionHeader {
+                                // A spread-out stack's app, with Show less
+                                // and a × that clears the stack
+                                Item {
+                                    id: groupHeader
+
+                                    visible: entry.header
                                     width: parent.width
-                                    visible: entry.index === 0 || root.rows[entry.index - 1].group !== entry.modelData.group
-                                    text: entry.modelData.group
-                                    inset: 0
-                                    line: false
+                                    height: Theme.noteCardButtonHeight + Theme.rowSpacing
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: entry.modelData.group ?? ""
+                                        color: root.current === entry.index ? Theme.selectedColor : Theme.textColor
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.controlFontSize
+                                        font.weight: Font.DemiBold
+                                    }
+
+                                    Row {
+                                        anchors.right: parent.right
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: Theme.keySpacing * 2
+
+                                        Rectangle {
+                                            width: lessLabel.implicitWidth + Theme.noteCardPadding * 1.5
+                                            height: Theme.noteCardButtonHeight
+                                            radius: height / 2
+                                            color: lessMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
+                                            border.width: 1
+                                            border.color: Theme.noteCardEdgeColor
+
+                                            Text {
+                                                id: lessLabel
+                                                anchors.centerIn: parent
+                                                text: "Show less"
+                                                color: Theme.textColor
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: Theme.controlSmallFontSize
+                                                font.weight: Font.DemiBold
+                                            }
+
+                                            MouseArea {
+                                                id: lessMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: root.setExpanded(entry.modelData.group, false)
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            width: Theme.noteCardButtonHeight
+                                            height: width
+                                            radius: width / 2
+                                            color: groupCloseMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
+                                            border.width: 1
+                                            border.color: Theme.noteCardEdgeColor
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: Theme.closeIcon
+                                                color: Theme.keyTextColor
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: Theme.controlSmallFontSize
+                                            }
+
+                                            MouseArea {
+                                                id: groupCloseMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: root.dismissGroup(entry.modelData.group)
+                                            }
+                                        }
+                                    }
                                 }
 
-                                Item {
+                                NotificationCard {
+                                    id: notificationCard
+
+                                    visible: !entry.header
+                                    y: Theme.noteCardCloseSize / 3
                                     width: parent.width
-                                    height: row.implicitHeight + Theme.rowSpacing * 2
-
-                                    // The selected one, faintly, so the keys
-                                    // show where they are
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        radius: Theme.cornerRadius
-                                        color: Theme.hoverColor
-                                        visible: entry.active
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onPositionChanged: root.current = entry.index
-                                        onClicked: root.server.activate(entry.modelData.notification)
-                                    }
-
-                                    NotificationRow {
-                                        id: row
-
-                                        x: Theme.rowSpacing
-                                        y: Theme.rowSpacing
-                                        width: parent.width - x * 2
-                                        notification: entry.modelData.notification
-                                        server: root.server
-                                        active: entry.active
-                                    }
+                                    notification: entry.modelData.notification ?? null
+                                    server: root.server
+                                    stack: entry.modelData.stack ?? 1
+                                    selected: root.current === entry.index
+                                    onClicked: root.activate(entry.modelData)
+                                    onCloseClicked: root.dismiss(entry.modelData)
+                                    onHoveredChanged: if (hovered)
+                                        root.current = entry.index
                                 }
                             }
                         }

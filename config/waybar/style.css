@@ -90,8 +90,7 @@ window#waybar {
 #custom-volume,
 #network,
 #bluetooth,
-#custom-notifications,
-#clock,
+#custom-clock,
 #custom-kernel {
   padding: 0 12px;
 }
@@ -191,22 +190,18 @@ window#waybar {
   color: rgba(192, 202, 245, 0.2);
 }
 
-/* The time, after the bell */
-#clock {
+/* The time, which opens the notification centre; brighter under the
+   mouse, like the icons before it */
+#custom-clock {
   color: #c0caf5;
+  font-size: 16px;
 }
-
-/* Wi-Fi, bluetooth and the notification bell, in the time's colour; grey
-   when off, disconnected or in do not disturb */
-#custom-notifications {
-  color: #c0caf5;
-}
-#custom-notifications.dnd {
-  color: #808080;
-}
-#custom-notifications:hover {
+#custom-clock:hover {
   color: #ffffff;
 }
+
+/* Wi-Fi and bluetooth, in the time's colour; grey when off or
+   disconnected */
 
 #bluetooth {
   color: #c0caf5;

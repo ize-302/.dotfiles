@@ -16,8 +16,7 @@
 		"custom/volume",
 		"network",
 		"bluetooth",
-		"custom/notifications",
-		"clock"
+		"custom/clock"
 		// "custom/kernel"
 	],
 
@@ -168,40 +167,29 @@
 		"format": "🐧"
 	},
 
-	// Just the time, last on the bar; hover shows the date
-	"clock": {
-		"format": "{:%H:%M}",
-		"interval": 10,
-		"tooltip-format": "{:%A, %d %B %Y}"
-	},
-
-	// Opens the notification centre, like Super+Shift+N. Quickshell writes
-	// what it shows (config/quickshell/launcher/Notifications.qml): a bell,
-	// with a badge and an orange dot while there are new notifications and a
-	// line through it during do not disturb. It signals SIGRTMIN+8 on a change.
-	"custom/notifications": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/notifications.json\" 2>/dev/null || echo '{\"text\": \"\udb80\udc9a\"}'",
+	"custom/clock": {
+		"exec": "~/.local/bin/clock-status",
 		"return-type": "json",
-		"interval": "once",
+		"interval": 10,
 		"signal": 8,
-		"tooltip": false,
 		"on-click": "~/.local/bin/notification-center --pointer"
 	},
 
 	// Replaces nm-applet's tray icon: signal bars on Wi-Fi, filling in with
 	// the strength (0-24, 25-49, 50-74, 75-100%), a cable on ethernet, and
-	// the bars struck through when off or disconnected. Hover
+	// the bars struck through when off or disconnected. Hover shows the
+	// download and upload speed too, every 2 seconds. Hover
 	// shows the network; click opens the control panel's Network page.
 	"network": {
-		"interval": 5,
+		"interval": 2,
 		"format-wifi": "{icon}",
 		"format-icons": ["\udb82\udcbf", "\udb82\udcbc", "\udb82\udcbd", "\udb82\udcbe"],
 		"format-ethernet": "\udb80\ude00",
 		"format-linked": "\udb81\udf83",
 		"format-disconnected": "\udb81\udf83",
 		"format-disabled": "\udb81\udf83",
-		"tooltip-format-wifi": "{essid}  {signalStrength}%\n{ipaddr}",
-		"tooltip-format-ethernet": "Ethernet\n{ipaddr}",
+		"tooltip-format-wifi": "{essid}  {signalStrength}%\n{ipaddr}\n\u2193 {bandwidthDownBytes}  \u2191 {bandwidthUpBytes}",
+		"tooltip-format-ethernet": "Ethernet\n{ipaddr}\n\u2193 {bandwidthDownBytes}  \u2191 {bandwidthUpBytes}",
 		"tooltip-format-disconnected": "Not connected",
 		"tooltip-format-disabled": "Wi-Fi off",
 		"on-click": "~/.local/bin/control-panel --pointer Network"

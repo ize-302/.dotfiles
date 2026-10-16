@@ -1,0 +1,27 @@
+#!/bin/sh
+# ~/.local/bin/clock-status
+# The bar's clock (waybar's custom/clock), as JSON: the date and time
+# ("Thu Oct 15  19:34"), an orange dot
+# after it while there are new notifications, and a bell with a line
+# through it before it during do not disturb, from what the launcher's
+# notification server writes ($XDG_RUNTIME_DIR/notifications.json,
+# config/quickshell/launcher/Notifications.qml). Hover shows the date.
+status=$(cat "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/notifications.json" 2>/dev/null)
+
+before=""
+after=""
+class=""
+case "$status" in
+*'"class":"dnd"'*)
+	# Bell with a line through it (nf-md-bell_off), dimmed
+	before="<span alpha='55%'>$(printf '\363\260\202\233')</span>  "
+	class="dnd"
+	;;
+*'"class":"unread"'*)
+	after=" <span color='#ff7518' size='small' rise='6pt'>●</span>"
+	class="unread"
+	;;
+esac
+
+printf '{"text": "%s%s%s", "tooltip": "%s", "class": "%s"}\n' \
+	"$before" "$(date '+%a %b %-d - %H:%M')" "$after" "$(date '+%A, %d %B %Y')" "$class"
