@@ -8,9 +8,10 @@ import Quickshell.Wayland
 import qs
 
 // Notification centre: the notifications kept by the server
-// (Notifications.qml), grouped by app, the app with the newest first. The
-// glass panel of the other menus, floating just above the bar by the right
-// edge, like the control panel. Toggled by
+// (Notifications.qml), grouped by app, the app with the newest first. No
+// panel: the title and each notification are cards of their own, like new
+// notifications (Notifications.qml) and as wide, floating just above the bar
+// by the right edge, like the control panel. Toggled by
 // ~/.local/bin/notification-center
 // (`qs -c launcher ipc call notificationCenter toggleNotificationCenter`),
 // Super+Shift+N or a click on the bar's clock.
@@ -64,12 +65,16 @@ Scope {
                     group: app,
                     count: list.length
                 });
-                for (const notification of list)
+                // Under the header on one card, divided, the last one
+                // rounding off its bottom
+                for (const [index, notification] of list.entries())
                     rows.push({
                         kind: "card",
                         group: app,
                         notification: notification,
-                        stack: 1
+                        stack: 1,
+                        joined: true,
+                        last: index === list.length - 1
                     });
             } else {
                 rows.push({
@@ -196,10 +201,12 @@ Scope {
         screen: (root.atPointer && root.pointerX >= 0 ? root.pointerScreen : null) ?? Quickshell.screens.find(screen => screen.name === I3.focusedMonitor?.name) ?? null
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
-        implicitWidth: Theme.notificationCenterWidth
+        implicitWidth: Theme.notificationWidth
         implicitHeight: panel.height
 
-        WlrLayershell.namespace: "launcher-shadow"
+        // No drop shadow, as there's no panel to cast one: just the blur
+        // behind the cards (sway's `layer_effects "launcher"`)
+        WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
@@ -229,10 +236,13 @@ Scope {
         Glass {
             id: panel
 
+            // Only there to rise into place: the cards are the glass
             floating: true
+            color: "transparent"
+            edgeColor: "transparent"
 
             width: parent.width
-            height: content.height + Theme.panelPadding * 2
+            height: content.height
 
             Column {
                 id: content
@@ -240,7 +250,7 @@ Scope {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: Theme.panelPadding
+                spacing: Theme.notificationSpacing
 
                 Keys.onPressed: event => {
                     const ctrl = event.modifiers & Qt.ControlModifier;
@@ -273,169 +283,180 @@ Scope {
                     event.accepted = true;
                 }
 
-                // The title and how many there are, then a round do not
-                // disturb button (blue while it's on) and Clear All, like
-                // macOS's
-                Item {
+                // The title card: the title and how many there are, then a
+                // do not disturb button (blue while it's on, like a switch)
+                // and Clear All
+                Rectangle {
                     width: parent.width
-                    height: Theme.noteCardCloseSize + Theme.panelPadding
+                    height: titleRows.height + Theme.panelPadding
+                    radius: Theme.cornerRadius
+                    color: Theme.noteCardColor
 
-                    Text {
-                        id: title
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "Notifications"
-                        color: Theme.textColor
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.searchFontSize
-                        font.weight: Font.DemiBold
-                    }
+                    Column {
+                        id: titleRows
 
-                    Text {
-                        anchors.left: title.right
-                        anchors.leftMargin: Theme.iconSpacing
-                        anchors.baseline: title.baseline
-                        text: root.countLabel()
-                        color: (root.server?.unread ?? 0) > 0 ? Theme.accentColor : Theme.dimColor
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.controlSmallFontSize
-                        font.weight: Theme.fontWeight
-                    }
+                        x: Theme.panelPadding
+                        y: Theme.panelPadding / 2
+                        width: parent.width - x * 2
 
-                    Row {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.keySpacing * 2
-
-                        Rectangle {
-                            readonly property bool on: root.server?.doNotDisturb ?? false
-
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: Theme.noteCardButtonHeight
-                            height: width
-                            radius: width / 2
-                            color: on ? Theme.toggleOnColor : doNotDisturbMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
-                            border.width: on ? 0 : 1
-                            border.color: Theme.noteCardEdgeColor
+                        Item {
+                            width: parent.width
+                            height: Theme.noteCardButtonHeight + Theme.rowSpacing * 2
 
                             Text {
-                                anchors.centerIn: parent
-                                text: Theme.doNotDisturbIcon
-                                color: parent.on ? "white" : Theme.keyTextColor
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.controlFontSize
-                            }
-
-                            MouseArea {
-                                id: doNotDisturbMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.toggleDoNotDisturb()
-                            }
-                        }
-
-                        Rectangle {
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: root.rows.length > 0
-                            width: clearLabel.implicitWidth + Theme.noteCardPadding * 1.5
-                            height: Theme.noteCardButtonHeight
-                            radius: height / 2
-                            color: clearMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
-                            border.width: 1
-                            border.color: Theme.noteCardEdgeColor
-
-                            Text {
-                                id: clearLabel
-                                anchors.centerIn: parent
-                                text: "Clear All"
+                                id: title
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "Notifications"
                                 color: Theme.textColor
                                 font.family: Theme.fontFamily
-                                font.pixelSize: Theme.controlSmallFontSize
+                                font.pixelSize: Theme.searchFontSize
                                 font.weight: Font.DemiBold
                             }
 
-                            MouseArea {
-                                id: clearMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.server.clear()
+                            Text {
+                                anchors.left: title.right
+                                anchors.leftMargin: Theme.iconSpacing
+                                anchors.baseline: title.baseline
+                                text: root.countLabel()
+                                color: (root.server?.unread ?? 0) > 0 ? Theme.accentColor : Theme.dimColor
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.controlSmallFontSize
+                                font.weight: Theme.fontWeight
+                            }
+
+                            Row {
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: Theme.keySpacing * 2
+
+                                Rectangle {
+                                    readonly property bool on: root.server?.doNotDisturb ?? false
+
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: Theme.noteCardButtonHeight
+                                    height: width
+                                    radius: Theme.cornerRadius
+                                    color: on ? Theme.toggleOnColor : doNotDisturbMouse.containsMouse ? Theme.hoverColor : Theme.keyColor
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: Theme.doNotDisturbIcon
+                                        color: parent.on ? "white" : Theme.keyTextColor
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.controlFontSize
+                                    }
+
+                                    MouseArea {
+                                        id: doNotDisturbMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.toggleDoNotDisturb()
+                                    }
+                                }
+
+                                Rectangle {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: root.rows.length > 0
+                                    width: clearLabel.implicitWidth + Theme.keyPadding * 2
+                                    height: Theme.noteCardButtonHeight
+                                    radius: Theme.cornerRadius
+                                    color: clearMouse.containsMouse ? Theme.hoverColor : Theme.keyColor
+
+                                    Text {
+                                        id: clearLabel
+                                        anchors.centerIn: parent
+                                        text: "Clear All"
+                                        color: Theme.textColor
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.controlSmallFontSize
+                                        font.weight: Font.DemiBold
+                                    }
+
+                                    MouseArea {
+                                        id: clearMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.server.clear()
+                                    }
+                                }
                             }
                         }
-                    }
-                }
 
-                // How long do not disturb lasts, while it's on: the choice
-                // lit and bold, and when it ends
-                Item {
-                    visible: root.server?.doNotDisturb ?? false
-                    width: parent.width
-                    height: Theme.rowHeight
+                        // How long do not disturb lasts, while it's on: the choice
+                        // lit and bold, and when it ends
+                        Item {
+                            visible: root.server?.doNotDisturb ?? false
+                            width: parent.width
+                            height: Theme.rowHeight
 
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: (root.server?.doNotDisturbEnd() ?? "") ? "Ends " + root.server.doNotDisturbEnd() : "Do not disturb"
-                        color: Theme.dimColor
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.controlSmallFontSize
-                        font.weight: Theme.fontWeight
-                    }
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: (root.server?.doNotDisturbEnd() ?? "") ? "Ends " + root.server.doNotDisturbEnd() : "Do not disturb"
+                                color: Theme.dimColor
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.controlSmallFontSize
+                                font.weight: Theme.fontWeight
+                            }
 
-                    Row {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.keySpacing
+                            Row {
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: Theme.keySpacing
 
-                        Repeater {
-                            model: [
-                                {
-                                    duration: "hour",
-                                    text: "1 hour"
-                                },
-                                {
-                                    duration: "morning",
-                                    text: "Until morning"
-                                },
-                                {
-                                    duration: "",
-                                    text: "Until off"
-                                }
-                            ]
+                                Repeater {
+                                    model: [
+                                        {
+                                            duration: "hour",
+                                            text: "1 hour"
+                                        },
+                                        {
+                                            duration: "morning",
+                                            text: "Until morning"
+                                        },
+                                        {
+                                            duration: "",
+                                            text: "Until off"
+                                        }
+                                    ]
 
-                            KeyCap {
-                                id: durationCap
+                                    KeyCap {
+                                        id: durationCap
 
-                                required property var modelData
+                                        required property var modelData
 
-                                text: modelData.text
-                                fontSize: Theme.controlSmallFontSize
-                                lit: (root.server?.doNotDisturbFor ?? "") === modelData.duration || durationMouse.containsMouse
-                                bold: (root.server?.doNotDisturbFor ?? "") === modelData.duration
-                                weight: Theme.unselectedWeight
-                                litTextColor: bold ? Theme.selectedColor : Theme.textColor
+                                        text: modelData.text
+                                        fontSize: Theme.controlSmallFontSize
+                                        lit: (root.server?.doNotDisturbFor ?? "") === modelData.duration || durationMouse.containsMouse
+                                        bold: (root.server?.doNotDisturbFor ?? "") === modelData.duration
+                                        weight: Theme.unselectedWeight
+                                        litTextColor: bold ? Theme.selectedColor : Theme.textColor
 
-                                MouseArea {
-                                    id: durationMouse
-                                    anchors.fill: parent
-                                    anchors.margins: -2
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.server.setDoNotDisturb(durationCap.modelData.duration)
+                                        MouseArea {
+                                            id: durationMouse
+                                            anchors.fill: parent
+                                            anchors.margins: -2
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.server.setDoNotDisturb(durationCap.modelData.duration)
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
 
-                Text {
-                    visible: root.rows.length === 0
-                    height: Theme.rowHeight
-                    verticalAlignment: Text.AlignVCenter
-                    text: (root.server?.doNotDisturb ?? false) ? Theme.doNotDisturbText : Theme.noNotificationsText
-                    color: Theme.dimColor
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.controlFontSize
-                    font.weight: Theme.fontWeight
+                        Text {
+                            visible: root.rows.length === 0
+                            height: Theme.rowHeight
+                            verticalAlignment: Text.AlignVCenter
+                            text: (root.server?.doNotDisturb ?? false) ? Theme.doNotDisturbText : Theme.noNotificationsText
+                            color: Theme.dimColor
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.controlFontSize
+                            font.weight: Theme.fontWeight
+                        }
+                    }
                 }
 
                 // Up to notificationCenterMaxHeight of the screen, then
@@ -454,7 +475,6 @@ Scope {
                         id: list
 
                         width: flick.width
-                        spacing: Theme.noteCardSpacing
 
                         Repeater {
                             id: repeater
@@ -467,23 +487,30 @@ Scope {
                                 required property var modelData
                                 required property int index
                                 readonly property bool header: modelData.kind === "header"
+                                // Space above each card; none inside a
+                                // spread-out stack's
+                                readonly property int gap: index > 0 && !modelData.joined ? Theme.notificationSpacing : 0
 
-                                x: Theme.noteCardCloseSize / 3
-                                width: list.width - x
-                                // Room above a card for its ×, which hangs over its
-                                // corner
-                                height: header ? groupHeader.height : notificationCard.implicitHeight + notificationCard.y
+                                width: list.width
+                                height: gap + (header ? groupHeader.height : notificationCard.implicitHeight)
 
                                 // A spread-out stack's app, with Show less
-                                // and a × that clears the stack
-                                Item {
+                                // and a × that clears the stack, on a card
+                                // like the title's
+                                Rectangle {
                                     id: groupHeader
 
                                     visible: entry.header
+                                    y: entry.gap
                                     width: parent.width
-                                    height: Theme.noteCardButtonHeight + Theme.rowSpacing
+                                    height: Theme.noteCardButtonHeight + Theme.rowSpacing * 2 + Theme.panelPadding / 2
+                                    // The top of the stack's card
+                                    topLeftRadius: Theme.cornerRadius
+                                    topRightRadius: Theme.cornerRadius
+                                    color: Theme.noteCardColor
 
                                     Text {
+                                        x: Theme.panelPadding
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: entry.modelData.group ?? ""
                                         color: root.current === entry.index ? Theme.selectedColor : Theme.unselectedColor
@@ -494,16 +521,15 @@ Scope {
 
                                     Row {
                                         anchors.right: parent.right
+                                        anchors.rightMargin: Theme.panelPadding
                                         anchors.verticalCenter: parent.verticalCenter
                                         spacing: Theme.keySpacing * 2
 
                                         Rectangle {
-                                            width: lessLabel.implicitWidth + Theme.noteCardPadding * 1.5
+                                            width: lessLabel.implicitWidth + Theme.keyPadding * 2
                                             height: Theme.noteCardButtonHeight
-                                            radius: height / 2
-                                            color: lessMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
-                                            border.width: 1
-                                            border.color: Theme.noteCardEdgeColor
+                                            radius: Theme.cornerRadius
+                                            color: lessMouse.containsMouse ? Theme.hoverColor : Theme.keyColor
 
                                             Text {
                                                 id: lessLabel
@@ -527,10 +553,8 @@ Scope {
                                         Rectangle {
                                             width: Theme.noteCardButtonHeight
                                             height: width
-                                            radius: width / 2
-                                            color: groupCloseMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
-                                            border.width: 1
-                                            border.color: Theme.noteCardEdgeColor
+                                            radius: Theme.cornerRadius
+                                            color: groupCloseMouse.containsMouse ? Theme.hoverColor : Theme.keyColor
 
                                             Text {
                                                 anchors.centerIn: parent
@@ -555,8 +579,10 @@ Scope {
                                     id: notificationCard
 
                                     visible: !entry.header
-                                    y: Theme.noteCardCloseSize / 3
+                                    y: entry.gap
                                     width: parent.width
+                                    joinedAbove: entry.modelData.joined ?? false
+                                    joinedBelow: (entry.modelData.joined ?? false) && !entry.modelData.last
                                     notification: entry.modelData.notification ?? null
                                     server: root.server
                                     stack: entry.modelData.stack ?? 1

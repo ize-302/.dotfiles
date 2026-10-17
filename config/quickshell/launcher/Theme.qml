@@ -267,25 +267,19 @@ Singleton {
     // For notifications that don't say how long to stay; critical ones stay
     // until closed
     readonly property int notificationTimeout: 5000
-    // The notification centre's cards (NotificationCard.qml), like
-    // macOS's: rounded, a little lighter than the glass, with the app's icon
-    // in a rounded square. A collapsed stack's cards peek out underneath.
-    readonly property int noteCardRadius: 14
-    readonly property int noteCardPadding: 12
-    readonly property int noteCardIconSize: 34
-    readonly property int noteCardSpacing: 8
-    readonly property color noteCardColor: Qt.rgba(1, 1, 1, 0.06)
-    readonly property color noteCardHoverColor: Qt.rgba(1, 1, 1, 0.1)
-    readonly property color noteCardEdgeColor: Qt.rgba(1, 1, 1, 0.08)
+    // The notification centre's cards (NotificationCard.qml), laid out like
+    // the new notifications' and on their dark glass, a little lighter under
+    // the mouse or picked with the keys. A collapsed stack's cards peek out
+    // underneath.
+    readonly property color noteCardColor: glassPanelColor
+    readonly property color noteCardHoverColor: Qt.rgba(52 / 255, 52 / 255, 52 / 255, 0.75)
     readonly property int noteCardStackPeek: 6
     readonly property int noteCardStackInset: 10
-    readonly property int noteCardCloseSize: 20
-    // The round and pill buttons: do not disturb, Clear All, Show less
+    // The buttons: do not disturb, Clear All, Show less
     readonly property int noteCardButtonHeight: 26
 
-    // Notification centre (NotificationCenter.qml): as wide as the cards,
-    // scrolling past this fraction of the screen height
-    readonly property int notificationCenterWidth: 380
+    // Notification centre (NotificationCenter.qml): as wide as the new
+    // notifications, scrolling past this fraction of the screen height
     readonly property real notificationCenterMaxHeight: 0.7
     readonly property string noNotificationsText: "No notifications"
     readonly property string doNotDisturbText: "Do not disturb is on"
