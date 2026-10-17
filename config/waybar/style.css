@@ -220,17 +220,27 @@ window#waybar {
   background-color: rgba(192, 202, 245, 0.06);
 }
 
-/* Hover popups: flat panel, no border. The GTK theme would otherwise add its
-   own outline and shadow. */
+/* Hover popups, like the launcher's menus and cards
+   (config/quickshell/launcher/Theme.qml) but solid: their #202020, a faint
+   white edge, 4px corners, and their font. No shadow, which the GTK theme
+   would otherwise add. */
 tooltip {
-  background-color: #15161e;
-  border: none;
+  background-color: #202020;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: none;
-  border-radius: 1px;
+  border-radius: 4px;
+  /* The theme's own padding (adw-gtk3: 6px 10px here, and 4px on
+     everything inside), on top of the label's; and its text shadow */
+  padding: 0;
+  text-shadow: none;
+}
+tooltip * {
+  padding: 0;
 }
 tooltip label {
-  color: #b1b1b1;
-  font-size: 11pt;
-  font-weight: 400;
-  padding: 4px;
+  color: #ffffff;
+  font-family: "Adwaita Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 3px 6px;
 }

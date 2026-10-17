@@ -89,7 +89,7 @@
 		"unit": "GiB",
 		"format": " {percentage_used}%",
 		"states": { "d0": 0, "d50": 50, "d65": 65, "d75": 75, "d85": 85, "d92": 92 },
-		"tooltip-format": "Used  {specific_used:0.0f}G\nFree  {specific_free:0.0f}G\nTotal {specific_total:0.0f}G"
+		"tooltip-format": "Used {specific_used:0.0f}G\nFree {specific_free:0.0f}G\nTotal {specific_total:0.0f}G"
 	},
 
 	// Colours come from the state classes in style.css.
@@ -108,7 +108,7 @@
 		"format": " {percentage}%",
 		"states": { "c0": 0, "c10": 10, "c25": 25, "c50": 50, "c60": 60, "c70": 70 },
 		"on-click": "~/.local/bin/btop-toggle",
-		"tooltip-format": "RAM  {used:0.1f} / {total:0.1f} GiB\nFree {avail:0.1f} GiB\nSwap {swapUsed:0.1f} / {swapTotal:0.1f} GiB"
+		"tooltip-format": "RAM {used:0.1f} / {total:0.1f} GiB\nFree {avail:0.1f} GiB\nSwap {swapUsed:0.1f} / {swapTotal:0.1f} GiB"
 	},
 
 	// Battery states match when capacity <= value.
