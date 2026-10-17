@@ -72,8 +72,8 @@ Singleton {
     // Shown instead of the list when nothing matches
     readonly property string emptyText: "No apps found"
 
-    // Power menu: a row of tiles in a drawer pulled up out of the middle of
-    // the bar, a large icon over each label
+    // Power menu: a row of tiles floating centred just above the bar, a large
+    // icon over each label
     // Line glyphs in the text's colour, like the control panel's (and the
     // login screen's power menu)
     readonly property string powerLockIcon: String.fromCodePoint(0xf0341)
@@ -86,9 +86,7 @@ Singleton {
     readonly property int powerTilePadding: 8
     readonly property int powerPanelPadding: 6
     readonly property int powerFontSize: 13
-    readonly property int powerRadius: 8
-    // The bar's own tint (config/waybar/style.css), so the drawer reads as
-    // part of it
+    // The bar's own tint (config/waybar/style.css)
     readonly property color powerColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
 
     // Clipboard menu: wider, entries are whole lines of text

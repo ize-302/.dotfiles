@@ -6,8 +6,8 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs
 
-// Power menu: a row of tiles in a drawer pulled up out of the middle of the
-// bar, a large icon over each label. Toggled by ~/.local/bin/power-menu
+// Power menu: a row of tiles floating centred just above the bar, a large
+// icon over each label. Toggled by ~/.local/bin/power-menu
 // (`qs -c launcher ipc call power togglePowerMenu`), which also carries out
 // the choice.
 Scope {
@@ -76,12 +76,13 @@ Scope {
         implicitWidth: panel.width
         implicitHeight: panel.height
 
-        // No drop shadow: it's part of the bar. Only the bottom anchored,
-        // so the layer shell centres it across, right on the bar.
+        // No drop shadow, like the bar. Only the bottom anchored, so the
+        // layer shell centres it across, floatingGap above the bar.
         WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
         anchors.bottom: true
+        margins.bottom: Theme.floatingGap
 
         onVisibleChanged: {
             if (!visible)
@@ -95,8 +96,7 @@ Scope {
         Glass {
             id: panel
 
-            attached: true
-            cornerRadius: Theme.powerRadius
+            floating: true
             color: Theme.powerColor
             width: tiles.width + Theme.powerPanelPadding * 2
             height: tiles.height + Theme.powerPanelPadding * 2
