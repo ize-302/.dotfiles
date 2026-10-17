@@ -1,15 +1,17 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.I3
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
 
-// Caps lock popup, like macOS's: a rounded glass square in the middle of the
-// screen with the focus, the ⇪ symbol and "Caps Lock On" (or dimmed, "Caps
-// Lock Off"), for a moment each time it's switched. Clicks go through it.
+// Caps lock popup, like macOS's: a rounded glass square centred across the
+// bottom of the screen with the focus, just above the bar, a caps lock icon and
+// "ON" (or dimmed, "OFF"). It stays up while caps lock is on, and shows OFF
+// for a moment once it's switched off. Clicks go through it.
 //
 // The state is the keyboards' caps lock lights
 // (/sys/class/leds/*::capslock), which sway keeps the same on every
@@ -20,7 +22,8 @@ Scope {
 
     property bool on: false
     property bool shown: false
-    // The first reading is what it already was, not a change
+    // The first reading is what it already was, not a change: it only shows
+    // the popup if caps lock is already on
     property bool armed: false
 
     readonly property var focusedScreen: Quickshell.screens.find(screen => screen.name === I3.focusedMonitor?.name) ?? null
@@ -29,15 +32,19 @@ Scope {
         if (lit === on && armed)
             return;
         on = lit;
-        if (!armed) {
-            armed = true;
+        const first = !armed;
+        armed = true;
+        if (first && !lit)
             return;
-        }
         if (!shown) {
             shown = true;
             panel.appear();
         }
-        hide.restart();
+        // Up until it's off; OFF only for a moment
+        if (lit)
+            hide.stop();
+        else
+            hide.restart();
     }
 
     // Reads the lights in a loop and prints 1 or 0 when caps lock changes
@@ -89,15 +96,19 @@ while True:
         visible: root.shown
         screen: root.focusedScreen
         color: "transparent"
-        exclusionMode: ExclusionMode.Ignore
+        // Above the bar, not over it
+        exclusionMode: ExclusionMode.Normal
         implicitWidth: panel.width
         implicitHeight: panel.height
         // Clicks go through to whatever is underneath
         mask: Region {}
 
-        // No edges anchored: the layer shell centres it. Blurred behind
-        // (`layer_effects "launcher"`), but no drop shadow: it's meant to
-        // be subtle.
+        // Only the bottom anchored: the layer shell centres it across
+        anchors.bottom: true
+        margins.bottom: Theme.floatingGap
+
+        // Blurred behind (`layer_effects "launcher"`), but no drop shadow:
+        // it's meant to be subtle.
         WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -106,7 +117,6 @@ while True:
             id: panel
 
             floating: true
-            cornerRadius: Theme.capsLockRadius
             width: Theme.capsLockSize
             height: Theme.capsLockSize
             // More see-through than the menus, plain, with a faint edge
@@ -115,22 +125,34 @@ while True:
 
             Column {
                 anchors.centerIn: parent
-                spacing: Theme.panelPadding / 2
+                spacing: Theme.rowSpacing
 
-                Text {
+                // Material Symbols' caps lock badge, drawn white and tinted
+                // like the text under it
+                Image {
+                    id: icon
+                    visible: false
+                    width: Theme.capsLockIconSize
+                    height: Theme.capsLockIconSize
+                    sourceSize: Qt.size(width, height)
+                    source: Qt.resolvedUrl("icons/capslock.svg")
+                }
+
+                MultiEffect {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: Theme.capsLockIcon
-                    color: root.on ? Theme.keyTextColor : Theme.dimColor
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.capsLockSize * 0.42
+                    width: icon.width
+                    height: icon.height
+                    source: icon
+                    colorization: 1
+                    colorizationColor: root.on ? Theme.keyTextColor : Theme.dimColor
                 }
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.on ? "Caps Lock On" : "Caps Lock Off"
+                    text: root.on ? "ON" : "OFF"
                     color: root.on ? Theme.keyTextColor : Theme.dimColor
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.controlSmallFontSize
+                    font.pixelSize: Theme.capsLockFontSize
                     font.weight: Theme.fontWeight
                 }
             }

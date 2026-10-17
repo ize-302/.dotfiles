@@ -210,14 +210,16 @@ Singleton {
     readonly property string playIcon: String.fromCodePoint(0xf040a)
     readonly property string pauseIcon: String.fromCodePoint(0xf03e4)
 
-    // Caps lock popup (CapsLock.qml): a square in the middle of the screen,
-    // with macOS's ⇪, for a moment after each switch. How often the
-    // keyboards' lights are read, in ms.
-    readonly property int capsLockSize: 110
-    readonly property int capsLockRadius: 12
+    // Caps lock popup (CapsLock.qml): a square centred across the bottom of
+    // the screen, floatingGap above the bar, with the menus' corners and a
+    // caps lock icon (icons/capslock.svg); up while caps lock is on, and for
+    // capsLockTimeout ms after it's turned off. How often the keyboards'
+    // lights are read, in ms.
+    readonly property int capsLockSize: 60
+    readonly property int capsLockIconSize: 24
+    readonly property int capsLockFontSize: 9
     readonly property int capsLockTimeout: 1200
     readonly property int capsLockPoll: 150
-    readonly property string capsLockIcon: String.fromCodePoint(0xf0632)
     // Fainter than the menus' glass, and its edge
     readonly property color capsLockColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
     readonly property color capsLockEdgeColor: Qt.rgba(1, 1, 1, 0.08)
