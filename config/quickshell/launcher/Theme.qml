@@ -26,11 +26,11 @@ Singleton {
     readonly property int panelRadius: 4
     readonly property int cornerRadius: 4
     // Hairline space between a floating panel (the control panel,
-    // notification cards, the clipboard menu, ...) and the bar, and the
+    // notification cards, the notification centre) and the bar, and the
     // screen's right edge
     readonly property int floatingGap: 3
     // Space between the bar and the popups centred above it (the power menu,
-    // the key bindings sheet, the caps lock popup)
+    // the key bindings sheet, the clipboard menu, the caps lock popup)
     readonly property int centredGap: 10
 
     // Search row

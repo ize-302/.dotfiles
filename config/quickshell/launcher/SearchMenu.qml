@@ -124,7 +124,7 @@ PanelWindow { // qmllint disable uncreatable-type
         left: !window.floating || window.strip
         right: window.strip
     }
-    margins.bottom: window.floating && window.aboveBar ? Theme.floatingGap : 0
+    margins.bottom: window.floating && window.aboveBar ? Theme.centredGap : 0
 
     onVisibleChanged: {
         if (!visible)
