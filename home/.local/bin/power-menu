@@ -20,7 +20,6 @@ run() {
 	lock) "${locker[@]}" ;;
 	logout) paplay "$logout_sound" && swaymsg -s "$sway_socket" exit ;;
 	sleep) systemctl suspend ;;
-	hibernate) paplay "$logout_sound" && "${locker[@]}" && sleep 1 && systemctl hibernate ;;
 	reboot) paplay "$logout_sound" && systemctl reboot ;;
 	shutdown) paplay "$logout_sound" && systemctl poweroff -i ;;
 	esac

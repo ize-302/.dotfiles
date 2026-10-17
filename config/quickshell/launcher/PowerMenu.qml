@@ -6,24 +6,47 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs
 
-// Power menu: the same corner panel as the app launcher, just wide enough
-// for its labels. Toggled by ~/.local/bin/power-menu
-// (`qs -c launcher ipc call power togglePowerMenu`), which also carries out the choice.
+// Power menu: a row of tiles in a drawer pulled up out of the middle of the
+// bar, a large icon over each label. Toggled by ~/.local/bin/power-menu
+// (`qs -c launcher ipc call power togglePowerMenu`), which also carries out
+// the choice.
 Scope {
     id: root
 
     property bool open: false
-    // Label, also the icon file name and the argument given to power-menu
-    readonly property list<string> entries: ["lock", "logout", "sleep", "hibernate", "reboot", "shutdown"]
+    // `id` is the argument given to power-menu
+    readonly property list<var> entries: [
+        {
+            id: "lock",
+            label: "Lock",
+            icon: Theme.powerLockIcon
+        },
+        {
+            id: "logout",
+            label: "Log Out",
+            icon: Theme.powerLogoutIcon
+        },
+        {
+            id: "sleep",
+            label: "Sleep",
+            icon: Theme.powerSleepIcon
+        },
+        {
+            id: "reboot",
+            label: "Restart",
+            icon: Theme.powerRestartIcon
+        },
+        {
+            id: "shutdown",
+            label: "Shut Down",
+            icon: Theme.powerShutDownIcon
+        }
+    ]
     property int current: 0
-
-    function iconSource(entry) {
-        return Qt.resolvedUrl("icons/" + entry + ".svg");
-    }
 
     function run(entry) {
         open = false;
-        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/power-menu", entry]);
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/power-menu", entry.id]);
     }
 
     IpcHandler {
@@ -34,15 +57,15 @@ Scope {
         }
     }
 
-    // Measures the widest label
+    // Measures the widest label, so every tile is as wide
     FontMetrics {
         id: longest
 
-        readonly property real widest: Math.max(...root.entries.map(entry => longest.advanceWidth(entry)))
+        readonly property real widest: Math.max(...root.entries.map(entry => longest.advanceWidth(entry.label)))
 
         font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontSize
-        // As wide as the selected row's bold
+        font.pixelSize: Theme.powerFontSize
+        // As wide as the selected tile's semibold
         font.weight: Theme.selectedWeight
     }
 
@@ -53,41 +76,35 @@ Scope {
         implicitWidth: panel.width
         implicitHeight: panel.height
 
-        // With the drop shadow (`layer_effects "launcher-shadow"` in sway)
-        WlrLayershell.namespace: "launcher-shadow"
+        // No drop shadow: it's part of the bar. Only the bottom anchored,
+        // so the layer shell centres it across, right on the bar.
+        WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-
-        anchors {
-            bottom: true
-            left: true
-        }
+        anchors.bottom: true
 
         onVisibleChanged: {
             if (!visible)
                 return;
 
             root.current = 0;
-            rows.forceActiveFocus();
+            tiles.forceActiveFocus();
             panel.appear();
         }
 
         Glass {
             id: panel
 
-            // Tighter than the right: the icons carry their own inset
-            readonly property int leftPadding: Theme.panelPadding - 4
+            attached: true
+            cornerRadius: Theme.powerRadius
+            color: Theme.powerColor
+            width: tiles.width + Theme.powerPanelPadding * 2
+            height: tiles.height + Theme.powerPanelPadding * 2
 
-            // Fitted to the widest label
-            width: Math.ceil(longest.widest) + Theme.iconSize + Theme.iconSpacing + Theme.rowPadding * 2 + leftPadding + Theme.panelPadding
-            height: rows.height + Theme.panelPadding * 2
+            Row {
+                id: tiles
 
-            Column {
-                id: rows
-
-                anchors.verticalCenter: parent.verticalCenter
-                x: panel.leftPadding
-                width: parent.width - panel.leftPadding - Theme.panelPadding
+                anchors.centerIn: parent
                 spacing: Theme.rowSpacing
 
                 Keys.onPressed: event => {
@@ -98,9 +115,9 @@ Scope {
                         root.open = false;
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root.run(root.entries[root.current]);
-                    } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N)) {
+                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L || event.key === Qt.Key_Down || event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N)) {
                         root.current = (root.current + 1) % count;
-                    } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P)) {
+                    } else if (event.key === Qt.Key_Left || event.key === Qt.Key_H || event.key === Qt.Key_Up || event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P)) {
                         root.current = (root.current + count - 1) % count;
                     } else {
                         return;
@@ -114,35 +131,38 @@ Scope {
                     Rectangle {
                         id: row
 
-                        required property string modelData
+                        required property var modelData
                         required property int index
+                        readonly property bool selected: root.current === index
 
-                        width: rows.width
-                        height: Theme.rowHeight
+                        width: Math.max(Theme.powerTileWidth, Math.ceil(longest.widest) + Theme.rowPadding * 2)
+                        height: tile.height + Theme.powerTilePadding * 2
                         color: "transparent"
                         radius: Theme.cornerRadius
 
-                        Row {
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Theme.rowPadding
-                            spacing: Theme.iconSpacing
+                        Column {
+                            id: tile
 
-                            Image {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Theme.iconSize
-                                height: Theme.iconSize
-                                sourceSize: Qt.size(width, height)
-                                source: root.iconSource(row.modelData)
+                            anchors.centerIn: parent
+                            spacing: Theme.rowSpacing + 2
+
+                            // The selected tile white, its label semibold;
+                            // the rest softer
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: row.modelData.icon
+                                color: row.selected ? Theme.selectedColor : Theme.unselectedColor
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.powerIconSize
                             }
 
                             Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: row.modelData
-                                // The selected row white and bold
-                                color: root.current === row.index ? Theme.selectedColor : Theme.unselectedColor
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: row.modelData.label
+                                color: row.selected ? Theme.selectedColor : Theme.unselectedColor
                                 font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSize
-                                font.weight: root.current === row.index ? Theme.selectedWeight : Theme.unselectedWeight
+                                font.pixelSize: Theme.powerFontSize
+                                font.weight: row.selected ? Theme.selectedWeight : Theme.unselectedWeight
                             }
                         }
 
