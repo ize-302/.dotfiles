@@ -149,7 +149,6 @@ Scope {
             id: panel
 
             floating: true
-            cornerRadius: Theme.keybindRadius
             width: parent.width
             height: content.implicitHeight + Theme.keybindPadding * 2
 

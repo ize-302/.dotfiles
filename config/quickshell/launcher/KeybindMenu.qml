@@ -281,7 +281,6 @@ Scope {
             property real lockedHeight: 0
 
             floating: true
-            cornerRadius: Theme.keybindRadius
             width: Math.max(sheet.width, title.implicitWidth, lockedWidth) + Theme.keybindPadding * 2
             height: bar.height + scroller.height + Theme.keybindPadding
 

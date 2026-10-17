@@ -96,11 +96,10 @@ Singleton {
     readonly property real clipboardWidth: 0.35
     readonly property string clipboardEmptyText: "Nothing found"
 
-    // Key bindings menu: a "Shortcuts" sheet in the middle of the screen, the
-    // groups in two columns with a line between, each row's keys lined up in
-    // outlined caps after the descriptions
+    // Key bindings menu: a "Shortcuts" sheet centred just above the bar, with
+    // the menus' corners, the groups in two columns with a line between, each
+    // row's keys lined up in outlined caps after the descriptions
     readonly property string keybindTitle: "Shortcuts"
-    readonly property int keybindRadius: 8
     readonly property int keybindPadding: 28
     readonly property int keybindFontSize: 14
     readonly property int keybindRowHeight: 28
