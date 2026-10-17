@@ -9,18 +9,13 @@
   min-height: 0;
 }
 
-/* Translucent #15161e; sway's `layer_effects "waybar"` blurs what's behind */
+/* Acrylic, like the Windows 11 taskbar: a neutral dark tint, see-through
+   enough that sway's `layer_effects "waybar"` blur of the wallpaper shows,
+   and a faint top hairline */
 window#waybar {
-  background-color: rgba(21, 22, 30, 0.96);
-  /* Glass cues: sheen fading down from the top and a lit top edge */
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.01) 45%,
-    rgba(255, 255, 255, 0)
-  );
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  color: #b1b1b1;
+  background-color: rgba(32, 32, 32, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
 /* Workspaces */
@@ -168,32 +163,23 @@ window#waybar {
   color: orange;
 }
 
-/* Volume: the clock's colour, more opaque the louder it gets, red when boosted past
-   100%. Faintest when muted. */
+/* Volume: the clock's colour at every level, red when boosted past 100%.
+   Faint when muted. */
 #custom-volume {
-  color: rgba(192, 202, 245, 0.35);
-}
-#custom-volume.mid {
-  color: rgba(192, 202, 245, 0.55);
-}
-#custom-volume.loud {
-  color: rgba(192, 202, 245, 0.75);
-}
-#custom-volume.high {
-  color: rgba(192, 202, 245, 1);
+  color: #ffffff;
 }
 #custom-volume.over {
   color: #f7768e;
 }
 /* Must come after the level states so muted wins */
 #custom-volume.muted {
-  color: rgba(192, 202, 245, 0.2);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* The time, which opens the notification centre; brighter under the
    mouse, like the icons before it */
 #custom-clock {
-  color: #c0caf5;
+  color: #ffffff;
   font-size: 16px;
 }
 #custom-clock:hover {
@@ -204,10 +190,10 @@ window#waybar {
    disconnected */
 
 #bluetooth {
-  color: #c0caf5;
+  color: #ffffff;
 }
 #network {
-  color: #c0caf5;
+  color: #ffffff;
 }
 #network.disconnected,
 #network.linked,
