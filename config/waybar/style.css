@@ -22,9 +22,9 @@ window#waybar {
 #workspaces button {
   padding: 0 14px 0 6px;
   margin: 0;
-  /* Tint, not a solid: lands on #1a1b26 over the bar without adding opacity */
-  background-color: rgba(192, 202, 245, 0.03);
-  color: #565f89;
+  /* Tint, not a solid, so the bar's glass shows through */
+  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* No icons to make room for, so keep the number centred */
@@ -34,13 +34,13 @@ window#waybar {
 
 /* Shown on another output */
 #workspaces button.visible {
-  background-color: rgba(192, 202, 245, 0.03);
-  color: #a9b1d6;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 #workspaces button.focused {
-  background-color: rgba(192, 202, 245, 0.12);
-  color: #c0caf5;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
 #workspaces button.urgent {
@@ -57,11 +57,11 @@ window#waybar {
 /* Scratchpad dots: one more workspace button, for the windows put away */
 #scratchpad {
   padding: 0 8px;
-  background-color: rgba(192, 202, 245, 0.03);
-  color: #565f89;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.6);
 }
 #scratchpad:hover {
-  color: #c0caf5;
+  color: #ffffff;
 }
 
 /* Binding mode indicator (swaybar defaults) */
