@@ -181,6 +181,12 @@ window#waybar {
 #custom-clock {
   color: #ffffff;
   font-size: 16px;
+  /* A short divider between it and bluetooth, half the bar's height: a 1px
+     background line, as a border or margin would make the bar taller */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25));
+  background-size: 1px 50%;
+  background-position: left center;
+  background-repeat: no-repeat;
 }
 #custom-clock:hover {
   color: #ffffff;

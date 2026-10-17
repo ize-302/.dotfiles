@@ -170,6 +170,8 @@
 	"custom/clock": {
 		"exec": "~/.local/bin/clock-status",
 		"return-type": "json",
+		// The time over the date, lined up on the left
+		"justify": "left",
 		"interval": 10,
 		"signal": 8,
 		"on-click": "~/.local/bin/notification-center --pointer"
