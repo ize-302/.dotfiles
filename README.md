@@ -1,6 +1,8 @@
 # My .dotfiles configuration
 
-This directory contains the .dotfiles for my computer, a Wayland / **Sway** setup.
+This directory contains my personal .dotfiles: editor, shell, terminal and tool configs.
+
+The desktop itself (Sway, waybar, the Quickshell shell and lock screen, GTK, the SDDM theme and their scripts) is its own project, **swarch**, in `~/swarch`. Install it first; this repo only adds this machine's settings on top (`config/sway/config.d/`).
 
 The old Xorg/i3 configs are kept as a frozen backup in [.dotfiles-i3](https://github.com/ize-302/.dotfiles-i3) (tag `pre-wayland-only` here marks the last commit that carried them).
 
@@ -8,9 +10,8 @@ The old Xorg/i3 configs are kept as a frozen backup in [.dotfiles-i3](https://gi
 
 ## Layout
 
-- `config/` — everything that lands in `~/.config`: Sway, waybar, nvim, tmux, terminal, the Quickshell lock screen, and the Quickshell launcher (app launcher, menus, control panel, notifications), etc.
-- `home/` — everything that lands directly in `$HOME`: `.bashrc`, `.bash_aliases`, `.gitconfig`, `.local/bin` scripts
-- `etc/` — system files copied into `/etc` by `install.sh` (SDDM theme selection)
+- `config/` — everything that lands in `~/.config`: nvim, tmux, wezterm, yazi, opencode, hop, starship, fastfetch, auto-cpufreq, and `sway/config.d/` (this machine's displays, read by swarch's sway config)
+- `home/` — everything that lands directly in `$HOME`: `.bashrc`, `.bash_aliases`, `.gitconfig`
 
 ## Requirements
 
