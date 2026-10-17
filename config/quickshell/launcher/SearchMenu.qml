@@ -309,7 +309,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
                         width: list.width
                         height: Theme.rowHeight
-                        color: ListView.isCurrentItem ? Theme.selectedColor : "transparent"
+                        color: "transparent"
                         radius: Theme.cornerRadius
 
                         Row {
@@ -332,11 +332,12 @@ PanelWindow { // qmllint disable uncreatable-type
                                 text: window.label(row.modelData)
                                 // Clipboard contents can look like markup
                                 textFormat: Text.PlainText
-                                color: Theme.textColor
+                                // The selected row white and bold
+                                color: row.ListView.isCurrentItem ? Theme.selectedColor : Theme.unselectedColor
                                 elide: Text.ElideRight
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSize
-                                font.weight: Theme.fontWeight
+                                font.weight: row.ListView.isCurrentItem ? Theme.selectedWeight : Theme.unselectedWeight
                             }
 
                             Row {

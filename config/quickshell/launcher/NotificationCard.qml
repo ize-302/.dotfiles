@@ -21,7 +21,7 @@ Item {
     required property var server
     // How many it stands for: 1, or the size of a collapsed stack
     property int stack: 1
-    // Picked with the keys: a blue outline
+    // Picked with the keys: a white outline
     property bool selected: false
     readonly property bool hovered: hover.hovered
 

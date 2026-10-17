@@ -46,8 +46,12 @@ Singleton {
     readonly property int rowPadding: 8
     readonly property int iconSize: 22
     readonly property int iconSpacing: 10
-    // macOS's system blue (dark mode), like a macOS menu's highlighted item
-    readonly property color selectedColor: "#0a84ff"
+    // What's selected or in use: white and semibold, the rest of its list in
+    // unselectedColor
+    readonly property color selectedColor: textColor
+    readonly property int selectedWeight: Font.DemiBold
+    readonly property int unselectedWeight: Font.Normal
+    readonly property color unselectedColor: keyTextColor
     // A lit key cap or button: a white tint
     readonly property color hoverColor: Qt.rgba(1, 1, 1, 0.12)
 
@@ -158,8 +162,9 @@ Singleton {
     // On/off switch
     readonly property int toggleWidth: 30
     readonly property int toggleHeight: 18
-    // A blue pill when on, like a macOS switch
-    readonly property color toggleOnColor: selectedColor
+    // A blue pill when on, like a macOS switch (macOS's system blue); the
+    // sliders' fill and the filled buttons too
+    readonly property color toggleOnColor: "#0a84ff"
     // Opens a section's page, and goes back from it
     readonly property string pageIcon: String.fromCodePoint(0xf0142)
     readonly property string backIcon: String.fromCodePoint(0xf0141)
@@ -168,8 +173,6 @@ Singleton {
     // Orange like the focused window's border (client.focused in
     // config/sway/config): what's in use or connected
     readonly property color accentColor: "#ff7518"
-    // Marks what's in use or connected
-    readonly property string checkIcon: "\uf00c"
 
     // Bluetooth pairing prompt (BluetoothAgent.qml): the code's digits as
     // key caps, and the buttons

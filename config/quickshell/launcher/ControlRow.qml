@@ -310,8 +310,8 @@ Column {
                 text: entry.label
                 textFormat: Text.PlainText
                 elide: Text.ElideRight
-                // The device in use or what's connected is
-                // selection blue all the way across, like its check.
+                // The device in use or what's connected is white
+                // and bold, its check white too.
                 // Forget and a failed join are red; a detail's name dim.
                 color: {
                     if (entry.kind === "forget" || entry.kind === "btForget" || (entry.kind === "joinStatus" && entry.modelData.error))
@@ -322,7 +322,7 @@ Column {
                 }
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.controlFontSize
-                font.weight: Theme.fontWeight
+                font.weight: entry.checked ? Theme.selectedWeight : Theme.unselectedWeight
 
                 Behavior on color {
                     ColorAnimation {
@@ -488,30 +488,14 @@ Column {
                 }
             }
 
-            // A check on what's in use or connected, or
-            // the switch
-            Item {
+            // The switch. What's in use or connected has no
+            // check: it's white and semibold.
+            Toggle {
                 id: end
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: !entry.slider && !entry.input
-                width: entry.toggle ? Theme.toggleWidth : Theme.iconSize
-                height: Theme.iconSize
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: !entry.toggle
-                    text: entry.checked ? Theme.checkIcon : ""
-                    color: Theme.selectedColor
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.sectionFontSize
-                }
-
-                Toggle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: entry.toggle
-                    checked: entry.on
-                }
+                visible: entry.toggle
+                checked: entry.on
             }
         }
     }

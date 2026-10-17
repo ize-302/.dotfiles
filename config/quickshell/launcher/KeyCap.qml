@@ -17,6 +17,9 @@ Rectangle {
     property color litTextColor: Theme.textColor
     // A thin outline and no tint, like a printed key
     property bool outlined: false
+    // Selected: bold, like the menus' selected rows; `weight` otherwise
+    property bool bold: false
+    property int weight: Theme.fontWeight
 
     width: Math.max(minWidth, label.implicitWidth + Theme.keyPadding * 2)
     height: Theme.keyHeight
@@ -33,6 +36,6 @@ Rectangle {
         color: cap.lit ? cap.litTextColor : cap.textColor
         font.family: Theme.fontFamily
         font.pixelSize: cap.fontSize
-        font.weight: Theme.fontWeight
+        font.weight: cap.bold ? Theme.selectedWeight : cap.weight
     }
 }

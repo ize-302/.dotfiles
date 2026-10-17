@@ -42,7 +42,8 @@ Scope {
 
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSize
-        font.weight: Theme.fontWeight
+        // As wide as the selected row's bold
+        font.weight: Theme.selectedWeight
     }
 
     PanelWindow { // qmllint disable uncreatable-type
@@ -118,7 +119,7 @@ Scope {
 
                         width: rows.width
                         height: Theme.rowHeight
-                        color: root.current === index ? Theme.selectedColor : "transparent"
+                        color: "transparent"
                         radius: Theme.cornerRadius
 
                         Row {
@@ -137,8 +138,11 @@ Scope {
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: row.modelData
-                                color: Theme.textColor
-                                font: longest.font
+                                // The selected row white and bold
+                                color: root.current === row.index ? Theme.selectedColor : Theme.unselectedColor
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSize
+                                font.weight: root.current === row.index ? Theme.selectedWeight : Theme.unselectedWeight
                             }
                         }
 

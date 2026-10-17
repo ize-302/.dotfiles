@@ -177,7 +177,7 @@ Scope {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Theme.bluetoothIcon
-                        color: Theme.selectedColor
+                        color: Theme.textColor
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.searchFontSize + 4
                     }
@@ -225,7 +225,7 @@ Scope {
                             minWidth: Theme.pairingCodeSize * 1.6
                             height: Theme.pairingCodeSize * 2
                             lit: root.type === "display-passkey" && index < (root.request?.entered ?? 0)
-                            litTextColor: Theme.selectedColor
+                            bold: lit
                         }
                     }
                 }
@@ -306,7 +306,7 @@ Scope {
                         width: Math.max(Theme.pairingButtonWidth, accept.implicitWidth + Theme.keyPadding * 2)
                         height: Theme.pairingButtonHeight
                         radius: Theme.cornerRadius
-                        color: Theme.selectedColor
+                        color: Theme.toggleOnColor
                         opacity: acceptMouse.containsMouse ? 0.85 : 1
 
                         Text {

@@ -321,7 +321,7 @@ Scope {
                 radius: Theme.cornerRadius
                 color: cell.selected ? Theme.hoverColor : Theme.keyColor
                 border.width: cell.selected ? 2 : 1
-                // Red while the close button is pointed at, the selection blue
+                // Red while the close button is pointed at, white
                 // around the selected one
                 border.color: cell.closing ? Theme.closeColor : cell.selected ? Theme.selectedColor : "transparent"
 

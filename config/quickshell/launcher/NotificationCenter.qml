@@ -313,7 +313,7 @@ Scope {
                             width: Theme.noteCardButtonHeight
                             height: width
                             radius: width / 2
-                            color: on ? Theme.selectedColor : doNotDisturbMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
+                            color: on ? Theme.toggleOnColor : doNotDisturbMouse.containsMouse ? Theme.noteCardHoverColor : Theme.noteCardColor
                             border.width: on ? 0 : 1
                             border.color: Theme.noteCardEdgeColor
 
@@ -366,7 +366,7 @@ Scope {
                 }
 
                 // How long do not disturb lasts, while it's on: the choice
-                // lit blue like the bell's cap, and when it ends
+                // lit and bold, and when it ends
                 Item {
                     visible: root.server?.doNotDisturb ?? false
                     width: parent.width
@@ -410,7 +410,9 @@ Scope {
                                 text: modelData.text
                                 fontSize: Theme.controlSmallFontSize
                                 lit: (root.server?.doNotDisturbFor ?? "") === modelData.duration || durationMouse.containsMouse
-                                litTextColor: (root.server?.doNotDisturbFor ?? "") === modelData.duration ? Theme.selectedColor : Theme.textColor
+                                bold: (root.server?.doNotDisturbFor ?? "") === modelData.duration
+                                weight: Theme.unselectedWeight
+                                litTextColor: bold ? Theme.selectedColor : Theme.textColor
 
                                 MouseArea {
                                     id: durationMouse
@@ -484,7 +486,7 @@ Scope {
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: entry.modelData.group ?? ""
-                                        color: root.current === entry.index ? Theme.selectedColor : Theme.textColor
+                                        color: root.current === entry.index ? Theme.selectedColor : Theme.unselectedColor
                                         font.family: Theme.fontFamily
                                         font.pixelSize: Theme.controlFontSize
                                         font.weight: Font.DemiBold
