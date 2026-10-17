@@ -77,12 +77,12 @@ Scope {
         implicitHeight: panel.height
 
         // No drop shadow, like the bar. Only the bottom anchored, so the
-        // layer shell centres it across, floatingGap above the bar.
+        // layer shell centres it across, centredGap above the bar.
         WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
         anchors.bottom: true
-        margins.bottom: Theme.floatingGap
+        margins.bottom: Theme.centredGap
 
         onVisibleChanged: {
             if (!visible)

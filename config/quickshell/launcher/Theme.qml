@@ -29,6 +29,9 @@ Singleton {
     // notification cards, the clipboard menu, ...) and the bar, and the
     // screen's right edge
     readonly property int floatingGap: 3
+    // Space between the bar and the popups centred above it (the power menu,
+    // the key bindings sheet, the caps lock popup)
+    readonly property int centredGap: 10
 
     // Search row
     readonly property int searchFontSize: 14
@@ -211,7 +214,7 @@ Singleton {
     readonly property string pauseIcon: String.fromCodePoint(0xf03e4)
 
     // Caps lock popup (CapsLock.qml): a square centred across the bottom of
-    // the screen, floatingGap above the bar, with the menus' corners and a
+    // the screen, centredGap above the bar, with the menus' corners and a
     // caps lock icon (icons/capslock.svg); up while caps lock is on, and for
     // capsLockTimeout ms after it's turned off. How often the keyboards'
     // lights are read, in ms.

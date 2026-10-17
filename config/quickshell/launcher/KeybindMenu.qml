@@ -256,7 +256,7 @@ Scope {
         // With the drop shadow (`layer_effects "launcher-shadow"` in sway).
         // Only the bottom anchored: the layer shell centres it across.
         anchors.bottom: true
-        margins.bottom: Theme.floatingGap
+        margins.bottom: Theme.centredGap
 
         WlrLayershell.namespace: "launcher-shadow"
         WlrLayershell.layer: WlrLayer.Overlay

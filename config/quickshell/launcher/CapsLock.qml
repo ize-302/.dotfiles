@@ -105,7 +105,7 @@ while True:
 
         // Only the bottom anchored: the layer shell centres it across
         anchors.bottom: true
-        margins.bottom: Theme.floatingGap
+        margins.bottom: Theme.centredGap
 
         // Blurred behind (`layer_effects "launcher"`), but no drop shadow:
         // it's meant to be subtle.
