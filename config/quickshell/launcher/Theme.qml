@@ -30,8 +30,8 @@ Singleton {
     // screen's right edge
     readonly property int floatingGap: 3
     // Space between the bar and the popups centred above it (the power menu,
-    // the key bindings sheet, the clipboard menu, the caps lock and volume
-    // popups)
+    // the key bindings sheet, the clipboard menu, the caps lock popup); the
+    // volume popup's from the screen's right edge
     readonly property int centredGap: 10
 
     // Search row
@@ -233,10 +233,11 @@ Singleton {
     readonly property int barHeight: 38
     readonly property string barAnchor: Quickshell.env("HOME") + "/.local/bin/bar-anchor"
 
-    // Volume popup (Osd.qml): centred across the bottom of the screen,
-    // centredGap above the bar, in the caps lock popup's glass, while the
-    // volume changes
-    readonly property int osdWidth: 320
+    // Volume popup (Osd.qml): upright, halfway down the right edge of the
+    // screen, centredGap in from it, in the caps lock popup's glass, while
+    // the volume changes
+    readonly property int osdWidth: 60
+    readonly property int osdHeight: 200
     readonly property int osdTimeout: 1500
 
     // Like the bar's volume: white, red past 100%, faint when muted

@@ -5,11 +5,12 @@ import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
 
-// Volume popup: a small glass gauge centred just above the bar, in the caps
-// lock popup's glass, drawn like the control panel's rows, shown for a
-// moment on the screen with the focus whenever the output volume changes or
-// the output or microphone is muted (from the volume keys, the bar or any
-// app). Clicks go through it.
+// Volume popup: a small upright glass gauge halfway down the right edge of
+// the screen, in the caps lock popup's glass, the percentage over the
+// control panel's slider stood up over its glyph, shown for a moment on the
+// screen with the focus whenever the output volume changes or the output or
+// microphone is muted (from the volume keys, the bar or any app). Clicks go
+// through it.
 Scope {
     id: root
 
@@ -89,9 +90,10 @@ Scope {
         // Clicks go through to whatever is underneath
         mask: Region {}
 
-        // Only the bottom anchored: the layer shell centres it across
-        anchors.bottom: true
-        margins.bottom: Theme.centredGap
+        // Only the right edge anchored: the layer shell centres it down the
+        // screen
+        anchors.right: true
+        margins.right: Theme.centredGap
 
         // Blurred behind (`layer_effects "launcher"`), but no drop shadow,
         // like the caps lock popup
@@ -103,46 +105,66 @@ Scope {
             id: panel
 
             floating: true
+            fromRight: true
             width: Theme.osdWidth
-            height: Theme.rowHeight + Theme.panelPadding
+            height: Theme.osdHeight
             // The caps lock popup's fainter glass
             color: Theme.popupColor
             edgeColor: Theme.popupEdgeColor
 
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.panelPadding
-                width: parent.width - x * 2
+            Column {
+                anchors.centerIn: parent
                 spacing: Theme.iconSpacing
+
+                // A key cap, as wide as "100%" so it doesn't jump
+                KeyCap {
+                    id: percent
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    minWidth: Math.ceil(percentWidth.advanceWidth) + Theme.keyPadding * 2
+                    text: root.muted ? "mute" : Math.round(root.level * 100) + "%"
+                    fontSize: Theme.controlSmallFontSize
+                }
+
+                // The control panel's slider, stood up: filled from the
+                // bottom
+                Rectangle {
+                    id: track
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: Theme.sliderHeight
+                    height: panel.height - Theme.panelPadding * 2 - percent.height - icon.height - parent.spacing * 2
+                    radius: width / 2
+                    color: Theme.sliderTrackColor
+
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        height: Math.max(track.width, track.height * Math.max(0, Math.min(root.level, 1)))
+                        radius: parent.radius
+                        color: Theme.sliderColor(root.level, root.muted)
+                        visible: root.level > 0
+
+                        Behavior on height {
+                            NumberAnimation {
+                                duration: Theme.animationDuration
+                            }
+                        }
+                    }
+                }
 
                 // The control panel's glyphs: the bar's speaker, or the
                 // microphone
                 Text {
-                    anchors.verticalCenter: parent.verticalCenter
+                    id: icon
+
+                    anchors.horizontalCenter: parent.horizontalCenter
                     width: Theme.iconSize
                     horizontalAlignment: Text.AlignHCenter
                     text: root.mode === "input" ? (root.muted ? Theme.micMutedIcon : Theme.micIcon) : Theme.volumeIcon(root.level, root.muted)
                     color: Theme.volumeColor(root.level, root.muted)
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.controlFontSize
-                }
-
-                Slider {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - Theme.iconSize - percent.width - parent.spacing * 2
-                    interactive: false
-                    value: root.level
-                    color: Theme.sliderColor(root.level, root.muted)
-                }
-
-                // A key cap, as wide as "100%" so it doesn't jump
-                KeyCap {
-                    id: percent
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    minWidth: Math.ceil(percentWidth.advanceWidth) + Theme.keyPadding * 2
-                    text: root.muted ? "mute" : Math.round(root.level * 100) + "%"
-                    fontSize: Theme.controlSmallFontSize
                 }
             }
         }

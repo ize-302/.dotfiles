@@ -13,13 +13,15 @@ Rectangle {
     property bool fullWidth: false
     // The lit edge's colour; red for a critical notification
     property color edgeColor: Theme.edgeColor
+    // Slides in from the screen's right edge instead of rising out of the bar
+    property bool fromRight: false
 
     color: Theme.glassPanelColor
     radius: floating ? cornerRadius : 0
     // The one corner that touches neither the screen edge nor the bar
     topRightRadius: fullWidth ? radius : cornerRadius
 
-    // Rises out of the bar
+    // Rises out of the bar (or slides in from the right)
     function appear() {
         animation.restart();
     }
@@ -33,7 +35,7 @@ Rectangle {
 
         NumberAnimation {
             target: slide
-            property: "y"
+            property: glass.fromRight ? "x" : "y"
             from: 16
             to: 0
             duration: Theme.animationDuration
