@@ -281,6 +281,9 @@ Singleton {
     // Notification centre (NotificationCenter.qml): as wide as the new
     // notifications, scrolling past this fraction of the screen height
     readonly property real notificationCenterMaxHeight: 0.7
+    // The list fades out over this much at the bottom while there's more
+    // below
+    readonly property int notificationFadeHeight: 48
     readonly property string noNotificationsText: "No notifications"
     readonly property string doNotDisturbText: "Do not disturb is on"
     // Kept for the notification centre, oldest dropped first

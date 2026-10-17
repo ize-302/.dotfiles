@@ -22,6 +22,13 @@ if ! pacman -Q python-dbus python-gobject >/dev/null 2>&1; then
   sudo pacman -S --needed python-dbus python-gobject
 fi
 
+# The fade at the bottom of the launcher's notification centre
+# (config/quickshell/launcher/NotificationCenter.qml, Qt5Compat's OpacityMask)
+if ! pacman -Q qt6-5compat >/dev/null 2>&1; then
+  echo "[+] Installing qt6-5compat..."
+  sudo pacman -S --needed qt6-5compat
+fi
+
 mkdir -p "$HOME/.config"
 stow --adopt -v -t "$HOME/.config" config
 stow --adopt -v -t "$HOME" home

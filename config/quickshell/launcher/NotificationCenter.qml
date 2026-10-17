@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.I3
 import Quickshell.Io
@@ -459,10 +460,42 @@ Scope {
                     }
                 }
 
+                // The fade at the bottom of the list (the Flickable's mask
+                // below): opaque, then clear over the last
+                // notificationFadeHeight
+                Item {
+                    id: fade
+
+                    visible: false
+                    layer.enabled: true
+                    width: flick.width
+                    height: flick.height
+
+                    Rectangle {
+                        anchors.fill: parent
+                        gradient: Gradient {
+                            GradientStop {
+                                position: 0
+                                color: "white"
+                            }
+                            GradientStop {
+                                position: Math.max(0, 1 - Theme.notificationFadeHeight / Math.max(1, fade.height))
+                                color: "white"
+                            }
+                            GradientStop {
+                                position: 1
+                                color: "transparent"
+                            }
+                        }
+                    }
+                }
+
                 // Up to notificationCenterMaxHeight of the screen, then
-                // scrolls
+                // scrolls, fading out at the bottom while there's more below
                 Flickable {
                     id: flick
+
+                    readonly property bool moreBelow: contentY + height < contentHeight - 1
 
                     visible: root.rows.length > 0
                     width: parent.width
@@ -470,6 +503,11 @@ Scope {
                     contentHeight: list.height
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
+
+                    layer.enabled: moreBelow
+                    layer.effect: OpacityMask {
+                        maskSource: fade
+                    }
 
                     Column {
                         id: list
