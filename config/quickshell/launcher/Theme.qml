@@ -261,6 +261,20 @@ Singleton {
         return muted ? volumeMutedIcon : Math.round(volume * 100) > 50 ? volumeHighIcon : volumeLowIcon;
     }
 
+    // Pomodoro timer (Pomodoro.qml, PomodoroCard.qml): minutes of focus and
+    // of each break, with a long break after pomodoroRounds focus sessions
+    readonly property int pomodoroFocus: 25
+    readonly property int pomodoroShortBreak: 5
+    readonly property int pomodoroLongBreak: 15
+    readonly property int pomodoroRounds: 4
+    readonly property int pomodoroFontSize: 18
+    readonly property int pomodoroDotSize: 6
+    // A break's bar, green against focus's blue
+    readonly property color pomodoroBreakColor: "#30d158"
+    // nf-md-timer_outline, nf-md-coffee (on the bar too)
+    readonly property string pomodoroIcon: String.fromCodePoint(0xf051b)
+    readonly property string pomodoroBreakIcon: String.fromCodePoint(0xf0176)
+
     // Calendar (Calendar.qml), at the bottom of the notification centre: each
     // day's cell is calendarCellSize tall (and a seventh of the card wide)
     readonly property int calendarCellSize: 30

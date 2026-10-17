@@ -15,7 +15,8 @@ import qs
 // notification centre (NotificationCenter.qml), the volume popup (Osd.qml),
 // the notifications
 // (Notifications.qml), the bluetooth pairing prompts (BluetoothAgent.qml)
-// the caps lock popup (CapsLock.qml) and the bar's volume (BarVolume.qml).
+// the caps lock popup (CapsLock.qml), the bar's volume (BarVolume.qml) and
+// the pomodoro timer (Pomodoro.qml).
 ShellRoot {
     id: root
 
@@ -222,6 +223,10 @@ ShellRoot {
         server: notifications
         onOpenChanged: if (open)
             root.closeOthers(notificationCenter)
+    }
+
+    Pomodoro {
+        id: pomodoro
     }
 
     BluetoothAgent {}

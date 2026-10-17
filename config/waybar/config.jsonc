@@ -14,6 +14,7 @@
 		"battery",
 		"backlight",
 		"custom/volume",
+		"custom/pomodoro",
 		"network",
 		"bluetooth",
 		"custom/clock"
@@ -165,6 +166,21 @@
 		"return-type": "json",
 		"interval": "once",
 		"format": "🐧"
+	},
+
+	// The pomodoro timer's time left, with a timer (focus) or a cup (a
+	// break), only while there's one going. Quickshell writes it
+	// (config/quickshell/launcher/Pomodoro.qml) and signals SIGRTMIN+11 each
+	// second. Click starts or pauses it, right click resets it, middle click
+	// skips to the next.
+	"custom/pomodoro": {
+		"exec": "cat \"$XDG_RUNTIME_DIR/pomodoro.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
+		"return-type": "json",
+		"interval": "once",
+		"signal": 11,
+		"on-click": "qs -c launcher ipc call pomodoro toggle",
+		"on-click-right": "qs -c launcher ipc call pomodoro reset",
+		"on-click-middle": "qs -c launcher ipc call pomodoro skip"
 	},
 
 	"custom/clock": {
