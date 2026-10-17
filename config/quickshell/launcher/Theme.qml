@@ -261,6 +261,11 @@ Singleton {
         return muted ? volumeMutedIcon : Math.round(volume * 100) > 50 ? volumeHighIcon : volumeLowIcon;
     }
 
+    // Calendar (Calendar.qml), at the top of the notification centre: each
+    // day's cell is calendarCellSize tall (and a seventh of the card wide)
+    readonly property int calendarCellSize: 30
+    readonly property int calendarFontSize: 12
+
     // Notifications: cards stacked up from the bar's right end, where dunst
     // put them, as wide as dunst's
     readonly property int notificationWidth: 360
