@@ -29,7 +29,9 @@ Item {
     signal clicked
     signal actionClicked
 
-    height: back ? titleSize * 2 + Theme.searchPadding : Theme.sectionHeight
+    // A page's title is at the top of the panel, pulled up into its padding
+    // so there's as much space above the title as between it and its divider
+    height: back ? label.y + label.height + Theme.searchPadding + 1 + Theme.searchPadding / 2 : Theme.sectionHeight
 
     // Back chevron, dim like the search row's magnifier
     Text {
@@ -43,12 +45,12 @@ Item {
         font.pixelSize: header.titleSize
     }
 
-    // A page's title sits in the middle, above its divider; a section's name
-    // sits low, by the row under it
+    // A page's title sits as far from the panel's edge as from its divider;
+    // a section's name sits low, by the row under it
     Text {
         id: label
         x: header.back && header.arrow ? backIcon.x + backIcon.width + Theme.iconSpacing : header.inset
-        y: header.back ? (header.height - Theme.searchPadding - height) / 2 : header.height - height - Theme.rowSpacing
+        y: header.back ? Theme.searchPadding - Theme.panelPadding : header.height - height - Theme.rowSpacing
         text: header.back ? header.text : header.text.toUpperCase()
         color: header.back ? Theme.textColor : Theme.dimColor
         font.family: Theme.fontFamily
