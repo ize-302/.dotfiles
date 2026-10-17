@@ -27,11 +27,10 @@ Singleton {
     readonly property int cornerRadius: 4
     // Hairline space between a floating panel (the control panel,
     // notification cards, the notification centre) and the bar, and the
-    // screen's right edge
+    // screen's right edge (the volume popup too)
     readonly property int floatingGap: 3
     // Space between the bar and the popups centred above it (the power menu,
-    // the key bindings sheet, the clipboard menu, the caps lock popup); the
-    // volume popup's from the screen's right edge
+    // the key bindings sheet, the clipboard menu, the caps lock popup)
     readonly property int centredGap: 10
 
     // Search row
@@ -234,9 +233,10 @@ Singleton {
     readonly property string barAnchor: Quickshell.env("HOME") + "/.local/bin/bar-anchor"
 
     // Volume popup (Osd.qml): upright, halfway down the right edge of the
-    // screen, centredGap in from it, in the caps lock popup's glass, while
+    // screen, floatingGap in from it, in the caps lock popup's glass, while
     // the volume changes
-    readonly property int osdWidth: 60
+    readonly property int osdWidth: 40
+    readonly property int osdFontSize: 10
     readonly property int osdHeight: 200
     readonly property int osdTimeout: 1500
 

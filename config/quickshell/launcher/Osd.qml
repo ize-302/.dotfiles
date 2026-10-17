@@ -93,7 +93,7 @@ Scope {
         // Only the right edge anchored: the layer shell centres it down the
         // screen
         anchors.right: true
-        margins.right: Theme.centredGap
+        margins.right: Theme.floatingGap
 
         // Blurred behind (`layer_effects "launcher"`), but no drop shadow,
         // like the caps lock popup
@@ -116,14 +116,16 @@ Scope {
                 anchors.centerIn: parent
                 spacing: Theme.iconSpacing
 
-                // A key cap, as wide as "100%" so it doesn't jump
-                KeyCap {
+                // Plain, like the caps lock popup's ON: a key cap is too wide
+                Text {
                     id: percent
 
                     anchors.horizontalCenter: parent.horizontalCenter
-                    minWidth: Math.ceil(percentWidth.advanceWidth) + Theme.keyPadding * 2
                     text: root.muted ? "mute" : Math.round(root.level * 100) + "%"
-                    fontSize: Theme.controlSmallFontSize
+                    color: Theme.keyTextColor
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.osdFontSize
+                    font.weight: Theme.fontWeight
                 }
 
                 // The control panel's slider, stood up: filled from the
@@ -168,13 +170,5 @@ Scope {
                 }
             }
         }
-    }
-
-    TextMetrics {
-        id: percentWidth
-        text: "100%"
-        font.family: Theme.fontFamily
-        font.pixelSize: Theme.controlSmallFontSize
-        font.weight: Theme.fontWeight
     }
 }
