@@ -5,10 +5,11 @@ import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
 
-// Volume popup: a small floating glass gauge above the middle of the bar,
-// drawn like the control panel's rows, shown for a moment on the screen with
-// the focus whenever the output volume changes or the output or microphone
-// is muted (from the volume keys, the bar or any app). Clicks go through it.
+// Volume popup: a small glass gauge centred just above the bar, in the caps
+// lock popup's glass, drawn like the control panel's rows, shown for a
+// moment on the screen with the focus whenever the output volume changes or
+// the output or microphone is muted (from the volume keys, the bar or any
+// app). Clicks go through it.
 Scope {
     id: root
 
@@ -88,13 +89,15 @@ Scope {
         // Clicks go through to whatever is underneath
         mask: Region {}
 
-        WlrLayershell.namespace: "launcher-shadow"
+        // Only the bottom anchored: the layer shell centres it across
+        anchors.bottom: true
+        margins.bottom: Theme.centredGap
+
+        // Blurred behind (`layer_effects "launcher"`), but no drop shadow,
+        // like the caps lock popup
+        WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        // Only the bottom edge: centred above the bar
-        anchors.bottom: true
-        margins.bottom: Theme.osdMargin
 
         Glass {
             id: panel
@@ -102,6 +105,9 @@ Scope {
             floating: true
             width: Theme.osdWidth
             height: Theme.rowHeight + Theme.panelPadding
+            // The caps lock popup's fainter glass
+            color: Theme.popupColor
+            edgeColor: Theme.popupEdgeColor
 
             Row {
                 anchors.verticalCenter: parent.verticalCenter

@@ -30,7 +30,8 @@ Singleton {
     // screen's right edge
     readonly property int floatingGap: 3
     // Space between the bar and the popups centred above it (the power menu,
-    // the key bindings sheet, the clipboard menu, the caps lock popup)
+    // the key bindings sheet, the clipboard menu, the caps lock and volume
+    // popups)
     readonly property int centredGap: 10
 
     // Search row
@@ -222,18 +223,20 @@ Singleton {
     readonly property int capsLockFontSize: 9
     readonly property int capsLockTimeout: 1200
     readonly property int capsLockPoll: 150
-    // Fainter than the menus' glass, and its edge
-    readonly property color capsLockColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
-    readonly property color capsLockEdgeColor: Qt.rgba(1, 1, 1, 0.08)
+    // The caps lock and volume popups' glass: fainter than the menus', and
+    // its edge
+    readonly property color popupColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
+    readonly property color popupEdgeColor: Qt.rgba(1, 1, 1, 0.08)
 
     // The bar's height ("height" in config/waybar/config.jsonc), where
     // ~/.local/bin/bar-anchor looks for the module a popup was opened from
     readonly property int barHeight: 38
     readonly property string barAnchor: Quickshell.env("HOME") + "/.local/bin/bar-anchor"
 
-    // Volume popup: floats above the bar while the volume changes
+    // Volume popup (Osd.qml): centred across the bottom of the screen,
+    // centredGap above the bar, in the caps lock popup's glass, while the
+    // volume changes
     readonly property int osdWidth: 320
-    readonly property int osdMargin: 24
     readonly property int osdTimeout: 1500
 
     // Like the bar's volume: white, red past 100%, faint when muted

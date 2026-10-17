@@ -120,8 +120,8 @@ while True:
             width: Theme.capsLockSize
             height: Theme.capsLockSize
             // More see-through than the menus, plain, with a faint edge
-            color: Theme.capsLockColor
-            edgeColor: Theme.capsLockEdgeColor
+            color: Theme.popupColor
+            edgeColor: Theme.popupEdgeColor
 
             Column {
                 anchors.centerIn: parent
