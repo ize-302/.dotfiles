@@ -265,6 +265,10 @@ Singleton {
     // day's cell is calendarCellSize tall (and a seventh of the card wide)
     readonly property int calendarCellSize: 30
     readonly property int calendarFontSize: 12
+    // An event's dot, and how old the events can be when it opens before
+    // they're fetched again, in ms
+    readonly property int calendarDotSize: 4
+    readonly property int calendarRefresh: 10 * 60 * 1000
 
     // Notifications: cards stacked up from the bar's right end, where dunst
     // put them, as wide as dunst's

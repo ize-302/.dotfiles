@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+# ~/.local/bin/calendar-events
+# The days with events on them, for the launcher's calendar
+# (config/quickshell/launcher/Calendar.qml), as a JSON list of "YYYY-MM-DD"
+# from about a year back to a year ahead, in local time.
+#
+# The calendars are iCal feeds, one URL per line in
+# ~/.config/calendar/urls (not in the dotfiles: for Google Calendar it's
+# each calendar's "Secret address in iCal format", under Settings >
+# Settings for my calendars > Integrate calendar, which anyone with it can
+# read). Each feed is kept in ~/.cache/calendar, and used from there when
+# it can't be fetched. No URLs: an empty list.
+#
+# Only the standard library: repeating events are expanded here, for the
+# rules calendars use (FREQ with INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY,
+# BYMONTH and BYSETPOS), less EXDATE and cancelled ones.
+import calendar
+import datetime as dt
+import hashlib
+import json
+import os
+import sys
+import urllib.request
+from zoneinfo import ZoneInfo
+
+CONFIG = os.path.join(os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config"), "calendar", "urls")
+CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "calendar")
+TODAY = dt.date.today()
+FIRST = TODAY - dt.timedelta(days=400)
+LAST = TODAY + dt.timedelta(days=400)
+WEEKDAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+# A day after which an event's still going is drawn on every day of it, up
+# to this many
+MAX_SPAN = 60
+
+
+def feed(url):
+    """The feed's text: fetched and cached, or the cache."""
+    path = os.path.join(CACHE, hashlib.sha256(url.encode()).hexdigest()[:16] + ".ics")
+    try:
+        with urllib.request.urlopen(url, timeout=20) as response:
+            text = response.read().decode("utf-8", "replace")
+        os.makedirs(CACHE, mode=0o700, exist_ok=True)
+        with open(path + ".tmp", "w") as file:
+            file.write(text)
+        os.replace(path + ".tmp", path)
+        return text
+    except (OSError, ValueError):
+        try:
+            with open(path) as file:
+                return file.read()
+        except OSError:
+            return ""
+
+
+def events(text):
+    """Each VEVENT's properties, {name: [(params, value)]}; not its alarms'."""
+    # Lines starting with a space or tab carry on the one before
+    lines = text.replace("\r\n", "\n").replace("\n ", "").replace("\n\t", "").split("\n")
+    stack = []
+    for line in lines:
+        if line.startswith("BEGIN:"):
+            stack.append((line[6:].strip(), {}))
+        elif line.startswith("END:"):
+            if stack:
+                name, props = stack.pop()
+                if name == "VEVENT":
+                    yield props
+        elif stack and stack[-1][0] == "VEVENT" and ":" in line:
+            head, value = line.split(":", 1)
+            name, *params = head.split(";")
+            params = dict(param.split("=", 1) for param in params if "=" in param)
+            stack[-1][1].setdefault(name.upper(), []).append((params, value.strip()))
+
+
+def parse(params, value):
+    """A DATE, or a DATE-TIME: aware if it says its zone, local otherwise."""
+    if len(value) == 8:
+        return dt.date(int(value[:4]), int(value[4:6]), int(value[6:8]))
+    moment = dt.datetime.strptime(value[:15], "%Y%m%dT%H%M%S")
+    if value.endswith("Z"):
+        return moment.replace(tzinfo=dt.timezone.utc)
+    if "TZID" in params:
+        try:
+            return moment.replace(tzinfo=ZoneInfo(params["TZID"].strip('"')))
+        except (KeyError, ValueError):
+            pass
+    return moment
+
+
+def local_day(moment):
+    if isinstance(moment, dt.datetime):
+        return (moment.astimezone() if moment.tzinfo else moment).date()
+    return moment
+
+
+def month_days(year, month, rule, default_day):
+    """The days of a month a MONTHLY (or YEARLY) rule picks, before BYSETPOS."""
+    length = calendar.monthrange(year, month)[1]
+    if "BYMONTHDAY" in rule:
+        days = []
+        for day in rule["BYMONTHDAY"].split(","):
+            day = int(day)
+            day = day if day > 0 else length + day + 1
+            if 1 <= day <= length:
+                days.append(dt.date(year, month, day))
+        return days
+    if "BYDAY" in rule:
+        days = []
+        for spec in rule["BYDAY"].split(","):
+            weekday = WEEKDAYS.index(spec[-2:])
+            matching = [dt.date(year, month, day) for day in range(1, length + 1) if dt.date(year, month, day).weekday() == weekday]
+            nth = spec[:-2]
+            if not nth:
+                days.extend(matching)
+            elif -len(matching) <= int(nth) <= len(matching) and int(nth) != 0:
+                days.append(matching[int(nth) - 1 if int(nth) > 0 else int(nth)])
+        return sorted(days)
+    return [dt.date(year, month, default_day)] if default_day <= length else []
+
+
+def occurrences(start, rule):
+    """The days a repeating event starting on `start` falls on, to LAST."""
+    rule = dict(part.split("=", 1) for part in rule.split(";") if "=" in part)
+    freq = rule.get("FREQ")
+    interval = int(rule.get("INTERVAL", 1))
+    count = int(rule["COUNT"]) if "COUNT" in rule else None
+    until = local_day(parse({}, rule["UNTIL"])) if "UNTIL" in rule else None
+    months = [int(month) for month in rule["BYMONTH"].split(",")] if "BYMONTH" in rule else None
+    setpos = [int(pos) for pos in rule["BYSETPOS"].split(",")] if "BYSETPOS" in rule else None
+
+    seen = 0
+    for period in range(5000):
+        step = period * interval
+        # The period's days, and when it begins
+        if freq == "DAILY":
+            begins = start + dt.timedelta(days=step)
+            days = [begins]
+            if "BYDAY" in rule:
+                days = [day for day in days if WEEKDAYS[day.weekday()] in rule["BYDAY"]]
+        elif freq == "WEEKLY":
+            begins = start - dt.timedelta(days=start.weekday()) + dt.timedelta(weeks=step)
+            weekdays = rule.get("BYDAY", WEEKDAYS[start.weekday()]).split(",")
+            days = [begins + dt.timedelta(days=WEEKDAYS.index(day[-2:])) for day in weekdays]
+        elif freq == "MONTHLY":
+            index = start.month - 1 + step
+            begins = dt.date(start.year + index // 12, index % 12 + 1, 1)
+            days = month_days(begins.year, begins.month, rule, start.day)
+        elif freq == "YEARLY":
+            begins = dt.date(start.year + step, 1, 1)
+            days = []
+            for month in months or [start.month]:
+                days.extend(month_days(begins.year, month, rule, start.day))
+        else:
+            return
+        if begins > LAST or (until and begins > until):
+            return
+        if months and freq != "YEARLY":
+            days = [day for day in days if day.month in months]
+        days = sorted(days)
+        if setpos:
+            days = [days[pos - 1 if pos > 0 else pos] for pos in setpos if -len(days) <= pos <= len(days) and pos != 0]
+        for day in days:
+            if day < start:
+                continue
+            if (until and day > until) or day > LAST or (count is not None and seen >= count):
+                return
+            seen += 1
+            yield day
+
+
+def days(props):
+    """Every day an event is on, in local time."""
+    if props.get("STATUS", [({}, "")])[0][1].upper() == "CANCELLED" or "DTSTART" not in props:
+        return set()
+    params, value = props["DTSTART"][0]
+    begin = parse(params, value)
+    end = parse(*props["DTEND"][0]) if "DTEND" in props else None
+    # Days it lasts: an all-day event's end is the day after; a timed one
+    # ending at midnight doesn't touch that day
+    if end is None:
+        span = 0
+    elif isinstance(begin, dt.datetime):
+        last = end - dt.timedelta(seconds=1) if end > begin else end
+        span = (local_day(last) - local_day(begin)).days
+    else:
+        span = (end - begin).days - 1
+    span = max(0, min(span, MAX_SPAN))
+
+    skipped = set()
+    for params, value in props.get("EXDATE", []):
+        for part in value.split(","):
+            skipped.add(local_day(parse(params, part)))
+
+    if "RRULE" in props:
+        # Expanded in the event's own zone, so a late evening one stays on
+        # its day there, then moved into local time
+        own_start = begin.date() if isinstance(begin, dt.datetime) else begin
+        starts = []
+        for day in occurrences(own_start, props["RRULE"][0][1]):
+            if isinstance(begin, dt.datetime):
+                starts.append(local_day(dt.datetime.combine(day, begin.timetz())))
+            else:
+                starts.append(day)
+    else:
+        starts = [local_day(begin)]
+
+    found = set()
+    for first in starts:
+        if first in skipped:
+            continue
+        for offset in range(span + 1):
+            day = first + dt.timedelta(days=offset)
+            if FIRST <= day <= LAST:
+                found.add(day)
+    return found
+
+
+def main():
+    try:
+        with open(CONFIG) as file:
+            urls = [line.strip() for line in file if line.strip() and not line.startswith("#")]
+    except OSError:
+        urls = []
+
+    found = set()
+    for url in urls:
+        for props in events(feed(url)):
+            try:
+                found |= days(props)
+            except (ValueError, KeyError, IndexError, OverflowError):
+                # One odd event doesn't lose the rest
+                continue
+    json.dump(sorted(day.isoformat() for day in found), sys.stdout)
+    print()
+
+
+main()

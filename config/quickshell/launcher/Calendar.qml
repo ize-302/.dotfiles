@@ -2,25 +2,39 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Templates as T
+import Quickshell
+import Quickshell.Io
 import qs
 
 // Month view at the bottom of the notification centre, on a card like its
 // title's: the month and year with arrows to the month before and after,
 // the days of the week, and the month's days (with the ends of the months
-// either side, dimmed), today on a blue circle like a switch that's on.
-// Scrolling moves a month too. The owner calls reset() to come back to this
-// month.
+// either side, dimmed), today on a blue circle like a switch that's on,
+// weeks from Monday. Days with events (~/.local/bin/calendar-events, from the
+// Google calendars in ~/.config/calendar/urls) have an orange dot, like the
+// bar's clock's for new notifications. Scrolling moves a month too. The
+// owner calls reset() to come back to this month, which fetches the events
+// again if they're old.
 Rectangle {
     id: calendar
 
     property date today: new Date()
     property int month: today.getMonth()
     property int year: today.getFullYear()
+    // Days with events ("YYYY-MM-DD" -> true), and when they were fetched
+    property var events: ({})
+    property real fetched: 0
 
     function reset() {
         today = new Date();
         month = today.getMonth();
         year = today.getFullYear();
+        if (Date.now() - fetched > Theme.calendarRefresh && !fetcher.running)
+            fetcher.running = true;
+    }
+
+    function key(year, month, day) {
+        return year + "-" + String(month + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
     }
 
     // A month forwards (1) or back (-1)
@@ -34,6 +48,27 @@ Rectangle {
     height: rows.height + Theme.panelPadding
     radius: Theme.cornerRadius
     color: Theme.noteCardColor
+
+    Process {
+        id: fetcher
+
+        command: [Quickshell.env("HOME") + "/.local/bin/calendar-events"]
+        running: true
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const events = {};
+                    for (const day of JSON.parse(text))
+                        events[day] = true;
+                    calendar.events = events;
+                    calendar.fetched = Date.now();
+                } catch (error) {
+                    // Kept as they were; tried again next time it opens
+                }
+            }
+        }
+    }
 
     // Today moves on at midnight while it's open
     Timer {
@@ -156,7 +191,8 @@ Rectangle {
             implicitHeight: contentItem.implicitHeight
             month: calendar.month
             year: calendar.year
-            locale: Qt.locale()
+            // British English: weeks from Monday
+            locale: Qt.locale("en_GB")
 
             contentItem: Grid {
                 rows: 6
@@ -173,6 +209,7 @@ Rectangle {
 
                 required property var model
                 readonly property bool isToday: model.day === calendar.today.getDate() && model.month === calendar.today.getMonth() && model.year === calendar.today.getFullYear()
+                readonly property bool busy: calendar.events[calendar.key(model.year, model.month, model.day)] ?? false
 
                 width: grid.width / 7
                 height: Theme.calendarCellSize
@@ -194,6 +231,18 @@ Rectangle {
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.calendarFontSize
                     font.weight: day.isToday ? Theme.selectedWeight : Theme.fontWeight
+                }
+
+                // Under the number, just below today's circle
+                Rectangle {
+                    visible: day.busy
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    width: Theme.calendarDotSize
+                    height: width
+                    radius: width / 2
+                    color: Theme.accentColor
+                    opacity: day.model.month === calendar.month ? 1 : 0.6
                 }
             }
 
