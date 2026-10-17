@@ -258,7 +258,6 @@ Scope {
         id: menu
 
         shadow: true
-        sheen: false
         // The cards keep cardSpacing around them too
         panelPadding: Theme.cardSpacing
         card: windowCard

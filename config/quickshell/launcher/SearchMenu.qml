@@ -39,8 +39,6 @@ PanelWindow { // qmllint disable uncreatable-type
     property color panelColor: Theme.glassPanelColor
     // Space between the panel's edges and its content
     property int panelPadding: Theme.panelPadding
-    // Sheen over the panel background; off for a plain fill
-    property bool sheen: true
     // Delegate for a strip of cards instead of rows: one row across the
     // whole screen, sitting on the bar and scrolling sideways. Its root gets
     // the ListView's `modelData` and `index`; ListView.isCurrentItem marks
@@ -144,7 +142,6 @@ PanelWindow { // qmllint disable uncreatable-type
         floating: window.floating
         cornerRadius: window.cornerRadius
         fullWidth: window.strip
-        sheen: window.sheen
         color: window.panelColor
         anchors.left: parent.left
         anchors.bottom: parent.bottom

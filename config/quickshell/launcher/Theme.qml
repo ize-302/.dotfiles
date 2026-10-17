@@ -3,8 +3,8 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// Same glass as the status bar (config/waybar/style.css): translucent
-// #15161e with a sheen fading down and a lit edge. sway's
+// Same glass as the status bar (config/waybar/style.css): a neutral dark
+// tint with a faint hairline edge, white text. sway's
 // `layer_effects "launcher"` blurs what's behind.
 Singleton {
     // Proportional (Adwaita Sans is Inter); fontconfig fills in the Nerd Font
@@ -16,12 +16,12 @@ Singleton {
     // Fraction of the screen width
     readonly property real panelWidth: 0.22
     readonly property int panelPadding: 14
-    readonly property color panelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.96)
-    // The menus' panels, more see-through than the bar
-    readonly property color glassPanelColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.9)
-    readonly property color sheenTop: Qt.rgba(1, 1, 1, 0.05)
-    readonly property color sheenMiddle: Qt.rgba(1, 1, 1, 0.01)
-    readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.16)
+    // Small solid bits, like the scratchpad cards' close button
+    readonly property color panelColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.9)
+    // The menus' panels: the bar's tint, a little less see-through, as they
+    // hold more text
+    readonly property color glassPanelColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.7)
+    readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.12)
     // Top right corner of the menus, and the smaller things inside them
     readonly property int panelRadius: 4
     readonly property int cornerRadius: 4
@@ -34,9 +34,9 @@ Singleton {
     readonly property int searchFontSize: 14
     readonly property string searchIcon: ""
     readonly property string placeholder: "Search…"
-    readonly property color textColor: "#c0caf5"
-    readonly property color dimColor: "#565f89"
-    readonly property color dividerColor: "#414868"
+    readonly property color textColor: "#ffffff"
+    readonly property color dimColor: "#9a9a9a"
+    readonly property color dividerColor: Qt.rgba(1, 1, 1, 0.12)
     readonly property int searchPadding: 10
 
     // Results
@@ -48,12 +48,12 @@ Singleton {
     readonly property int iconSpacing: 10
     // macOS's system blue (dark mode), like a macOS menu's highlighted item
     readonly property color selectedColor: "#0a84ff"
-    // A lit key cap or button: a tint, like the bar's focused workspace button
-    readonly property color hoverColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.12)
+    // A lit key cap or button: a white tint
+    readonly property color hoverColor: Qt.rgba(1, 1, 1, 0.12)
 
-    // Key caps, tinted like the bar's workspace buttons
-    readonly property color keyColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.05)
-    readonly property color keyTextColor: "#a9b1d6"
+    // Key caps, a fainter white tint
+    readonly property color keyColor: Qt.rgba(1, 1, 1, 0.06)
+    readonly property color keyTextColor: "#cccccc"
     readonly property int keyFontSize: 13
     readonly property int keyHeight: 22
     readonly property int keyPadding: 7
@@ -197,7 +197,7 @@ Singleton {
     readonly property int capsLockPoll: 150
     readonly property string capsLockIcon: String.fromCodePoint(0xf0632)
     // Fainter than the menus' glass, and its edge
-    readonly property color capsLockColor: Qt.rgba(21 / 255, 22 / 255, 30 / 255, 0.55)
+    readonly property color capsLockColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
     readonly property color capsLockEdgeColor: Qt.rgba(1, 1, 1, 0.08)
 
     // The bar's height ("height" in config/waybar/config.jsonc), where
@@ -210,16 +210,12 @@ Singleton {
     readonly property int osdMargin: 24
     readonly property int osdTimeout: 1500
 
-    // Like the bar's volume: the clock's colour, more opaque the louder it
-    // gets, red past 100%, faintest when muted (config/waybar/style.css)
+    // Like the bar's volume: white, red past 100%, faint when muted
+    // (config/waybar/style.css)
     function volumeColor(volume, muted) {
         if (muted)
-            return Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.2);
-        if (volume > 1.005)
-            return closeColor;
-        const percent = Math.round(volume * 100);
-        const alpha = percent >= 71 ? 1 : percent >= 51 ? 0.75 : percent >= 31 ? 0.55 : 0.35;
-        return Qt.rgba(192 / 255, 202 / 255, 245 / 255, alpha);
+            return Qt.rgba(1, 1, 1, 0.3);
+        return volume > 1.005 ? closeColor : textColor;
     }
 
     // A volume slider's fill: blue like a switch that's on, red past 100%,

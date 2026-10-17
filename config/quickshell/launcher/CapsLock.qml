@@ -111,7 +111,6 @@ while True:
             height: Theme.capsLockSize
             // More see-through than the menus, plain, with a faint edge
             color: Theme.capsLockColor
-            sheen: false
             edgeColor: Theme.capsLockEdgeColor
 
             Column {

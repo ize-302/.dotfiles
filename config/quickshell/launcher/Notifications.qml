@@ -309,8 +309,6 @@ Scope {
                     readonly property list<NotificationAction> actions: (modelData?.actions ?? []).filter(action => action.identifier !== "default")
 
                     floating: true
-                    // A plain fill, no sheen
-                    sheen: false
                     width: cards.width
                     height: content.implicitHeight + Theme.panelPadding * 2
                     // No lit edge, except red on a critical one

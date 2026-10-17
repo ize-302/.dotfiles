@@ -1,19 +1,16 @@
 import QtQuick
 import qs
 
-// Panel background shared by the menus: translucent, with a sheen fading down
-// from the top and a lit top and right edge. Left and bottom touch the screen
-// edge and the bar, unless the panel is floating: then every corner is
-// rounded and every edge lit. A full width panel, like the bar, only has its
-// top edge lit and no rounded corner.
+// Panel background shared by the menus: translucent, with a lit top and right
+// edge. Left and bottom touch the screen edge and the bar, unless the panel
+// is floating: then every corner is rounded and every edge lit. A full width
+// panel, like the bar, only has its top edge lit and no rounded corner.
 Rectangle {
     id: glass
 
     property bool floating: false
     property int cornerRadius: Theme.panelRadius
     property bool fullWidth: false
-    // Fading sheen over the top; off leaves a plain fill
-    property bool sheen: true
     // The lit edge's colour; red for a critical notification
     property color edgeColor: Theme.edgeColor
 
@@ -51,27 +48,6 @@ Rectangle {
         }
     }
 
-    Rectangle {
-        visible: glass.sheen
-        anchors.fill: parent
-        radius: glass.radius
-        topLeftRadius: glass.topLeftRadius
-        topRightRadius: glass.topRightRadius
-        gradient: Gradient {
-            GradientStop {
-                position: 0
-                color: Theme.sheenTop
-            }
-            GradientStop {
-                position: 0.45
-                color: Theme.sheenMiddle
-            }
-            GradientStop {
-                position: 1
-                color: "transparent"
-            }
-        }
-    }
     // The lit edge is an outline that follows the corner; its sides on the
     // screen edge and the bar hang outside the panel and are clipped away
     // (unless floating)
