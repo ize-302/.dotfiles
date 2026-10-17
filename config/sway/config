@@ -156,6 +156,9 @@ exec paplay /usr/share/sounds/freedesktop/stereo/service-login.oga
 # Power menu
 bindsym $mod+Escape exec ~/.local/bin/power-menu
 
+# Next wallpaper now, rather than at the next 30 minutes
+bindsym $mod+Shift+w exec ~/.local/bin/wallpaper-rotate --next
+
 # Open a terminal
 bindsym $mod+Return exec $term
 
