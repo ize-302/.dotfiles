@@ -275,7 +275,7 @@ Singleton {
     readonly property string pomodoroIcon: String.fromCodePoint(0xf051b)
     readonly property string pomodoroBreakIcon: String.fromCodePoint(0xf0176)
 
-    // Calendar (Calendar.qml), at the bottom of the notification centre: each
+    // Calendar (Calendar.qml), at the bottom of the date panel: each
     // day's cell is calendarCellSize tall (and a seventh of the card wide)
     readonly property int calendarCellSize: 30
     readonly property int calendarFontSize: 12
@@ -320,8 +320,7 @@ Singleton {
     readonly property string bellIcon: String.fromCodePoint(0xf009a)
     readonly property string bellUnreadIcon: String.fromCodePoint(0xf116b)
     readonly property int notificationRowIconSize: 20
-    // Do not disturb, in the notification centre (and on the bar's clock,
-    // ~/.local/bin/clock-status)
+    // Do not disturb, in the notification centre (and on the bar's bell)
     readonly property string doNotDisturbIcon: String.fromCodePoint(0xf009b)
     // Do not disturb "until morning" ends at this hour
     readonly property int doNotDisturbMorning: 8

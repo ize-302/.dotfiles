@@ -19,11 +19,10 @@ import qs
 // runs the notification's default action, a right click or the × dismisses
 // it, and its other actions are key caps.
 //
-// The bar's clock shows an orange dot while there are new ones and a bell
-// with a line through it during do not disturb: this writes
-// $XDG_RUNTIME_DIR/notifications.json, which ~/.local/bin/clock-status
-// reads for waybar's custom/clock module, and signals it (SIGRTMIN+8) to
-// read it again.
+// The bar's bell (waybar's custom/notifications) has an orange dot while
+// there are new ones and a line through it during do not disturb: this
+// writes $XDG_RUNTIME_DIR/notifications.json and signals waybar
+// (SIGRTMIN+8) to read it again.
 Scope {
     id: root
 
@@ -199,8 +198,7 @@ Scope {
     onUnreadChanged: root.writeStatus()
     Component.onCompleted: root.writeStatus()
 
-    // { text, class }: the class ("unread", "dnd") is what the bar's clock
-    // goes by
+    // { text, class }: the bell, and "unread" or "dnd" for style.css
     function writeStatus() {
         const dot = unread > 0 ? `<span color='${Theme.accentColor}' size='small' rise='6pt'>●</span>` : "";
         status.setText(JSON.stringify({

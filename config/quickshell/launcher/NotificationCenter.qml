@@ -9,25 +9,24 @@ import Quickshell.Wayland
 import qs
 
 // Notification centre: the notifications kept by the server
-// (Notifications.qml), grouped by app, the app with the newest first, over a
-// month calendar (Calendar.qml). No panel: the title, each notification and
-// the calendar are cards of their own, like new notifications
-// (Notifications.qml) and as wide, floating just above the bar by the right
-// edge, like the control panel. Toggled by
+// (Notifications.qml), grouped by app, the app with the newest first. No
+// panel: the title and each notification are cards of their own, like new
+// notifications (Notifications.qml) and as wide, floating just above the bar
+// by the right edge, like the control panel. Toggled by
 // ~/.local/bin/notification-center
 // (`qs -c launcher ipc call notificationCenter toggleNotificationCenter`),
-// Super+Shift+N or a click on the bar's clock.
+// Super+Shift+N or a click on the bar's bell (waybar's custom/notifications).
 //
 // The title has a do not disturb key cap and Clear; while do not disturb is
 // on, a row under it says how long for: an hour, until morning, or until
 // it's turned off. Up and Down (or j and k) move between notifications,
 // Enter runs one's default action, Delete dismisses it, c clears them all,
-// d turns do not disturb on or off (h for an hour, m until morning), Left
-// and Right move the calendar a month, and Escape closes it. Scrolls when
+// d turns do not disturb on or off (h for an hour, m until morning), and
+// Escape closes it. Scrolls when
 // there are more than fit.
 //
-// Opened from the bar's clock (`notification-center --pointer`), it's
-// centred over the clock, kept on the screen; from the keyboard, it's at the
+// Opened from the bar's bell (`notification-center --pointer`), it's
+// centred over the bell, kept on the screen; from the keyboard, it's at the
 // right edge (like ControlPanel.qml).
 Scope {
     id: root
@@ -232,7 +231,6 @@ Scope {
 
             root.current = 0;
             flick.contentY = 0;
-            calendar.reset();
             content.forceActiveFocus();
             panel.appear();
         }
@@ -269,10 +267,6 @@ Scope {
                         root.server.setDoNotDisturb("hour");
                     } else if (event.key === Qt.Key_M && root.server) {
                         root.server.setDoNotDisturb("morning");
-                    } else if (event.key === Qt.Key_Left) {
-                        calendar.step(-1);
-                    } else if (event.key === Qt.Key_Right) {
-                        calendar.step(1);
                     } else if (count === 0) {
                         return;
                     } else if (event.key === Qt.Key_C) {
@@ -640,12 +634,6 @@ Scope {
                             }
                         }
                     }
-                }
-
-                // Under the notifications, just above the bar's clock
-                Calendar {
-                    id: calendar
-                    width: parent.width
                 }
             }
         }

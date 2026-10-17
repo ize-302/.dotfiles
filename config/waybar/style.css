@@ -86,6 +86,7 @@ window#waybar {
 #custom-pomodoro,
 #network,
 #bluetooth,
+#custom-notifications,
 #custom-clock,
 #custom-kernel {
   padding: 0 12px;
@@ -188,12 +189,21 @@ window#waybar {
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* The time, which opens the notification centre; brighter under the
+/* The bell, which opens the notification centre; faint during do not
+   disturb */
+#custom-notifications {
+  color: #ffffff;
+}
+#custom-notifications.dnd {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* The time, which opens the calendar and pomodoro timer; brighter under the
    mouse, like the icons before it */
 #custom-clock {
   color: #ffffff;
   font-size: 16px;
-  /* A short divider between it and bluetooth, half the bar's height: a 1px
+  /* A short divider between it and the bell, half the bar's height: a 1px
      background line, as a border or margin would make the bar taller */
   background-image: linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25));
   background-size: 1px 50%;

@@ -12,7 +12,8 @@ import qs
 // daemon serves the power menu (PowerMenu.qml), the clipboard menu
 // (ClipboardMenu.qml), the scratchpad menu (ScratchpadMenu.qml), the key
 // bindings menu (KeybindMenu.qml), the control panel (ControlPanel.qml), the
-// notification centre (NotificationCenter.qml), the volume popup (Osd.qml),
+// notification centre (NotificationCenter.qml), the date panel
+// (DatePanel.qml), the volume popup (Osd.qml),
 // the notifications
 // (Notifications.qml), the bluetooth pairing prompts (BluetoothAgent.qml)
 // the caps lock popup (CapsLock.qml), the bar's volume (BarVolume.qml) and
@@ -22,7 +23,7 @@ ShellRoot {
 
     // Desktop entry id -> times launched. Most used apps are listed first.
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, datePanel]
     readonly property bool anyOpen: menus.some(menu => menu.open)
     // Where the pointer was when a menu opened (x on its screen), from the
     // click catcher below, which appears under it, moved to the middle of the
@@ -223,6 +224,15 @@ ShellRoot {
         server: notifications
         onOpenChanged: if (open)
             root.closeOthers(notificationCenter)
+    }
+
+    DatePanel {
+        id: datePanel
+        pointerX: root.pointerX
+        pointerScreen: root.pointerScreen
+        pomodoro: pomodoro
+        onOpenChanged: if (open)
+            root.closeOthers(datePanel)
     }
 
     Pomodoro {

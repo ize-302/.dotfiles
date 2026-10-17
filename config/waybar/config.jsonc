@@ -17,6 +17,7 @@
 		"custom/pomodoro",
 		"network",
 		"bluetooth",
+		"custom/notifications",
 		"custom/clock"
 		// "custom/kernel"
 	],
@@ -183,14 +184,28 @@
 		"on-click-middle": "qs -c launcher ipc call pomodoro skip"
 	},
 
+	// A bell, with an orange dot while there are new notifications and a
+	// line through it during do not disturb. Quickshell writes it
+	// (config/quickshell/launcher/Notifications.qml) and signals SIGRTMIN+8
+	// on a change. Click opens the notification centre over it, right click
+	// turns do not disturb on or off.
+	"custom/notifications": {
+		"exec": "cat \"$XDG_RUNTIME_DIR/notifications.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
+		"return-type": "json",
+		"interval": "once",
+		"signal": 8,
+		"tooltip": false,
+		"on-click": "~/.local/bin/notification-center --pointer",
+		"on-click-right": "qs -c launcher ipc call notifications toggleDoNotDisturb"
+	},
+
 	"custom/clock": {
 		"exec": "~/.local/bin/clock-status",
 		"return-type": "json",
 		// The time over the date, lined up on the left
 		"justify": "left",
 		"interval": 10,
-		"signal": 8,
-		"on-click": "~/.local/bin/notification-center --pointer"
+		"on-click": "~/.local/bin/date-panel --pointer"
 	},
 
 	// Replaces nm-applet's tray icon: signal bars on Wi-Fi, filling in with
