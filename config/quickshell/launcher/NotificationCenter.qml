@@ -8,10 +8,10 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs
 
-// Notification centre: a month calendar (Calendar.qml) over the
-// notifications kept by the server (Notifications.qml), grouped by app, the
-// app with the newest first. No panel: the calendar, the title and each
-// notification are cards of their own, like new notifications
+// Notification centre: the notifications kept by the server
+// (Notifications.qml), grouped by app, the app with the newest first, over a
+// month calendar (Calendar.qml). No panel: the title, each notification and
+// the calendar are cards of their own, like new notifications
 // (Notifications.qml) and as wide, floating just above the bar by the right
 // edge, like the control panel. Toggled by
 // ~/.local/bin/notification-center
@@ -289,11 +289,6 @@ Scope {
                         return;
                     }
                     event.accepted = true;
-                }
-
-                Calendar {
-                    id: calendar
-                    width: parent.width
                 }
 
                 // The title card: the title and how many there are, then a
@@ -645,6 +640,12 @@ Scope {
                             }
                         }
                     }
+                }
+
+                // Under the notifications, just above the bar's clock
+                Calendar {
+                    id: calendar
+                    width: parent.width
                 }
             }
         }

@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Templates as T
 import qs
 
-// Month view at the top of the notification centre, on a card like its
+// Month view at the bottom of the notification centre, on a card like its
 // title's: the month and year with arrows to the month before and after,
 // the days of the week, and the month's days (with the ends of the months
 // either side, dimmed), today on a blue circle like a switch that's on.
