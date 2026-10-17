@@ -32,6 +32,8 @@ QtObject {
     readonly property color menuTextColor: "white"
     readonly property color menuSoftTextColor: "#cccccc"
     readonly property int menuSelectedWeight: Font.DemiBold
+    // Under the picked row: the launcher's faint white tint
+    readonly property color menuCurrentRowColor: Qt.rgba(1, 1, 1, 0.08)
 
     readonly property color textColor: "#c0caf5"
     readonly property color dimColor: "#565f89"

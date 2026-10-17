@@ -137,7 +137,7 @@ Scope {
 
                         width: Math.max(Theme.powerTileWidth, Math.ceil(longest.widest) + Theme.rowPadding * 2)
                         height: tile.height + Theme.powerTilePadding * 2
-                        color: "transparent"
+                        color: row.selected ? Theme.currentRowColor : "transparent"
                         radius: Theme.cornerRadius
 
                         Column {

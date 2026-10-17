@@ -232,6 +232,18 @@ Column {
         width: parent.width
         height: entry.kind === "media" ? mediaView.implicitHeight + Theme.rowSpacing * 2 : Theme.rowHeight
 
+        // A faint tint under the row the keys or the mouse are on. A page's
+        // rows run flush with its title, so there it reaches into the
+        // panel's padding to leave room around the text.
+        Rectangle {
+            anchors.fill: parent
+            anchors.leftMargin: panel.page !== "" ? -Theme.rowPadding : 0
+            anchors.rightMargin: panel.page !== "" ? -Theme.rowPadding : 0
+            visible: entry.active && !entry.passive
+            radius: Theme.cornerRadius
+            color: Theme.currentRowColor
+        }
+
         MouseArea {
             id: rowMouse
 

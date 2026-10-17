@@ -52,6 +52,8 @@ Singleton {
     readonly property int selectedWeight: Font.DemiBold
     readonly property int unselectedWeight: Font.Normal
     readonly property color unselectedColor: keyTextColor
+    // Under the row the keys or the mouse are on: a faint white tint
+    readonly property color currentRowColor: Qt.rgba(1, 1, 1, 0.08)
     // A lit key cap or button: a white tint
     readonly property color hoverColor: Qt.rgba(1, 1, 1, 0.12)
 

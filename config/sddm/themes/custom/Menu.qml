@@ -5,7 +5,7 @@ import "."
 
 // A list to pick from, over everything: the launcher's rows on its glass,
 // the one under the pointer or picked with the arrow keys white and
-// semibold; it starts on the current one. Opens above or below `anchor`, and
+// semibold over a faint tint; it starts on the current one. Opens above or below `anchor`, and
 // closes on Escape, a click outside or a pick.
 Item {
     id: menu
@@ -102,7 +102,7 @@ Item {
                     width: list.width
                     height: Theme.rowHeight
                     radius: Theme.rowRadius
-                    color: "transparent"
+                    color: lit ? Theme.menuCurrentRowColor : "transparent"
 
                     Text {
                         id: glyph

@@ -309,7 +309,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
                         width: list.width
                         height: Theme.rowHeight
-                        color: "transparent"
+                        color: ListView.isCurrentItem ? Theme.currentRowColor : "transparent"
                         radius: Theme.cornerRadius
 
                         Row {
