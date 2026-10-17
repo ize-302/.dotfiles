@@ -269,8 +269,7 @@ Scope {
 
         // Showing it puts it on the current workspace and tiling it takes it
         // out of the scratchpad; then it moves to an empty workspace, and
-        // focus follows. It arrives before the workspace is focused, so
-        // workspace-menu doesn't open the app launcher there.
+        // focus follows.
         onAccepted: entry => {
             const workspace = root.emptyWorkspace();
             Quickshell.execDetached(["swaymsg", `[con_id=${entry.id}] scratchpad show, floating disable, move container to workspace number ${workspace}, workspace number ${workspace}`]);
