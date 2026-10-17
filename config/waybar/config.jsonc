@@ -136,7 +136,7 @@
 
 	"backlight": {
 		"device": "intel_backlight",
-		"format": "☀️{percent}%",
+		"format": "󰖨 {percent}%",
 		"tooltip": false
 	},
 
