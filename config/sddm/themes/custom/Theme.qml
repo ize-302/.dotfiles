@@ -24,11 +24,14 @@ QtObject {
 
     // Glass (Glass.qml), more opaque than the lock's over a plain background
     readonly property color glassColor: Qt.rgba(1, 1, 1, 0.04)
-    readonly property color sheenTop: Qt.rgba(1, 1, 1, 0.05)
-    readonly property color sheenMiddle: Qt.rgba(1, 1, 1, 0.01)
     readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.16)
     // The menus over the screen: the launcher's glass panels
-    readonly property color menuColor: Qt.rgba(26 / 255, 27 / 255, 38 / 255, 0.98)
+    // (config/quickshell/launcher/Theme.qml), white text, the picked row
+    // white and semibold and the rest a little softer
+    readonly property color menuColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.7)
+    readonly property color menuTextColor: "white"
+    readonly property color menuSoftTextColor: "#cccccc"
+    readonly property int menuSelectedWeight: Font.DemiBold
 
     readonly property color textColor: "#c0caf5"
     readonly property color dimColor: "#565f89"
@@ -105,7 +108,7 @@ QtObject {
     readonly property string shutDownIcon: String.fromCodePoint(0xf0425)
     readonly property int powerIconSize: 20
 
-    // The user and session menus: the launcher's rows, the selected one blue
+    // The user, session and power menus: the launcher's rows
     readonly property int menuRadius: 8
     readonly property int menuPadding: 6
     readonly property int menuWidth: 220

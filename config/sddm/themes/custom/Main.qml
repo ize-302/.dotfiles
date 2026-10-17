@@ -543,7 +543,7 @@ Rectangle {
         centred: false
         items: root.powerActions.map(action => action.label)
         icons: root.powerActions.map(action => action.icon)
-        // Nothing to tick
+        // Nothing is current: starts on the first
         currentIndex: -1
         onPicked: index => root.powerActions[index].run()
         onVisibleChanged: {

@@ -4,9 +4,9 @@ import QtQuick
 import "."
 
 // A list to pick from, over everything: the launcher's rows on its glass,
-// the one under the pointer or picked with the arrow keys blue, a tick by
-// the current one. Opens above or below `anchor`, and closes on Escape, a
-// click outside or a pick.
+// the one under the pointer or picked with the arrow keys white and
+// semibold; it starts on the current one. Opens above or below `anchor`, and
+// closes on Escape, a click outside or a pick.
 Item {
     id: menu
 
@@ -102,7 +102,7 @@ Item {
                     width: list.width
                     height: Theme.rowHeight
                     radius: Theme.rowRadius
-                    color: lit ? Theme.selectedColor : "transparent"
+                    color: "transparent"
 
                     Text {
                         id: glyph
@@ -112,34 +112,23 @@ Item {
                         width: visible ? Theme.iconSize + Theme.keySpacing : 0
                         visible: text !== ""
                         text: menu.icons[row.index] ?? ""
-                        color: row.lit ? "white" : Theme.softTextColor
+                        color: row.lit ? Theme.menuTextColor : Theme.menuSoftTextColor
                         font.pixelSize: Theme.iconSize
                         font.family: Theme.fontFamily
                     }
 
                     Text {
                         anchors.left: glyph.visible ? glyph.right : parent.left
-                        anchors.right: tick.left
+                        anchors.right: parent.right
                         anchors.leftMargin: glyph.visible ? 0 : Theme.rowPadding
                         anchors.rightMargin: Theme.rowPadding
                         anchors.verticalCenter: parent.verticalCenter
                         text: row.modelData
                         elide: Text.ElideRight
-                        color: row.lit ? "white" : Theme.textColor
+                        color: row.lit ? Theme.menuTextColor : Theme.menuSoftTextColor
                         font.pixelSize: Theme.inputFontSize
                         font.family: Theme.fontFamily
-                    }
-
-                    Text {
-                        id: tick
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.rowPadding
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: row.index === menu.currentIndex
-                        text: Theme.checkIcon
-                        color: row.lit ? "white" : Theme.softTextColor
-                        font.pixelSize: Theme.keyFontSize
-                        font.family: Theme.fontFamily
+                        font.weight: row.lit ? Theme.menuSelectedWeight : Font.Normal
                     }
 
                     MouseArea {

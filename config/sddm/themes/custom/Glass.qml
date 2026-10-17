@@ -1,9 +1,9 @@
 import QtQuick
 import "."
 
-// The lock screen's floating glass (config/quickshell/lock/Glass.qml):
-// translucent, rounded, with a sheen fading down from the top and a lit edge
-// all round. Rises into place with appear().
+// The lock screen's floating glass (config/quickshell/lock/Glass.qml), without
+// its sheen, like the launcher's: translucent, rounded, with a lit edge all
+// round. Rises into place with appear().
 Rectangle {
     id: glass
 
@@ -37,25 +37,6 @@ Rectangle {
             from: 0
             to: 1
             duration: Theme.animationDuration
-        }
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: glass.radius
-        gradient: Gradient {
-            GradientStop {
-                position: 0
-                color: Theme.sheenTop
-            }
-            GradientStop {
-                position: 0.45
-                color: Theme.sheenMiddle
-            }
-            GradientStop {
-                position: 1
-                color: "transparent"
-            }
         }
     }
 
