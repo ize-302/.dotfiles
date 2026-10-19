@@ -51,3 +51,5 @@ cat() {
 		command cat "$@"
 	fi
 }
+
+alias fastfetch='fastfetch --data-raw " " --logo-padding 0'
