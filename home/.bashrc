@@ -81,9 +81,6 @@ eval "$(thefuck --alias)"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# fastfetch: Show system info on terminal launch
-fastfetch
-
 ##===================
 ## Sounds
 ##===================
