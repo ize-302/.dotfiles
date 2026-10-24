@@ -214,3 +214,5 @@ symbol = " "
 
 [gradle]
 symbol = " "
+
+scan_timeout = 100
