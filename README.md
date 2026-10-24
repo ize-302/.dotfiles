@@ -2,7 +2,7 @@
 
 This directory contains my personal .dotfiles: editor, shell, terminal and tool configs.
 
-The desktop itself (Sway, waybar, the Quickshell shell and lock screen, GTK, the SDDM theme and their scripts) is its own project, **swarch**, in `~/swarch`. Install it first; this repo only adds this machine's settings on top (`config/sway/config.d/`).
+The desktop itself (mango, waybar, the Quickshell shell, GTK, the SDDM theme and their scripts) is its own project, **mangifera**, in `~/mangifera`. Install it first; this repo only adds this machine's settings on top (`config/mango/local.conf`).
 
 The old Xorg/i3 configs are kept as a frozen backup in [.dotfiles-i3](https://github.com/ize-302/.dotfiles-i3) (tag `pre-wayland-only` here marks the last commit that carried them).
 
@@ -10,7 +10,7 @@ The old Xorg/i3 configs are kept as a frozen backup in [.dotfiles-i3](https://gi
 
 ## Layout
 
-- `config/` — everything that lands in `~/.config`: nvim, tmux, wezterm, yazi, opencode, hop, starship, fastfetch, auto-cpufreq, and `sway/config.d/` (this machine's displays, read by swarch's sway config)
+- `config/` — everything that lands in `~/.config`: nvim, tmux, wezterm, yazi, opencode, hop, starship, auto-cpufreq, and `mango/local.conf` (this machine's displays, read last by mangifera's mango config)
 - `home/` — everything that lands directly in `$HOME`: `.bashrc`, `.bash_aliases`, `.gitconfig`
 
 ## Requirements

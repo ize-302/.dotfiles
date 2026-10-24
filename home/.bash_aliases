@@ -22,7 +22,7 @@ alias abeg="sudo"
 alias nv="nvim"
 
 # switch to use only external display
-alias solo-hdmi="swaymsg output eDP-1 disable"
+alias solo-hdmi="wlr-randr --output eDP-1 --off"
 
 # gparted
 alias gparted="sudo gparted"
