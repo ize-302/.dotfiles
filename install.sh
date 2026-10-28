@@ -22,6 +22,13 @@ if [ -d /etc/sddm.conf.d ]; then
   sudo install -Dm644 etc/sddm.conf.d/scale.conf /etc/sddm.conf.d/scale.conf
 fi
 
+# auto-cpufreq's daemon runs as root and never reads ~/.config, only /etc
+if command -v auto-cpufreq >/dev/null; then
+  echo "[+] Installing auto-cpufreq config..."
+  sudo install -Dm644 config/auto-cpufreq/auto-cpufreq.conf /etc/auto-cpufreq.conf
+  sudo systemctl restart auto-cpufreq
+fi
+
 # Reload shell once installed
 echo "[+] Reloading shell..."
 exec $SHELL -l
