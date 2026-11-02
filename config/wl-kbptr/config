@@ -1,2 +1,7 @@
 [general]
 modes=tile,split
+# Exactly 11 keys: 8 bisect sub-area keys, then left, right, middle click.
+# Split mode checks click keys before its hjkl/wasd moves, so a=left,
+# s=middle, d=right click here and hjkl alone move. The first 8 are unused
+# (no bisect) but must not repeat a/s/d: the first match wins.
+home_row_keys=qwertyuiads
