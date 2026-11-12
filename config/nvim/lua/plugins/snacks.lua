@@ -76,7 +76,16 @@ end, { desc = "Goto Implementation" })
 vim.keymap.set("n", "gy", function()
 	Snacks.picker.lsp_type_definitions()
 end, { desc = "Goto Type Definition" })
-vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover Documentation" })
+-- Sized like Zed's hover popover: up to 120 columns and 16 lines, capped at
+-- half the window, never under 20 columns or 4 lines. The solid border
+-- stands in for Zed's padding; its colors come from NormalFloat/FloatBorder.
+vim.keymap.set("n", "K", function()
+	vim.lsp.buf.hover({
+		border = "solid",
+		max_width = math.max(20, math.min(120, math.floor(vim.api.nvim_win_get_width(0) / 2))),
+		max_height = math.max(4, math.min(16, math.floor(vim.api.nvim_win_get_height(0) / 2))),
+	})
+end, { desc = "Hover Documentation" })
 vim.keymap.set("n", "<leader>ds", function()
 	Snacks.picker.lsp_symbols()
 end, { desc = "Document Symbols" })

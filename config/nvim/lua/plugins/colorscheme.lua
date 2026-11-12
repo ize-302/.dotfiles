@@ -63,6 +63,9 @@ tokyonight.setup({
 				hl[group] = spec
 			end
 		end
+		-- Zed's popovers sit on elevated_surface.background.
+		hl.NormalFloat = vim.tbl_extend("force", hl.NormalFloat or {}, { fg = "#a9b1d6", bg = "#14141b" })
+		hl.FloatBorder = vim.tbl_extend("force", hl.FloatBorder or {}, { bg = "#14141b" })
 	end,
 })
 
