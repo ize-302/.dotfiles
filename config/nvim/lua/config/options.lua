@@ -19,7 +19,7 @@ vim.opt.mouse = "a"
 
 -- sync clipboard between os and neovim
 vim.schedule(function()
-  vim.opt.clipboard = "unnamedplus"
+	vim.opt.clipboard = "unnamedplus"
 end)
 
 vim.opt.splitright = true
@@ -32,10 +32,10 @@ vim.opt.termguicolors = true
 vim.opt.signcolumn = "yes"
 
 -- how many spaces per tab
-vim.o.tabstop = 2
+vim.o.tabstop = 4
 
 -- how many spaces per shift
-vim.o.shiftwidth = 2
+vim.o.shiftwidth = 4
 
 -- highlight line where cursor is
 vim.o.cursorline = true
@@ -58,4 +58,3 @@ vim.opt.textwidth = 80
 vim.opt.linebreak = true
 vim.opt.list = false
 vim.opt.formatoptions:append("t")
-
