@@ -122,3 +122,7 @@ if [ -d "$ZVM_INSTALL" ]; then
 	export PATH="$PATH:$HOME/.zvm/bin"
 	export PATH="$PATH:$ZVM_INSTALL"
 fi
+
+# Android SDK
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools"
